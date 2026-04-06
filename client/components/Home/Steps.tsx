@@ -7,7 +7,7 @@ export default function Steps() {
     const router = useRouter();
 
     return (
-        <div className="py-10">
+        <div className="py-10 px-5 bg-secondary">
             <p className="text-sm text-center font-bold text-primary mb-7 md:mb-14">
                     GET STARTED EASILY
                 </p>

@@ -129,7 +129,7 @@ export default function LoginPage() {
                         <div className="my-6 border-t-2 border-black"></div>
                         <p className="text-sm text-center">
                             New here?{" "}
-                            <span className="text-primary font-bold cursor-pointer" onClick={() => router.push("/signup")}>
+                            <span className="text-primary font-bold cursor-pointer" onClick={() => router.push("/auth/register")}>
                                 Create account
                             </span>
                         </p>

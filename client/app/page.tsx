@@ -1,6 +1,5 @@
 "use client";
 
-import Comparision from "@/components/Home/Comparision";
 import CTA from "@/components/Home/CTA";
 import Footer from "@/components/Home/Footer";
 import Hero from "@/components/Home/Hero";
@@ -18,7 +17,6 @@ export default function Home() {
       <Hero/>
       <Steps/>
       <Preview/>
-      <Comparision/>
       <CTA/>
       <Footer/>
     </div>

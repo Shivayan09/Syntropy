@@ -1,5 +1,6 @@
 "use client"
 
+import { ArrowBigDown, ArrowDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Hero() {
@@ -7,14 +8,14 @@ export default function Hero() {
     const router = useRouter();
 
     return (
-        <section className="mx-auto md:h-[85vh] py-10 md:px-10 flex flex-col md:flex-row items-center gap-10 md:gap-0">
+        <section className="mx-auto md:h-screen py-10 px-5 md:px-10 flex flex-col md:flex-row items-center gap-10 md:gap-0">
             <div className="text-left w-full md:w-1/2">
                 <p className="text-sm font-bold text-primary mb-3">
                     MOCK TEST PLATFORM
                 </p>
 
                 <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
-                    Stop Guessing <br/> <span className="text-primary">Start Improving</span>
+                    Stop Guessing <br /> <span className="text-primary">Start Improving</span>
                 </h1>
 
                 <p className="text-lg mb-8 text-gray-600 max-w-md">
@@ -22,7 +23,7 @@ export default function Hero() {
                 </p>
 
                 <div className="flex gap-4 text-sm md:text-[1rem]">
-                    <button onClick={() => router.push("/dashboard")}>Start Testing</button>
+                    <button onClick={() => router.push("/main/dashboard")}>Start Testing</button>
                     <button
                         className="button-secondary"
                         onClick={() => router.push("/profile")}
@@ -73,10 +74,13 @@ export default function Hero() {
 
                 <button
                     className="mt-6 w-full"
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => router.push("/main/dashboard")}
                 >
                     View Full Analysis
                 </button>
+            </div>
+            <div className="absolute bottom-10 left-1/2 p-3 bg-secondary rounded-full animate-bounce">
+                <ArrowDown className="opacity-70"/>
             </div>
         </section>
     );

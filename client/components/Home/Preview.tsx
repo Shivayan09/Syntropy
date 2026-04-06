@@ -7,7 +7,7 @@ export default function Preview() {
     const router = useRouter();
 
     return (
-        <section className="py-10 md:py-20 md:px-10">
+        <section className="py-10 px-5 md:px-10">
 
             <div className="text-center max-w-2xl mx-auto mb-10 md:mb-16">
                 <p className="text-sm font-bold text-primary mb-3">
