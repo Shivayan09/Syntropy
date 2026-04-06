@@ -3,18 +3,68 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function RegisterPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
 
+    const [loading, setLoading] = useState(false);
+
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        phoneNumber: "",
+        password: "",
+        confirmPassword: ""
+    });
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
     const next = () => setStep((s) => Math.min(s + 1, 3));
     const back = () => setStep((s) => Math.max(s - 1, 1));
+
+    const handleRegister = async () => {
+        if (form.password !== form.confirmPassword) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const res = await fetch(BACKEND_URL + "/api/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    name: form.name,
+                    email: form.email,
+                    phoneNumber: form.phoneNumber,
+                    password: form.password
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.warn(data.message)
+                return;
+            }
+            toast.success("Account created successfully")
+            router.replace("/main/dashboard");
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err)
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className="min-h-screen flex">
 
-            {/* LEFT SIDE — SAME AS LOGIN */}
+            {/* LEFT SIDE */}
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-neutral-100 border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
@@ -25,7 +75,7 @@ export default function RegisterPage() {
                 </div>
 
                 <h1 className="text-5xl font-extrabold leading-tight mb-6">
-                    Stop guessing <br /> 
+                    Stop guessing <br />
                     <span className="text-primary">Start improving</span>
                 </h1>
 
@@ -87,17 +137,15 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            {/* RIGHT SIDE — MULTI STEP REGISTER */}
+            {/* RIGHT SIDE */}
             <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">
 
                 <div className="w-full max-w-md relative">
 
-                    {/* Offset shadow */}
                     <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
 
                     <div className="card bg-surface">
 
-                        {/* Header */}
                         <div className="mb-6 text-center">
                             <p className="text-sm font-bold text-primary mb-1">
                                 CREATE ACCOUNT
@@ -107,7 +155,6 @@ export default function RegisterPage() {
                             </h2>
                         </div>
 
-                        {/* Progress Bar */}
                         <div className="w-full h-2 bg-secondary mb-6 border-2 border-black">
                             <div
                                 className="h-full bg-primary"
@@ -118,9 +165,30 @@ export default function RegisterPage() {
                         {/* STEP 1 */}
                         {step === 1 && (
                             <div className="space-y-4">
-                                <input type="text" placeholder="Full Name" className="w-full" />
-                                <input type="email" placeholder="Email" className="w-full" />
-                                <input type="tel" placeholder="Phone Number" className="w-full" />
+
+                                <input
+                                    type="text"
+                                    placeholder="Full Name"
+                                    className="w-full"
+                                    value={form.name}
+                                    onChange={(e)=>setForm({...form, name: e.target.value})}
+                                />
+
+                                <input
+                                    type="email"
+                                    placeholder="Email"
+                                    className="w-full"
+                                    value={form.email}
+                                    onChange={(e)=>setForm({...form, email: e.target.value})}
+                                />
+
+                                <input
+                                    type="tel"
+                                    placeholder="Phone Number"
+                                    className="w-full"
+                                    value={form.phoneNumber}
+                                    onChange={(e)=>setForm({...form, phoneNumber: e.target.value})}
+                                />
 
                                 <button className="w-full" onClick={next}>
                                     Continue
@@ -161,26 +229,34 @@ export default function RegisterPage() {
                                     type="password"
                                     placeholder="Password"
                                     className="w-full"
+                                    value={form.password}
+                                    onChange={(e)=>setForm({...form, password: e.target.value})}
                                 />
 
                                 <input
                                     type="password"
                                     placeholder="Confirm Password"
                                     className="w-full"
+                                    value={form.confirmPassword}
+                                    onChange={(e)=>setForm({...form, confirmPassword: e.target.value})}
                                 />
 
                                 <div className="flex gap-3">
                                     <button className="button-secondary w-1/2" onClick={back}>
                                         Back
                                     </button>
-                                    <button className="w-1/2">
-                                        Create Account
+
+                                    <button
+                                        className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        onClick={handleRegister}
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Creating..." : "Create Account"}
                                     </button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Footer */}
                         <div className="mt-6 border-t-2 border-black pt-4 text-center text-xs">
                             Already have an account?{" "}
                             <span
@@ -190,6 +266,7 @@ export default function RegisterPage() {
                                 Login
                             </span>
                         </div>
+
                     </div>
                 </div>
             </div>

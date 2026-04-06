@@ -2,9 +2,44 @@
 
 import { useRouter } from "next/navigation";
 import { Target, TrendingUp, BarChart3 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
+
     const router = useRouter();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            setLoading(true);
+            const res = await fetch(BACKEND_URL + "/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email, password }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.warn(data.message)
+                return;
+            } else {
+                toast.success("Logged in successfully")
+                router.push("/main/dashboard");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className="min-h-screen flex">
@@ -89,7 +124,7 @@ export default function LoginPage() {
                                 Login to continue
                             </h2>
                         </div>
-                        <form className="space-y-5">
+                        <form className="space-y-5" onSubmit={handleLogin}>
 
                             <div>
                                 <label className="text-sm font-bold mb-1 block">
@@ -99,6 +134,8 @@ export default function LoginPage() {
                                     type="email"
                                     placeholder="you@example.com"
                                     className="w-full"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
 
@@ -110,19 +147,22 @@ export default function LoginPage() {
                                     type="password"
                                     placeholder="••••••••"
                                     className="w-full"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
 
                             <div className="flex justify-between text-sm">
-                                <span
-                                    className="text-primary cursor-pointer font-semibold"
-                                    onClick={() => router.push("/forgot-password")}
-                                >
+                                <span className="text-primary cursor-pointer font-semibold" onClick={() => router.push("/forgot-password")}>
                                     Forgot password?
                                 </span>
                             </div>
 
-                            <button className="w-full">
+                            <button
+                                disabled={loading}
+                                className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                type="submit"
+                            >
                                 Login
                             </button>
                         </form>

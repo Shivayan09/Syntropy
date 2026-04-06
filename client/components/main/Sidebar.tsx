@@ -1,8 +1,9 @@
 "use client";
 
-import { BarChart3, BookOpen, LayoutDashboard, LogOut, Menu, X } from "lucide-react";
+import { BarChart3, BookOpen, LayoutDashboard, LogOut, Menu, User2, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -21,6 +22,21 @@ export default function Sidebar() {
   const navigate = (path: string) => {
     router.push(path);
     setOpen(false);
+  };
+
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+  const handleLogout = async () => {
+    try {
+      await fetch(BACKEND_URL + "/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      toast.success("Logged out successfully");
+      router.push("/auth/login");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -69,10 +85,15 @@ export default function Sidebar() {
               Analytics
             </div>
 
+            <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
+              <User2 size={18} />
+              Profile
+            </div>
+
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={() => navigate("/login")}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={handleLogout}>
           <LogOut size={18} />
           Logout
         </div>
@@ -106,10 +127,15 @@ export default function Sidebar() {
               Analytics
             </div>
 
+            <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
+              <User2 size={18} />
+              Profile
+            </div>
+
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={() => router.push("/login")}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={handleLogout}>
           <LogOut size={18} />
           Logout
         </div>

@@ -104,7 +104,7 @@ export default function Dashboard() {
 
         <div className="w-full md:w-1/3 md:pl-10">
           <h3 className="font-bold text-2xl mb-4">
-            Recent Tests
+            Overall Stats
           </h3>
           <div className="card2 bg-white">
             <p className="text-sm text-gray-600">
