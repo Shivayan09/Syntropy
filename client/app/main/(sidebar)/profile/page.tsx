@@ -8,7 +8,7 @@ type UserForm = {
   email: string;
   phone: string;
   avatar: string;
-  
+
   college: string;
   semester: string;
   targetRole: string;
@@ -25,6 +25,7 @@ export default function Profile() {
   const [form, setForm] = useState<UserForm | null>(null);
   const [dirty, setDirty] = useState(false);
   const [subjectInput, setSubjectInput] = useState("");
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -33,7 +34,7 @@ export default function Profile() {
       name: user.name || "",
       email: user.email || "",
       phone: user.phoneNumber || "",
-      avatar: user.avatar || "/avatar.png",
+      avatar: user.avatar || "",
 
       college: user.college || "",
       semester: user.semester?.toString() || "",
@@ -75,7 +76,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="mx-auto px-4 md:px-10 py-8 max-w-5xl">
+    <div className="mx-auto px-5 pt-20 md:pt-8 md:px-10 py-8">
 
       {/* HEADER */}
       <div className="mb-10">
@@ -86,11 +87,20 @@ export default function Profile() {
       </div>
 
       {/* AVATAR */}
-      <div className="flex items-center gap-6 mb-12">
-        <img
-          src={form.avatar}
-          className="w-20 h-20 rounded-full object-cover"
-        />
+      <div className="flex items-center gap-6 mb-10">
+        <div className="relative w-24 h-24">
+
+          {!imgLoaded && (
+            <div className="absolute inset-0 rounded-full bg-gray-200 animate-pulse flex items-center justify-center text-xs text-gray-500">
+              photo
+            </div>
+          )}
+
+          <img
+            src={form.avatar || `https://picsum.photos/seed/${encodeURIComponent(form.email || form.name || "user")}/200`}
+            onLoad={() => setImgLoaded(true)}
+            className={`w-24 h-24 rounded-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}/>
+        </div>
 
         <div>
           <p className="font-bold text-lg">{form.name}</p>
@@ -103,7 +113,7 @@ export default function Profile() {
       </div>
 
       {/* ACCOUNT */}
-      <section className="mb-12">
+      <section className="mb-8 card2">
         <p className="font-bold mb-4">Account</p>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -134,7 +144,7 @@ export default function Profile() {
       </section>
 
       {/* EDUCATION */}
-      <section className="mb-12">
+      <section className="mb-8 card2">
         <p className="font-bold mb-4">Educational Info</p>
 
         <div className="grid md:grid-cols-3 gap-4">
@@ -154,7 +164,7 @@ export default function Profile() {
             }
           >
             <option value="">Semester</option>
-            {[1,2,3,4,5,6,7,8].map((s)=>(
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
               <option key={s}>{s}</option>
             ))}
           </select>
@@ -177,7 +187,7 @@ export default function Profile() {
       </section>
 
       {/* TEST PREFERENCES */}
-      <section className="mb-12">
+      <section className="mb-8 card2">
         <p className="font-bold mb-4">Test Preferences</p>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -209,7 +219,7 @@ export default function Profile() {
       </section>
 
       {/* SUBJECTS */}
-      <section className="mb-16">
+      <section className="mb-10 card2">
         <p className="font-bold mb-4">Subjects</p>
 
         <div className="flex items-center gap-5 mb-3">

@@ -3,12 +3,13 @@
 import { useRouter } from "next/navigation";
 import { Target, TrendingUp, BarChart3 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 
 export default function LoginPage() {
 
     const router = useRouter();
-
+    const { getMe } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -30,12 +31,13 @@ export default function LoginPage() {
                 toast.warn(data.message)
                 return;
             } else {
+                await getMe();
                 toast.success("Logged in successfully")
                 router.push("/main/dashboard");
             }
-        } catch (error) {
+        } catch (error:any) {
             console.error(error);
-            alert("Something went wrong");
+            toast.error(error)
         } finally {
             setLoading(false);
         }

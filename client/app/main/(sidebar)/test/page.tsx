@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
 
 export default function TestsPage() {
     const router = useRouter();
@@ -38,8 +38,23 @@ export default function TestsPage() {
                     </p>
                 </div>
 
-                <button onClick={() => router.push("/main/tests/create")}>
+                <button className="w-32" onClick={() => router.push("/main/test/generate")}>
                     Generate
+                </button>
+            </div>
+            <div className="card2 mb-6 flex justify-between items-center">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <BookOpen size={16} />
+                        <p className="font-bold">Manual Test Builder</p>
+                    </div>
+                    <p className="text-sm text-gray-600">
+                        Create a custom test with your own questions
+                    </p>
+                </div>
+
+                <button className="w-32" onClick={() => router.push("/main/test/create")}>
+                    Create
                 </button>
             </div>
 
@@ -84,7 +99,7 @@ export default function TestsPage() {
                             onClick={() => router.push(`/main/tests/${test.id}`)}
                         >
                             Attempt
-                            <ArrowRight className="group-hover:translate-x-1 transition-all duration-200"/>
+                            <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
                         </button>
                     </div>
                 ))}

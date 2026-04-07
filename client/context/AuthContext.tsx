@@ -6,13 +6,10 @@ type User = {
   _id: string;
   name: string;
   email: string;
-
   phoneNumber?: string;
   avatar?: string;
-
   college?: string;
   semester?: number;
-
   preferences?: {
     subjects?: string[];
     difficulty?: "Easy" | "Medium" | "Hard";
@@ -35,13 +32,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getMe = async () => {
     try {
-      const res = await fetch(
-        process.env.NEXT_PUBLIC_BACKEND_URL + "/api/getMe",
+      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/getMe",
         {
           credentials: "include",
         }
       );
-
       if (!res.ok) {
         setUser(null);
       } else {
@@ -51,7 +46,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       setUser(null);
     }
-
     setLoading(false);
   };
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import { BarChart3, BookOpen, LayoutDashboard, LogOut, Menu, User2, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -9,6 +10,7 @@ export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { getMe } = useAuth();
 
   const isActive = (path: string) => pathname.startsWith(path);
 
@@ -32,6 +34,7 @@ export default function Sidebar() {
         method: "POST",
         credentials: "include",
       });
+      await getMe();
       toast.success("Logged out successfully");
       router.push("/auth/login");
     } catch (error) {
