@@ -5,7 +5,7 @@ const questionSchema = new mongoose.Schema({
     options: { type: [String], required: true, validate: v => v.length === 4 },
     correctAnswer: { type: Number, required: true },
     explanation: { type: String, default: "" },
-    subject: { type: String, required: true, default: null },
+    subject: { type: String, default: null },
     difficulty: { type: String, enum: ["Easy", "Medium", "Hard"] },
     topic: String
 });

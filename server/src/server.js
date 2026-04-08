@@ -5,6 +5,8 @@ import authRouter from "./routes/auth.routes.js";
 import connectDB from "./config/mongodb.js";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.js";
+import testRouter from "./routes/test.routes.js";
+import attemptRouter from "./routes/attempt.routes.js";
 
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.get("/", (req, res) => {
 
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
+app.use('/api/test', testRouter);
+app.use("/api/attempt", attemptRouter);
 
 const PORT = process.env.PORT || 5000;
 
