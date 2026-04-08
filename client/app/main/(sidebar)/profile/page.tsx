@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 
 type UserForm = {
   name: string;
+  username: string;
   email: string;
   phone: string;
   avatar: string;
@@ -26,12 +28,14 @@ export default function Profile() {
   const [dirty, setDirty] = useState(false);
   const [subjectInput, setSubjectInput] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user) return;
 
     const normalized: UserForm = {
       name: user.name || "",
+      username: user.username || "",
       email: user.email || "",
       phone: user.phoneNumber || "",
       avatar: user.avatar || "",
@@ -55,6 +59,50 @@ export default function Profile() {
   }, [form, original]);
 
   if (loading || !form) return null;
+
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+
+      const res = await fetch(BACKEND_URL+"/api/user/update-profile",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            name: form.name,
+            username: form.username,
+            email: form.email,
+            phoneNumber: form.phone,
+            college: form.college,
+            semester: Number(form.semester),
+            preferences: {
+              targetRole: form.targetRole,
+              difficulty: form.difficulty,
+              questionsPerTest: Number(form.questions),
+              subjects: form.subjects,
+            },
+          }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast.warn(data.message);
+        return;
+      }
+      toast.success("Profile updated")
+      setOriginal(form);
+      setDirty(false);
+    } catch (error) {
+      console.error("Profile update failed", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const addSubject = () => {
     if (!subjectInput.trim()) return;
@@ -97,18 +145,24 @@ export default function Profile() {
           )}
 
           <img
-            src={form.avatar || `https://picsum.photos/seed/${encodeURIComponent(form.email || form.name || "user")}/200`}
+            src={
+              form.avatar ||
+              `https://picsum.photos/seed/${encodeURIComponent(
+                form.email || form.name || "user"
+              )}/200`
+            }
             onLoad={() => setImgLoaded(true)}
-            className={`w-24 h-24 rounded-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}/>
+            className={`w-24 h-24 rounded-full object-cover transition-opacity duration-300 ${
+              imgLoaded ? "opacity-100" : "opacity-0"
+            }`}
+          />
         </div>
 
         <div>
           <p className="font-bold text-lg">{form.name}</p>
           <p className="text-sm text-gray-600">{form.email}</p>
 
-          <button className="mt-2">
-            Change Photo
-          </button>
+          <button className="mt-2">Change Photo</button>
         </div>
       </div>
 
@@ -140,6 +194,14 @@ export default function Profile() {
               setForm({ ...form, phone: e.target.value })
             }
           />
+
+          <input
+            placeholder="Username"
+            value={form.username}
+            onChange={(e) =>
+              setForm({ ...form, username: e.target.value })
+            }
+          />
         </div>
       </section>
 
@@ -164,8 +226,10 @@ export default function Profile() {
             }
           >
             <option value="">Semester</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-              <option key={s}>{s}</option>
+            {[1,2,3,4,5,6,7,8].map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
             ))}
           </select>
 
@@ -256,12 +320,13 @@ export default function Profile() {
       {/* SAVE */}
       <div className="flex justify-end">
         <button
-          disabled={!dirty}
+          onClick={handleSave}
+          disabled={!dirty || saving}
           className={`px-6 py-2 font-bold
-            ${!dirty ? "opacity-50 cursor-not-allowed" : ""}
+          ${!dirty ? "opacity-50 cursor-not-allowed" : ""}
           `}
         >
-          Save Changes
+          {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
 

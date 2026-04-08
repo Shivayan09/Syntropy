@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 
 type User = {
   _id: string;
+  username?: string;
   name: string;
   email: string;
   phoneNumber?: string;
@@ -32,7 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getMe = async () => {
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/getMe",
+      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/getMe",
         {
           credentials: "include",
         }

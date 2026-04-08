@@ -20,7 +20,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             setLoading(true);
-            const res = await fetch(BACKEND_URL + "/api/login", {
+            const res = await fetch(BACKEND_URL + "/api/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

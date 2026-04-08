@@ -8,15 +8,10 @@ export default function CreateAITest() {
 
     const [subjects, setSubjects] = useState<string[]>([]);
     const [input, setInput] = useState("");
-
-    const [difficulty, setDifficulty] = useState<
-        "Easy" | "Medium" | "Hard"
-    >("Medium");
-
+    const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Medium");
     const [questions, setQuestions] = useState(20);
     const [time, setTime] = useState(30);
 
-    // additional customization
     const [topicFocus, setTopicFocus] = useState("");
     const [includeTheory, setIncludeTheory] = useState(false);
     const [mixedSubjects, setMixedSubjects] = useState(true);
@@ -32,7 +27,6 @@ export default function CreateAITest() {
     const addSubject = () => {
         if (!input.trim()) return;
         if (subjects.includes(input)) return;
-
         setSubjects([...subjects, input]);
         setInput("");
     };
@@ -88,7 +82,7 @@ export default function CreateAITest() {
             <div className="mb-7">
                 <p className="font-bold">Subjects</p>
 
-                <div className="flex flex-wrap gap-2 mb-3">
+                <div className="flex flex-wrap gap-2 my-3">
                     {subjects.map((sub) => (
                         <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-white">
                             {sub}

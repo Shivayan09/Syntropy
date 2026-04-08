@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import authRouter from "./routes/auth.routes.js";
 import connectDB from "./config/mongodb.js";
 import cookieParser from "cookie-parser";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -22,7 +23,8 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
-app.use('/api', authRouter)
+app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 const PORT = process.env.PORT || 5000;
 

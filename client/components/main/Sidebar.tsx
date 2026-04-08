@@ -30,7 +30,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await fetch(BACKEND_URL + "/api/logout", {
+      await fetch(BACKEND_URL + "/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });

@@ -33,7 +33,7 @@ export default function RegisterPage() {
         try {
             setLoading(true);
 
-            const res = await fetch(BACKEND_URL + "/api/register", {
+            const res = await fetch(BACKEND_URL + "/api/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
