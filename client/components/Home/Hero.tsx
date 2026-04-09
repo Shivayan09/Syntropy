@@ -26,7 +26,7 @@ export default function Hero() {
                     <button onClick={() => router.push("/main/dashboard")}>Start Testing</button>
                     <button
                         className="button-secondary"
-                        onClick={() => router.push("/profile")}
+                        onClick={() => router.push("/main/profile")}
                     >
                         Setup Profile
                     </button>
@@ -76,7 +76,7 @@ export default function Hero() {
                     className="mt-6 w-full"
                     onClick={() => router.push("/main/dashboard")}
                 >
-                    View Full Analysis
+                    View your Analysis
                 </button>
             </div>
             <div className="absolute bottom-10 left-1/2 p-3 bg-secondary rounded-full animate-bounce">

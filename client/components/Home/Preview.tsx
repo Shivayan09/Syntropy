@@ -112,7 +112,7 @@ export default function Preview() {
                     {/* CTA */}
                     <button
                         className="w-full mt-4"
-                        onClick={() => router.push("/dashboard")}
+                        onClick={() => router.push("/main/test")}
                     >
                         Start Your First Test
                     </button>

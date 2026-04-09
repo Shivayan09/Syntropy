@@ -10,6 +10,7 @@ export default function AttemptPage() {
     const [test, setTest] = useState<any>(null);
     const [current, setCurrent] = useState(0);
     const [answers, setAnswers] = useState<number[]>([]);
+    const [loading, setLoading] = useState(false);
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
@@ -46,8 +47,8 @@ export default function AttemptPage() {
 
     const submitTest = async () => {
         try {
-            const res = await fetch(
-                BACKEND_URL + "/api/attempt/submit",
+            setLoading(true);
+            const res = await fetch(BACKEND_URL + "/api/attempt/submit",
                 {
                     method: "POST",
                     credentials: "include",
@@ -60,15 +61,13 @@ export default function AttemptPage() {
                     }),
                 }
             );
-
             const data = await res.json();
-
             if (!res.ok) return;
-
             router.push(`/main/test/result/${data.attemptId}`);
-
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,11 +94,10 @@ export default function AttemptPage() {
                         <div
                             key={i}
                             onClick={() => selectOption(i)}
-                            className={`card cursor-pointer ${
-                                answers[current] === i
+                            className={`card cursor-pointer ${answers[current] === i
                                     ? "bg-primary text-white"
                                     : ""
-                            }`}
+                                }`}
                         >
                             {opt}
                         </div>
@@ -118,8 +116,8 @@ export default function AttemptPage() {
                     </button>
 
                     {current === questions.length - 1 ? (
-                        <button onClick={submitTest}>
-                            Submit Test
+                        <button disabled={loading} className={`${loading ? 'opacity-65 cursor-not-allowed' : ''}`} onClick={submitTest}>
+                            {loading ? 'Submitting' : 'Submit test'}
                         </button>
                     ) : (
                         <button
@@ -144,11 +142,10 @@ export default function AttemptPage() {
                         <div
                             key={i}
                             onClick={() => setCurrent(i)}
-                            className={`card text-center cursor-pointer ${
-                                answers[i] !== undefined
+                            className={`card text-center cursor-pointer ${answers[i] !== undefined
                                     ? "bg-primary text-white"
                                     : ""
-                            }`}
+                                }`}
                         >
                             {i + 1}
                         </div>

@@ -66,7 +66,7 @@ export default function Profile() {
     try {
       setSaving(true);
 
-      const res = await fetch(BACKEND_URL+"/api/user/update-profile",
+      const res = await fetch(BACKEND_URL + "/api/user/update-profile",
         {
           method: "PUT",
           headers: {
@@ -152,9 +152,8 @@ export default function Profile() {
               )}/200`
             }
             onLoad={() => setImgLoaded(true)}
-            className={`w-24 h-24 rounded-full object-cover transition-opacity duration-300 ${
-              imgLoaded ? "opacity-100" : "opacity-0"
-            }`}
+            className={`w-24 h-24 rounded-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"
+              }`}
           />
         </div>
 
@@ -226,7 +225,7 @@ export default function Profile() {
             }
           >
             <option value="">Semester</option>
-            {[1,2,3,4,5,6,7,8].map((s) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -299,19 +298,13 @@ export default function Profile() {
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mt-5">
           {form.subjects.map((sub) => (
-            <div
-              key={sub}
-              className="px-3 py-1 card bg-stone-100 text-sm flex items-center gap-2"
-            >
+            <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-white">
               {sub}
-              <p
-                onClick={() => removeSubject(sub)}
-                className="cursor-pointer"
-              >
+              <button onClick={() => removeSubject(sub)} className="h-5! px-1! text-sm">
                 ×
-              </p>
+              </button>
             </div>
           ))}
         </div>

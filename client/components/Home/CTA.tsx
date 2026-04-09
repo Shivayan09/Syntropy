@@ -24,7 +24,7 @@ export default function CTA() {
                     <p className="mb-6">
                         Your weaknesses aren't going to fix themselves.
                     </p>
-                    <button onClick={() => router.push("/dashboard")}>Go to Dashboard</button>
+                    <button onClick={() => router.push("/main/dashboard")}>Go to Dashboard</button>
                 </div>
             </section>
         </div>

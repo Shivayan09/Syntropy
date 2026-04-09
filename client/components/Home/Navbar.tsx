@@ -81,15 +81,15 @@ export default function Navbar() {
 
         <div
           onClick={() => nav("/")}
-          className="font-bold text-xl cursor-pointer text-primary flex items-center gap-1"
+          className="font-extrabold cursor-pointer text-primary flex items-center gap-1"
         >
           <img src="/logo.png" className="h-7" />
-          Testify
+          TESTIFY
         </div>
 
         <div className="flex items-center gap-10">
           <p onClick={() => nav("/")} className="cursor-pointer hover:text-black/70">Home</p>
-          <p onClick={() => nav("/tests")} className="cursor-pointer hover:text-black/70">Tests</p>
+          <p onClick={() => nav("/main/test")} className="cursor-pointer hover:text-black/70">Tests</p>
           <p onClick={() => nav("/main/dashboard")} className="cursor-pointer hover:text-black/70">Dashboard</p>
           <p onClick={() => nav("/main/analytics")} className="cursor-pointer hover:text-black/70">Analysis</p>
           <p className="cursor-pointer hover:text-black/70">Contact</p>

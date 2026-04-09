@@ -1,5 +1,5 @@
 import Test from "../models/test.model.js";
-
+import { generateTest } from "../services/test.service.js";
 
 export const createTest = async (req, res) => {
     try {
@@ -65,6 +65,22 @@ export const getTestForAttempt = async (req, res) => {
         res.status(500).json({
             success: false,
             message: error.message
+        });
+    }
+};
+
+export const aiTest = async (req, res) => {
+    try {
+        const test = await generateTest(req.body, req.user._id);
+        res.json({
+            success: true,
+            testId: test._id,
+            data: test
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: err.message
         });
     }
 };

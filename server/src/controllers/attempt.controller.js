@@ -52,3 +52,20 @@ export const getAttemptById = async (req, res) => {
         });
     }
 };
+
+export const getMyAttempts = async (req, res) => {
+    try {
+        const attempts = await Attempt.find({ user: req.user._id })
+            .populate("test", "title subjects duration")
+            .sort({ createdAt: -1 })
+        res.json({
+            success: true,
+            attempts
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

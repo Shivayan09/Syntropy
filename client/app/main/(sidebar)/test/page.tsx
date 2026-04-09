@@ -50,7 +50,7 @@ export default function TestsPage() {
                 <p className="text-gray-600">Select a test to begin</p>
             </div>
 
-            <div className="card2 mb-6 flex justify-between items-center">
+            <div className="card2 mb-6 flex flex-col md:flex-row mt-5 md:mt-0 justify-between items-center">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <Sparkles size={16} />
@@ -62,14 +62,14 @@ export default function TestsPage() {
                 </div>
 
                 <button
-                    className="w-32"
+                    className="w-full md:w-32 mt-5 md:mt-0"
                     onClick={() => router.push("/main/test/generate")}
                 >
                     Generate
                 </button>
             </div>
 
-            <div className="card2 mb-6 flex justify-between items-center">
+            <div className="card2 mb-6 flex flex-col md:flex-row justify-between items-center">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <BookOpen size={16} />
@@ -81,7 +81,7 @@ export default function TestsPage() {
                 </div>
 
                 <button
-                    className="w-32"
+                    className="w-full md:w-32 mt-5 md:mt-0"
                     onClick={() => router.push("/main/test/create")}
                 >
                     Create

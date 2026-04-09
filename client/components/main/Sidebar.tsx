@@ -108,7 +108,7 @@ export default function Sidebar() {
         <div>
           <div className="flex items-center gap-1 mb-7 ml-2">
             <img src="/logo.png" alt="" className="h-7" />
-            <p onClick={() => router.push("/")} className="cursor-pointer font-extrabold text-lg text-primary">
+            <p onClick={() => router.push("/")} className="cursor-pointer font-extrabold text-primary">
               TESTIFY
             </p>
           </div>

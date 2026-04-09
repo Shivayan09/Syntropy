@@ -22,16 +22,12 @@ export default function ResultPage() {
           `${BACKEND_URL}/api/attempt/${id}`,
           { credentials: "include" }
         );
-
         const data = await res.json();
-
         console.log("RESULT DATA:", data);
-
         if (!res.ok) {
           setLoading(false);
           return;
         }
-
         setResult(data.attempt);
       } catch (err) {
         console.error(err);

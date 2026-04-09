@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
 
 export default function CreateAITest() {
     const { user } = useAuth();
@@ -36,6 +37,41 @@ export default function CreateAITest() {
     };
 
     const canGenerate = subjects.length > 0;
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+    const generateTest = async () => {
+        if (!subjects.length) return;
+
+        try {
+            const res = await fetch(BACKEND_URL + "/api/test/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    subjects,
+                    difficulty,
+                    questions,
+                    time,
+                    topicFocus,
+                    mixedSubjects
+                })
+            });
+            const data = await res.json();
+            console.log("AI TEST:", data);
+            if (!res.ok) {
+                toast.warn(data.message)
+                return;
+            }
+            toast.success("Test created")
+            window.location.href = `/main/test/preview/${data.testId}`;
+
+        } catch (err) {
+            console.error("Failed to generate test", err);
+        }
+    };
 
     return (
         <div className="mx-auto px-4 md:px-10 py-20 md:py-8">
@@ -95,7 +131,7 @@ export default function CreateAITest() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <input placeholder="Add subject" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addSubject()} className="w-full"/>
+                    <input placeholder="Add subject" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addSubject()} className="w-full" />
 
                     <button className="button-secondary" onClick={addSubject}>
                         Add
@@ -116,13 +152,7 @@ export default function CreateAITest() {
                 <div>
                     <p className="font-bold mb-3">Difficulty</p>
 
-                    <select
-                        value={difficulty}
-                        onChange={(e) =>
-                            setDifficulty(e.target.value as any)
-                        }
-                        className="w-full"
-                    >
+                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as any)} className="w-full">
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium</option>
                         <option value="Hard">Hard</option>
@@ -133,16 +163,7 @@ export default function CreateAITest() {
                 <div>
                     <p className="font-bold mb-3">Questions</p>
 
-                    <input
-                        type="range"
-                        min={5}
-                        max={50}
-                        value={questions}
-                        onChange={(e) =>
-                            setQuestions(Number(e.target.value))
-                        }
-                        className="w-full"
-                    />
+                    <input type="range" min={5} max={50} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
 
                     <p className="text-sm mt-2">
                         {questions}
@@ -153,17 +174,7 @@ export default function CreateAITest() {
                 <div>
                     <p className="font-bold mb-3">Time</p>
 
-                    <input
-                        type="range"
-                        min={10}
-                        max={120}
-                        step={5}
-                        value={time}
-                        onChange={(e) =>
-                            setTime(Number(e.target.value))
-                        }
-                        className="w-full"
-                    />
+                    <input type="range" min={10} max={120} step={5} value={time} onChange={(e) => setTime(Number(e.target.value))} className="w-full" />
 
                     <p className="text-sm mt-2">
                         {time} min
@@ -179,17 +190,12 @@ export default function CreateAITest() {
                     Additional Customization
                 </p>
 
-                <input
-                    placeholder="Focus topics (optional) e.g. graphs, dp, trees"
-                    value={topicFocus}
-                    onChange={(e) => setTopicFocus(e.target.value)}
-                    className="w-full"
-                />
+                <input placeholder="Focus topics (optional) e.g. graphs, dp, trees" value={topicFocus} onChange={(e) => setTopicFocus(e.target.value)} className="w-full" />
 
             </div>
 
             {/* GENERATE */}
-            <button disabled={!canGenerate} className={`w-full text-lg ${!canGenerate && "opacity-50 cursor-not-allowed"}`}>
+            <button onClick={generateTest} disabled={!canGenerate} className={`w-full text-lg ${!canGenerate && "opacity-50 cursor-not-allowed"}`}>
                 Generate AI Test
             </button>
 

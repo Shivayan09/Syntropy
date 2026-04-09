@@ -63,7 +63,7 @@ export default function Steps() {
                         </p>
                     </div>
                     <div className="flex gap-4">
-                        <button className="w-full md:w-fit" onClick={() => router.push("/dashboard")}>Start Testing right now</button>
+                        <button className="w-full md:w-fit" onClick={() => router.push("/main/dashboard")}>Start Testing right now</button>
                     </div>
                 </div>
             </section>
