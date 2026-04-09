@@ -8,31 +8,31 @@ export default function Hero() {
     const router = useRouter();
 
     return (
-        <section className="mx-auto md:h-screen py-10 px-5 md:px-10 flex flex-col md:flex-row items-center gap-10 md:gap-0">
+        <section className="mx-auto md:h-screen pt-20 md:pt-10 py-10 px-5 md:px-10 flex flex-col md:flex-row items-center gap-10 md:gap-0">
             <div className="text-left w-full md:w-1/2">
-                <p className="text-sm font-bold text-primary mb-3">
+                <p className="text-sm hidden md:flex font-bold text-primary mb-3">
                     MOCK TEST PLATFORM
                 </p>
 
-                <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-6">
+                <h1 className="text-[2.5rem] md:text-6xl text-center md:text-left font-extrabold leading-tight mb-6">
                     Stop Guessing <br /> <span className="text-primary">Start Improving</span>
                 </h1>
 
-                <p className="text-lg mb-8 text-gray-600 max-w-md">
+                <p className="text-lg mb-8 text-center md:text-left text-gray-600 max-w-md">
                     Take subject-based mock tests and get brutally honest analysis of where you actually stand.
                 </p>
 
-                <div className="flex gap-4 text-sm md:text-[1rem]">
-                    <button onClick={() => router.push("/main/dashboard")}>Start Testing</button>
+                <div className="flex items-center justify-center md:justify-start gap-5 text-sm md:text-[1rem]">
+                    <button className="w-[90%] md:w-fit" onClick={() => router.push("/main/dashboard")}>Start Testing</button>
                     <button
-                        className="button-secondary"
+                        className="button-secondary w-[90%] md:w-fit"
                         onClick={() => router.push("/main/profile")}
                     >
                         Setup Profile
                     </button>
                 </div>
 
-                <div className="flex gap-6 mt-10">
+                <div className="flex justify-center md:justify-start gap-6 mt-10">
                     <div>
                         <p className="text-2xl font-bold">10K+</p>
                         <p className="text-sm text-gray-600">Tests Taken</p>
@@ -79,7 +79,7 @@ export default function Hero() {
                     View your Analysis
                 </button>
             </div>
-            <div className="absolute bottom-10 left-1/2 p-3 bg-secondary rounded-full animate-bounce">
+            <div className="absolute bottom-10 left-1/2 hidden md:flex p-3 bg-secondary rounded-full animate-bounce">
                 <ArrowDown className="opacity-70"/>
             </div>
         </section>
