@@ -20,10 +20,10 @@ export default function Navbar() {
 
         <div
           onClick={() => nav("/")}
-          className="font-bold text-lg text-primary flex items-center gap-1"
+          className="font-extrabold text-lg text-primary flex items-center gap-1"
         >
           <img src="/logo.png" className="h-6" />
-          Testify
+          TESTIFY
         </div>
 
         <button onClick={() => setOpen(true)}>
