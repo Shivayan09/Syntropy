@@ -126,23 +126,12 @@ export default function Create() {
 
                 <div>
                     <p className="font-bold mb-2">Test Name</p>
-                    <input
-                        placeholder="DSA Mock 1"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full"
-                    />
+                    <input placeholder="DSA Mock 1" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full" />
                 </div>
 
                 <div>
                     <p className="font-bold mb-2">Difficulty</p>
-                    <select
-                        value={difficulty}
-                        onChange={(e) =>
-                            setDifficulty(e.target.value)
-                        }
-                        className="w-full"
-                    >
+                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full">
                         <option>Easy</option>
                         <option>Medium</option>
                         <option>Hard</option>
@@ -153,15 +142,7 @@ export default function Create() {
                     <p className="font-bold mb-2">
                         Time (minutes)
                     </p>
-                    <input
-                        type="number"
-                        min={5}
-                        value={time}
-                        onChange={(e) =>
-                            setTime(Number(e.target.value))
-                        }
-                        className="w-full"
-                    />
+                    <input type="number" min={5} value={time} onChange={(e) => setTime(Number(e.target.value))} className="w-full" />
                 </div>
 
             </div>
@@ -171,33 +152,18 @@ export default function Create() {
                 <p className="font-bold mb-2">Subjects</p>
 
                 <div className="flex gap-3 mb-3">
-                    <input
-                        placeholder="Add subject"
-                        value={subjectInput}
-                        onChange={(e) =>
-                            setSubjectInput(e.target.value)
-                        }
-                    />
+                    <input placeholder="Add subject" value={subjectInput} onChange={(e) => setSubjectInput(e.target.value)} />
 
-                    <button
-                        className="button-secondary"
-                        onClick={addSubject}
-                    >
+                    <button className="button-secondary" onClick={addSubject}>
                         Add
                     </button>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
                     {subjects.map((s) => (
-                        <div
-                            key={s}
-                            className="card px-3 py-1 flex gap-2"
-                        >
+                        <div key={s} className="card px-3 py-1 flex gap-2">
                             {s}
-                            <span
-                                className="cursor-pointer"
-                                onClick={() => removeSubject(s)}
-                            >
+                            <span className="cursor-pointer" onClick={() => removeSubject(s)}>
                                 ×
                             </span>
                         </div>
@@ -225,47 +191,21 @@ export default function Create() {
                                     Question {qIndex + 1}
                                 </p>
 
-                                <button
-                                    onClick={() => removeQuestion(qIndex)}
-                                    className="button-secondary"
-                                >
+                                <button onClick={() => removeQuestion(qIndex)} className="button-secondary">
                                     Remove
                                 </button>
                             </div>
 
-                            <textarea
-                                placeholder="Enter question"
-                                value={q.question}
-                                onChange={(e) =>
-                                    updateQuestion(qIndex, e.target.value)
-                                }
-                                className="w-full mb-4"
-                            />
+                            <textarea placeholder="Enter question" value={q.question} onChange={(e) => updateQuestion(qIndex, e.target.value)} className="w-full mb-4" />
 
                             {/* OPTIONS */}
                             <div className="grid md:grid-cols-2 gap-3">
                                 {q.options.map((opt, optIndex) => {
-                                    const isCorrect =
-                                        q.correctIndex === optIndex;
-
+                                    const isCorrect = q.correctIndex === optIndex;
                                     return (
-                                        <div
-                                            key={optIndex}
-                                            className="flex gap-2 items-center"
-                                        >
-                                            <div
-                                                onClick={() =>
-                                                    setCorrect(
-                                                        qIndex,
-                                                        optIndex
-                                                    )
-                                                }
-                                                className={`w-6 h-6 border-2 border-black cursor-pointer flex items-center justify-center ${
-                                                    isCorrect
-                                                        ? "bg-primary"
-                                                        : "bg-white"
-                                                }`}
-                                            >
+                                        <div key={optIndex} className="flex gap-2 items-center">
+                                            <div onClick={() => setCorrect(qIndex, optIndex)}
+                                                className={`w-6 h-6 border-2 border-black cursor-pointer flex items-center justify-center ${isCorrect ? "bg-primary" : "bg-white"}`}>
                                                 {isCorrect && (
                                                     <span className="text-white text-xs font-bold">
                                                         ✓
@@ -273,18 +213,7 @@ export default function Create() {
                                                 )}
                                             </div>
 
-                                            <input
-                                                placeholder={`Option ${optIndex + 1}`}
-                                                value={opt}
-                                                onChange={(e) =>
-                                                    updateOption(
-                                                        qIndex,
-                                                        optIndex,
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="w-full"
-                                            />
+                                            <input placeholder={`Option ${optIndex + 1}`} value={opt} onChange={(e) => updateOption(qIndex, optIndex, e.target.value)} className="w-full" />
                                         </div>
                                     );
                                 })}
@@ -301,20 +230,14 @@ export default function Create() {
 
             {/* ADD QUESTION */}
             <div className="mt-5">
-                <button
-                    onClick={addQuestion}
-                    className="button-secondary"
-                >
+                <button onClick={addQuestion} className="button-secondary">
                     + Add Question
                 </button>
             </div>
 
             {/* CREATE */}
             <div className="mt-5">
-                <button
-                    className="w-full text-lg"
-                    onClick={createTest}
-                >
+                <button className="w-full text-lg" onClick={createTest}>
                     Create Test
                 </button>
             </div>

@@ -24,7 +24,7 @@ export default function TestsPage() {
     useEffect(() => {
         const fetchTests = async () => {
             try {
-                const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include",});
+                const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include"});
                 const data = await res.json();
                 if (!res.ok) return;
                 setTests(data.tests);
@@ -61,10 +61,7 @@ export default function TestsPage() {
                     </p>
                 </div>
 
-                <button
-                    className="w-full md:w-32 mt-5 md:mt-0"
-                    onClick={() => router.push("/main/test/generate")}
-                >
+                <button className="w-full md:w-32 mt-5 md:mt-0" onClick={() => router.push("/main/test/generate")}>
                     Generate
                 </button>
             </div>
@@ -80,27 +77,18 @@ export default function TestsPage() {
                     </p>
                 </div>
 
-                <button
-                    className="w-full md:w-32 mt-5 md:mt-0"
-                    onClick={() => router.push("/main/test/create")}
-                >
+                <button className="w-full md:w-32 mt-5 md:mt-0" onClick={() => router.push("/main/test/create")}>
                     Create
                 </button>
             </div>
 
             <div className="flex gap-3 mb-6 mt-10">
 
-                <button
-                    className={type === "manual" ? "" : "button-secondary"}
-                    onClick={() => setType("manual")}
-                >
+                <button className={type === "manual" ? "" : "button-secondary"} onClick={() => setType("manual")}>
                     Manual Tests
                 </button>
 
-                <button
-                    className={type === "ai" ? "" : "button-secondary"}
-                    onClick={() => setType("ai")}
-                >
+                <button className={type === "ai" ? "" : "button-secondary"} onClick={() => setType("ai")}>
                     AI Generated
                 </button>
 
@@ -117,10 +105,7 @@ export default function TestsPage() {
                 )}
 
                 {filtered.map((test) => (
-                    <div
-                        key={test._id}
-                        className="card flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between"
-                    >
+                    <div key={test._id} className="card flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
                         <div>
                             <p className="font-semibold">
                                 {test.title}
@@ -142,14 +127,7 @@ export default function TestsPage() {
                             </div>
                         </div>
 
-                        <button
-                            className="button-secondary w-full md:w-fit flex items-center gap-1 group"
-                            onClick={() =>
-                                router.push(
-                                    `/main/test/preview/${test._id}`
-                                )
-                            }
-                        >
+                        <button className="button-secondary w-full md:w-fit flex items-center gap-1 group" onClick={() => router.push(`/main/test/preview/${test._id}`) }>
                             Attempt
                             <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
                         </button>
