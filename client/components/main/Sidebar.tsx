@@ -46,7 +46,7 @@ export default function Sidebar() {
   return (
     <>
       {/* ================= MOBILE TOP BAR ================= */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white flex items-center px-4 z-50">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-secondary flex items-center px-4 z-50">
         <button onClick={() => setOpen(true)}>
           <Menu size={22} />
         </button>
@@ -63,6 +63,9 @@ export default function Sidebar() {
       <aside
         className={` fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div>
+          <div className="absolute bottom-4 right-5">
+            <ThemeToggle/>
+          </div>
           <div className="flex justify-between items-center mb-6">
             <p onClick={() => navigate("/")} className="cursor-pointer font-extrabold text-lg text-primary">
               TESTIFY
