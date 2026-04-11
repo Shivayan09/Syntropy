@@ -72,9 +72,8 @@ export default function AttemptPage() {
     };
 
     return (
-        <div className="min-h-screen flex">
+        <div className="h-screen overflow-hidden flex">
 
-            {/* LEFT */}
             <div className="flex-1 p-8">
 
                 <div className="flex justify-between items-center mb-6">
@@ -91,14 +90,7 @@ export default function AttemptPage() {
 
                 <div className="space-y-4">
                     {q.options.map((opt: string, i: number) => (
-                        <div
-                            key={i}
-                            onClick={() => selectOption(i)}
-                            className={`card cursor-pointer ${answers[current] === i
-                                    ? "bg-primary text-white"
-                                    : ""
-                                }`}
-                        >
+                        <div key={i} onClick={() => selectOption(i)} className={`card cursor-pointer ${answers[current] === i ? "bg-primary text-white" : ""}`} >
                             {opt}
                         </div>
                     ))}
@@ -106,12 +98,7 @@ export default function AttemptPage() {
 
                 <div className="flex justify-between mt-8">
 
-                    <button
-                        className="button-secondary"
-                        onClick={() =>
-                            setCurrent((c) => Math.max(0, c - 1))
-                        }
-                    >
+                    <button className="button-secondary" onClick={() => setCurrent((c) => Math.max(0, c - 1))} >
                         Previous
                     </button>
 
@@ -120,11 +107,7 @@ export default function AttemptPage() {
                             {loading ? 'Submitting' : 'Submit test'}
                         </button>
                     ) : (
-                        <button
-                            onClick={() =>
-                                setCurrent((c) => c + 1)
-                            }
-                        >
+                        <button onClick={() => setCurrent((c) => c + 1)} >
                             Next
                         </button>
                     )}
@@ -133,20 +116,12 @@ export default function AttemptPage() {
 
             </div>
 
-            {/* RIGHT NAVIGATOR */}
-            <div className="w-64 border-l-2 border-black p-6 bg-secondary">
+            <div className="w-64 border-l-2 border-black p-6 bg-secondary overflow-y-auto">
                 <p className="font-bold mb-4">Questions</p>
 
-                <div className="grid grid-cols-5 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                     {questions.map((_: any, i: number) => (
-                        <div
-                            key={i}
-                            onClick={() => setCurrent(i)}
-                            className={`card text-center cursor-pointer ${answers[i] !== undefined
-                                    ? "bg-primary text-white"
-                                    : ""
-                                }`}
-                        >
+                        <div key={i} onClick={() => setCurrent(i)} className={`card text-center cursor-pointer ${answers[i] !== undefined ? "bg-primary text-white" : ""}`} >
                             {i + 1}
                         </div>
                     ))}

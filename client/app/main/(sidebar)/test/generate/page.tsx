@@ -12,7 +12,7 @@ export default function CreateAITest() {
     const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Medium");
     const [questions, setQuestions] = useState(20);
     const [time, setTime] = useState(30);
-
+    const [loading, setLoading] = useState(false);
     const [topicFocus, setTopicFocus] = useState("");
     const [includeTheory, setIncludeTheory] = useState(false);
     const [mixedSubjects, setMixedSubjects] = useState(true);
@@ -42,8 +42,8 @@ export default function CreateAITest() {
 
     const generateTest = async () => {
         if (!subjects.length) return;
-
         try {
+            setLoading(true);
             const res = await fetch(BACKEND_URL + "/api/test/generate", {
                 method: "POST",
                 headers: {
@@ -70,20 +70,20 @@ export default function CreateAITest() {
 
         } catch (err) {
             console.error("Failed to generate test", err);
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="mx-auto px-4 md:px-10 py-20 md:py-8">
 
-            {/* HEADER */}
             <div className="mb-5">
                 <h1 className="text-3xl font-extrabold">
                     AI Test Generator
                 </h1>
             </div>
 
-            {/* PREVIEW BAR */}
             <div className="mb-7 border-2 border-black px-5 py-4 flex flex-wrap items-center justify-between gap-4">
 
                 <div className="flex flex-wrap gap-6 text-sm">
@@ -114,7 +114,6 @@ export default function CreateAITest() {
 
             </div>
 
-            {/* SUBJECTS */}
             <div className="mb-7">
                 <p className="font-bold">Subjects</p>
 
@@ -145,10 +144,8 @@ export default function CreateAITest() {
                 )}
             </div>
 
-            {/* CONTROLS */}
             <div className="grid md:grid-cols-3 gap-10 mb-5">
 
-                {/* DIFFICULTY DROPDOWN */}
                 <div>
                     <p className="font-bold mb-3">Difficulty</p>
 
@@ -159,7 +156,6 @@ export default function CreateAITest() {
                     </select>
                 </div>
 
-                {/* QUESTIONS */}
                 <div>
                     <p className="font-bold mb-3">Questions</p>
 
@@ -170,7 +166,6 @@ export default function CreateAITest() {
                     </p>
                 </div>
 
-                {/* TIME */}
                 <div>
                     <p className="font-bold mb-3">Time</p>
 
@@ -183,7 +178,6 @@ export default function CreateAITest() {
 
             </div>
 
-            {/* ADDITIONAL CUSTOMIZATION */}
             <div className="mb-7 space-y-5">
 
                 <p className="font-bold">
@@ -194,9 +188,8 @@ export default function CreateAITest() {
 
             </div>
 
-            {/* GENERATE */}
-            <button onClick={generateTest} disabled={!canGenerate} className={`w-full text-lg ${!canGenerate && "opacity-50 cursor-not-allowed"}`}>
-                Generate AI Test
+            <button onClick={generateTest} disabled={!canGenerate && loading} className={`w-full text-lg ${!canGenerate && loading && "opacity-50 cursor-not-allowed"}`}>
+                {loading ? 'Generating..' : 'Generate AI Test'}
             </button>
 
         </div>

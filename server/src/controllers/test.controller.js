@@ -5,6 +5,53 @@ export const createTest = async (req, res) => {
     try {
         const userId = req.user._id;
         const { title, description, difficulty, duration, subjects, questions, type } = req.body;
+        if (!title) {
+            return res.status(400).json({
+                success: false,
+                message: "Title is required"
+            });
+        }
+        if(subjects.length<1) {
+            return res.status(400).json({
+                success: false,
+                message: "Enter atleast 1 subject"
+            })
+        }
+        if (!questions || questions.length < 1) {
+            return res.status(400).json({
+                success: false,
+                message: "At least 1 question is required"
+            });
+        }
+        for (let i = 0; i < questions.length; i++) {
+            const q = questions[i];
+            if (!q.question || !q.question.trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Question ${i + 1} cannot be empty`
+                });
+            }
+            if (!q.options || q.options.length < 2) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Question ${i + 1} must have options`
+                });
+            }
+            for (let j = 0; j < q.options.length; j++) {
+                if (!q.options[j] || !q.options[j].trim()) {
+                    return res.status(400).json({
+                        success: false,
+                        message: `Option ${j + 1} in Question ${i + 1} cannot be empty`
+                    });
+                }
+            }
+            if (q.correctAnswer === undefined || q.correctAnswer === null || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Question ${i + 1} must have a valid correct answer`
+                });
+            }
+        }
         const test = await Test.create({ title, description, difficulty, duration, subjects, questions, totalQuestions: questions.length, createdBy: userId, type });
         res.status(201).json({
             success: true,

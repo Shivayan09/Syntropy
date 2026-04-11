@@ -16,19 +16,13 @@ export default function Create() {
 
     const [subjects, setSubjects] = useState<string[]>([]);
     const [subjectInput, setSubjectInput] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const [questions, setQuestions] = useState<Question[]>([
-        {
-            question: "",
-            options: ["", "", "", ""],
-            correctIndex: 0,
-        },
-    ]);
+    const [questions, setQuestions] = useState<Question[]>([{ question: "", options: ["", "", "", ""], correctIndex: 0 }]);
 
     const addSubject = () => {
         if (!subjectInput.trim()) return;
         if (subjects.includes(subjectInput)) return;
-
         setSubjects([...subjects, subjectInput]);
         setSubjectInput("");
     };
@@ -38,18 +32,13 @@ export default function Create() {
     };
 
     const addQuestion = () => {
-        setQuestions([
-            ...questions,
-            {
-                question: "",
-                options: ["", "", "", ""],
-                correctIndex: 0,
-            },
-        ]);
+        setQuestions([...questions, { question: "", options: ["", "", "", ""], correctIndex: 0 },]);
     };
 
     const removeQuestion = (index: number) => {
-        if (questions.length === 1) return;
+        if (questions.length === 1) {
+            return;
+        }
         setQuestions(questions.filter((_, i) => i !== index));
     };
 
@@ -59,11 +48,7 @@ export default function Create() {
         setQuestions(updated);
     };
 
-    const updateOption = (
-        qIndex: number,
-        optIndex: number,
-        value: string
-    ) => {
+    const updateOption = (qIndex: number, optIndex: number, value: string) => {
         const updated = [...questions];
         updated[qIndex].options[optIndex] = value;
         setQuestions(updated);
@@ -78,40 +63,44 @@ export default function Create() {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
     const createTest = async () => {
-        const res = await fetch(BACKEND_URL + "/api/test/create",
-            {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    title,
-                    difficulty,
-                    duration: time,
-                    subjects,
-                    type: "manual",
-                    questions: questions.map((q) => ({
-                        question: q.question,
-                        options: q.options,
-                        correctAnswer: q.correctIndex,
-                    })),
-                }),
+        try {
+            setLoading(true);
+            const res = await fetch(BACKEND_URL + "/api/test/create",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify({
+                        title,
+                        difficulty,
+                        duration: time,
+                        subjects,
+                        type: "manual",
+                        questions: questions.map((q) => ({
+                            question: q.question,
+                            options: q.options,
+                            correctAnswer: q.correctIndex,
+                        })),
+                    }),
+                }
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                toast.warn(data.message)
+                return;
             }
-        );
-        const data = await res.json();
-        if (!res.ok) {
-            toast.warn(data.message)
-            return;
+            toast.success("Test created")
+            window.location.href = `/main/test/preview/${data.test._id}`;
+        } catch (error:any) {
+            toast.error(error.message);
+        } finally {
+            setLoading(false);
         }
-        toast.success("Test created")
-        window.location.href = `/main/test/preview/${data.test._id}`;
     };
 
     return (
         <div className="mx-auto px-4 md:px-10 py-20 md:py-8">
 
-            {/* HEADER */}
             <div className="mb-5">
                 <h1 className="text-3xl font-extrabold">
                     Create Test
@@ -121,7 +110,6 @@ export default function Create() {
                 </p>
             </div>
 
-            {/* TEST META */}
             <div className="grid md:grid-cols-3 gap-6 mb-7">
 
                 <div>
@@ -147,7 +135,6 @@ export default function Create() {
 
             </div>
 
-            {/* SUBJECTS */}
             <div className="mb-7">
                 <p className="font-bold mb-2">Subjects</p>
 
@@ -171,7 +158,6 @@ export default function Create() {
                 </div>
             </div>
 
-            {/* QUESTIONS */}
             <div>
                 <div className="mb-3">
                     <h3 className="text-xl">
@@ -198,7 +184,6 @@ export default function Create() {
 
                             <textarea placeholder="Enter question" value={q.question} onChange={(e) => updateQuestion(qIndex, e.target.value)} className="w-full mb-4" />
 
-                            {/* OPTIONS */}
                             <div className="grid md:grid-cols-2 gap-3">
                                 {q.options.map((opt, optIndex) => {
                                     const isCorrect = q.correctIndex === optIndex;
@@ -228,17 +213,15 @@ export default function Create() {
                 </div>
             </div>
 
-            {/* ADD QUESTION */}
             <div className="mt-5">
                 <button onClick={addQuestion} className="button-secondary">
                     + Add Question
                 </button>
             </div>
 
-            {/* CREATE */}
             <div className="mt-5">
-                <button className="w-full text-lg" onClick={createTest}>
-                    Create Test
+                <button disabled={loading} className={`${loading ? 'opacity-65 cursor-not-allowed' : ''} w-full text-lg`} onClick={createTest}>
+                    {loading ? 'Creating..' : 'Create Test'}
                 </button>
             </div>
 
