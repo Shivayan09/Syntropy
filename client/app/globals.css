@@ -115,8 +115,8 @@ button:active {
 
 /* Secondary button */
 .button-secondary {
-  background: white;
-  color: black;
+  background: var(--bg-secondary);
+  color: var(--text);
   border: var(--border-width) solid black;
 }
 
@@ -153,8 +153,8 @@ button:active {
 input,
 textarea,
 select {
-  background: white;
-  color: black;
+  background: var(--bg-secondary);
+  color: var(--text);
   border: var(--border-width) solid black;
   padding: 10px;
 
@@ -173,6 +173,7 @@ textarea:focus {
 ========================= */
 .card {
   border: var(--border-width) solid black;
+  background-color: var(--bg-secondary);
   padding: 20px;
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0px black;
 }
@@ -196,4 +197,22 @@ textarea:focus {
 :focus-visible {
   outline: 2px dashed var(--primary);
   outline-offset: 3px;
+}
+
+
+/* =========================
+   DARK MODE
+========================= */
+.dark {
+  --bg: #0e0e0e;
+  --bg-secondary: #161616;
+  --surface: #111111;
+
+  --text: #f5f5f5;
+
+  --primary: #00c46a;
+  --primary-dark: #009452;
+  --accent: #00ffaa;
+
+  --border: #ffffff;
 }

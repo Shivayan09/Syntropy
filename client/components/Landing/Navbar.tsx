@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "../ThemeToggle";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -16,7 +17,7 @@ export default function Navbar() {
   return (
     <>
       {/* ================= MOBILE NAVBAR ================= */}
-      <div className="md:hidden border-b fixed z-50 w-full bg-white/60 backdrop-blur-lg border-black/10 px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden border-b fixed z-50 w-full bg-[color:var(--surface)]/80 backdrop-blur-lg border-black/10 px-4 py-3 flex items-center justify-between">
 
         <div
           onClick={() => nav("/")}
@@ -44,13 +45,16 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       <div
         className={`
-          md:hidden fixed top-0 right-0 h-screen w-64 bg-white z-50 p-6
+          md:hidden fixed top-0 right-0 h-screen w-64 bg-secondary z-50 p-6
           transform transition-transform duration-300 ease-out
           flex flex-col justify-between
           ${open ? "translate-x-0" : "translate-x-full"}
         `}
       >
         <div>
+          <div className="absolute top-7 left-5">
+            <ThemeToggle/>
+          </div>
           <div className="flex justify-end mb-8">
             <button onClick={() => setOpen(false)}>
               <X size={20} />
@@ -77,7 +81,7 @@ export default function Navbar() {
       </div>
 
       {/* ================= DESKTOP NAVBAR ================= */}
-      <div className="hidden md:flex border-b fixed z-50 w-full bg-white/60 backdrop-blur-lg border-black/10 px-10 py-3 items-center justify-between">
+      <div className="hidden md:flex border-b fixed z-50 w-full bg-[color:var(--surface)]/80 backdrop-blur-lg border-black/10 px-10 py-3 items-center justify-between">
 
         <div
           onClick={() => nav("/")}
@@ -95,9 +99,12 @@ export default function Navbar() {
           <p className="cursor-pointer hover:text-black/70">Contact</p>
         </div>
 
-        <button onClick={() => nav("/auth/login")}>
-          Sign in
-        </button>
+        <div className="flex items-center gap-5">
+          <ThemeToggle />
+          <button onClick={() => nav("/auth/login")}>
+            Sign in
+          </button>
+        </div>
 
       </div>
     </>

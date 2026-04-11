@@ -5,6 +5,7 @@ import { BarChart3, BookOpen, LayoutDashboard, LogOut, Menu, User2, X } from "lu
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import ThemeToggle from "../ThemeToggle";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function Sidebar() {
     `flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors
      ${isActive(path)
       ? "bg-primary text-white"
-      : "hover:bg-stone-100"
+      : "hover:bg-black/5 dark:hover:bg-white/5"
     }`;
 
   const navigate = (path: string) => {
@@ -60,7 +61,7 @@ export default function Sidebar() {
 
       {/* ================= MOBILE SIDEBAR ================= */}
       <aside
-        className={` fixed top-0 left-0 h-screen w-48 bg-white z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        className={` fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div>
           <div className="flex justify-between items-center mb-6">
             <p onClick={() => navigate("/")} className="cursor-pointer font-extrabold text-lg text-primary">
@@ -96,16 +97,19 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={handleLogout}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={handleLogout}>
           <LogOut size={18} />
           Logout
         </div>
       </aside>
 
       {/* ================= DESKTOP SIDEBAR ================= */}
-      <aside className="hidden md:flex w-54 h-screen bg-white py-6 px-3 flex-col justify-between">
+      <aside className="hidden relative md:flex w-54 h-screen bg-secondary py-6 px-3 flex-col justify-between">
 
         <div>
+          <div className="absolute top-5 right-5">
+            <ThemeToggle/>
+          </div>
           <div className="flex items-center gap-1 mb-7 ml-2">
             <img src="/logo.png" alt="" className="h-7" />
             <p onClick={() => router.push("/")} className="cursor-pointer font-extrabold text-primary">
@@ -138,7 +142,7 @@ export default function Sidebar() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 bg-stone-100 rounded-lg" onClick={handleLogout}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={handleLogout}>
           <LogOut size={18} />
           Logout
         </div>

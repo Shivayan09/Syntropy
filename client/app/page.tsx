@@ -1,11 +1,12 @@
 "use client";
 
-import CTA from "@/components/Home/CTA";
-import Footer from "@/components/Home/Footer";
-import Hero from "@/components/Home/Hero";
-import Navbar from "@/components/Home/Navbar";
-import Preview from "@/components/Home/Preview";
-import Steps from "@/components/Home/Steps";
+import CTA from "@/components/Landing/CTA";
+import FAQ from "@/components/Landing/FAQ";
+import Footer from "@/components/Landing/Footer";
+import Hero from "@/components/Landing/Hero";
+import Navbar from "@/components/Landing/Navbar";
+import Preview from "@/components/Landing/Preview";
+import Steps from "@/components/Landing/Steps";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
       <Hero/>
       <Steps/>
       <Preview/>
+      <FAQ/>
       <CTA/>
       <Footer/>
     </div>

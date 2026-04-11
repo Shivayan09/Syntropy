@@ -9,7 +9,7 @@ export default function Layout({
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <main className="flex-1 md:overflow-y-auto bg-secondary w-screen">
+      <main className="flex-1 md:overflow-y-auto w-screen">
         {children}
       </main>
     </div>

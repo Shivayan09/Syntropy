@@ -7,7 +7,7 @@ export default function CTA() {
     const router = useRouter();
 
     return (
-        <div className="pb-10 py-10 px-5 bg-secondary">
+        <div className="pb-10 py-10 px-5">
             <div className="text-center mx-auto mb-10">
                 <p className="text-sm font-bold text-primary mb-3">
                     TRANSFORMATION

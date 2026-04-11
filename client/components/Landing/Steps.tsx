@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useRouter } from "next/navigation";
@@ -33,7 +34,7 @@ export default function Steps() {
                     ].map((s, i) => (
                         <div
                             key={i}
-                            className="border border-black p-6 bg-white relative card"
+                            className="border border-black p-6 relative card"
                         >
                             <span className="absolute -top-3 -left-3 bg-primary text-white text-xs px-2 py-1">
                                 STEP {i + 1}

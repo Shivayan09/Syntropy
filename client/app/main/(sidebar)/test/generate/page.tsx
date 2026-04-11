@@ -119,7 +119,7 @@ export default function CreateAITest() {
 
                 <div className="flex flex-wrap gap-2 my-3">
                     {subjects.map((sub) => (
-                        <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-white">
+                        <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-secondary">
                             {sub}
 
                             <button onClick={() => removeSubject(sub)} className="h-5! px-1! text-sm">

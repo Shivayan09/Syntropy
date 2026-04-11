@@ -50,7 +50,7 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="card2 bg-white mb-8">
+      <div className="card2 mb-8">
 
         <div className="flex justify-between items-start">
 
@@ -108,7 +108,7 @@ export default function Dashboard() {
           Overall Stats
         </h3>
         <div className="flex flex-col md:flex-row gap-10">
-          <div className="card2 bg-white w-full md:w-1/3">
+          <div className="card2 w-full md:w-1/3">
             <p className="text-sm text-gray-600">
               Tests Taken
             </p>
@@ -117,7 +117,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="card2 bg-white w-full md:w-1/3">
+          <div className="card2 w-full md:w-1/3">
             <p className="text-sm text-gray-600">
               Avg Score
             </p>
@@ -126,7 +126,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="card2 bg-white w-full md:w-1/3">
+          <div className="card2 w-full md:w-1/3">
             <p className="text-sm text-gray-600">
               Rank
             </p>

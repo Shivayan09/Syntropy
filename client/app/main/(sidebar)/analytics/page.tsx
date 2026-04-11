@@ -15,22 +15,22 @@ export default function Analytics() {
       {/* STAT STRIP */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
 
-        <div className="card2 bg-white">
+        <div className="card2 bg-secondary">
           <p className="text-xs text-gray-600">Tests</p>
           <p className="text-2xl font-bold">24</p>
         </div>
 
-        <div className="card2 bg-white">
+        <div className="card2 bg-secondary">
           <p className="text-xs text-gray-600">Average</p>
           <p className="text-2xl font-bold">68%</p>
         </div>
 
-        <div className="card2 bg-white">
+        <div className="card2 bg-secondary">
           <p className="text-xs text-gray-600">Best</p>
           <p className="text-2xl font-bold">81%</p>
         </div>
 
-        <div className="card2 bg-white">
+        <div className="card2 bg-secondary">
           <p className="text-xs text-gray-600">Improvement</p>
           <p className="text-2xl font-bold text-primary">+12%</p>
         </div>
@@ -41,7 +41,7 @@ export default function Analytics() {
       <div className="grid md:grid-cols-2 gap-8">
 
         {/* SUBJECT RANKING */}
-        <div className="card bg-white">
+        <div className="card bg-secondary">
           <h2 className="font-bold mb-4">
             Subject Ranking
           </h2>
@@ -72,7 +72,7 @@ export default function Analytics() {
         </div>
 
         {/* DIFFICULTY */}
-        <div className="card bg-white">
+        <div className="card bg-secondary">
           <h2 className="font-bold mb-4">
             Difficulty Breakdown
           </h2>
@@ -98,7 +98,7 @@ export default function Analytics() {
         </div>
 
         {/* TIME */}
-        <div className="card bg-white">
+        <div className="card bg-secondary">
           <h2 className="font-bold mb-4">
             Time Metrics
           </h2>
@@ -124,7 +124,7 @@ export default function Analytics() {
         </div>
 
         {/* WEAK TOPICS */}
-        <div className="card bg-white">
+        <div className="card bg-secondary">
           <h2 className="font-bold mb-4">
             Weak Topics
           </h2>
