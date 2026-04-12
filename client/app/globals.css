@@ -59,7 +59,12 @@ body {
 /* =========================
    TYPOGRAPHY
 ========================= */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -104,8 +109,7 @@ button {
 
 button:hover {
   transform: translate(-2px, -2px);
-  box-shadow: calc(var(--shadow-offset) + 2px)
-              calc(var(--shadow-offset) + 2px) 0px black;
+  box-shadow: calc(var(--shadow-offset) + 2px) calc(var(--shadow-offset) + 2px) 0px black;
 }
 
 button:active {
@@ -177,6 +181,7 @@ textarea:focus {
   padding: 20px;
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0px black;
 }
+
 .card2 {
   border: var(--border-width) solid black;
   padding: 20px;

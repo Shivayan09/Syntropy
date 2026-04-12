@@ -1,3 +1,4 @@
+import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
 
 export const updateProfile = async (req, res) => {
@@ -45,4 +46,45 @@ export const updateProfile = async (req, res) => {
             message: error.message
         });
     }
+};
+
+export const updateAvatar = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image uploaded"
+      });
+    }
+
+    const result = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+      {
+        folder: "testify/pfps",
+        width: 500,
+        height: 500,
+        crop: "fill"
+      }
+    );
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar: result.secure_url },
+      { returnDocument: "after" }
+    ).select("-password");
+
+    res.json({
+      success: true,
+      avatar: result.secure_url,
+      user
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
 };

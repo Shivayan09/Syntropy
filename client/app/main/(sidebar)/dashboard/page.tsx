@@ -150,31 +150,37 @@ export default function Dashboard() {
             {attempts.slice(0, visibleCount).map((a) => (
               <div
                 key={a._id}
-                className="flex card justify-between items-center"
+                className="flex card items-center"
               >
-                <span>{a.test?.title || "AI Test"}</span>
+                <div className="w-1/3">
+                  <span>{a.test?.title || "AI Test"}</span>
+                </div>
 
-                <span className="font-bold">
-                  {Math.round(a.accuracy)}%
-                </span>
+                <div className="w-1/3 flex items-center justify-center">
+                  <span className="font-bold">
+                    {Math.round(a.accuracy)}%
+                  </span>
+                </div>
 
-                <button
-                  onClick={() =>
-                    router.push(`/main/attempt/${a._id}`)
-                  }
-                  className="flex items-center gap-1 group"
-                >
-                  Analysis
-                  <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
-                </button>
+                <div className="w-1/3 flex justify-end">
+                  <button
+                    onClick={() =>
+                      router.push(`/main/attempt/${a._id}`)
+                    }
+                    className="flex items-center gap-1 group"
+                  >
+                    Analysis
+                    <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
+                  </button>
+                </div>
               </div>
             ))}
 
             {visibleCount < attempts.length && (
               <div className="w-full flex justify-end">
-                <button onClick={() => setVisibleCount((prev) => prev + 10) } className="button-secondary flex items-center gap-1 group mt-2">
-                Load more tests
-              </button>
+                <button onClick={() => setVisibleCount((prev) => prev + 10)} className="button-secondary flex items-center gap-1 group mt-2">
+                  Load more tests
+                </button>
               </div>
             )}
 

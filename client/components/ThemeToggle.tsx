@@ -30,7 +30,7 @@ export default function ThemeToggle() {
     };
 
     return (
-        <div onClick={toggle} className=" cursor-pointer px-3 py-2 bg-secondary text-(--text) flex items-center justify-center transition-all select-none">
+        <div onClick={toggle} className=" cursor-pointer px-3 py-2 text-(--text) flex items-center justify-center transition-all select-none">
             {dark ? <Sun size={18} /> : <Moon size={18} />}
         </div>
     );
