@@ -18,6 +18,29 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Testify",
   description: "Test your exam preparation",
+
+  openGraph: {
+    title: "Testify",
+    description: "Test your exam preparation",
+    url: "https://testify-jet.vercel.app",
+    siteName: "Testify",
+    images: [
+      {
+        url: "https://testify-jet.vercel.app/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Testify logo",
+      },
+    ],
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Testify",
+    description: "Test your exam preparation",
+    images: ["https://testify-jet.vercel.app/logo.png"],
+  },
 };
 
 export default function RootLayout({
