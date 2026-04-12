@@ -49,42 +49,40 @@ export const updateProfile = async (req, res) => {
 };
 
 export const updateAvatar = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "No image uploaded"
-      });
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded",
+            });
+        }
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        if (user.avatarPublicId) {
+            await cloudinary.uploader.destroy(user.avatarPublicId);
+        }
+        const uploadResult = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+            {
+                folder: "testify/avatars",
+                transformation: [{ width: 300, height: 300, crop: "fill" }, { quality: "auto" }],
+            }
+        );
+        user.avatar = uploadResult.secure_url;
+        user.avatarPublicId = uploadResult.public_id;
+        await user.save();
+        return res.status(200).json({
+            success: true,
+            avatar: user.avatar,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message,
+        });
     }
-
-    const result = await cloudinary.uploader.upload(
-      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-      {
-        folder: "testify/pfps",
-        width: 500,
-        height: 500,
-        crop: "fill"
-      }
-    );
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { avatar: result.secure_url },
-      { returnDocument: "after" }
-    ).select("-password");
-
-    res.json({
-      success: true,
-      avatar: result.secure_url,
-      user
-    });
-
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
 };
