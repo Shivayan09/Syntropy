@@ -19,7 +19,7 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ================= MOBILE NAVBAR ================= */}
+      {/* MOBILE NAVBAR */}
       <div className="md:hidden border-b fixed z-50 w-full bg-(--surface)/80 backdrop-blur-lg border-black/10 px-4 py-3 flex items-center justify-between">
 
         <div onClick={() => nav("/")} className="font-extrabold text-lg text-primary flex items-center gap-1">
@@ -63,7 +63,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ================= DESKTOP NAVBAR ================= */}
+      {/* DESKTOP NAVBAR */}
       <div className="hidden md:flex border-b fixed z-50 w-full bg-(--surface)/80 backdrop-blur-lg border-black/10 px-10 py-3 items-center justify-between">
 
         <div onClick={() => nav("/")} className="font-extrabold cursor-pointer text-primary flex items-center gap-1">

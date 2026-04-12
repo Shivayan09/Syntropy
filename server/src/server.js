@@ -14,8 +14,10 @@ const app = express();
 await connectDB();
 
 app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true
+  origin: ["http://localhost:3000", "https://testify-jet.vercel.app", process.env.FRONTEND_URL],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());
