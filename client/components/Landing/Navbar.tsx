@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ThemeToggle from "../ThemeToggle";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -14,15 +15,14 @@ export default function Navbar() {
     setOpen(false);
   };
 
+  const { user, loading } = useAuth();
+
   return (
     <>
       {/* ================= MOBILE NAVBAR ================= */}
       <div className="md:hidden border-b fixed z-50 w-full bg-(--surface)/80 backdrop-blur-lg border-black/10 px-4 py-3 flex items-center justify-between">
 
-        <div
-          onClick={() => nav("/")}
-          className="font-extrabold text-lg text-primary flex items-center gap-1"
-        >
+        <div onClick={() => nav("/")} className="font-extrabold text-lg text-primary flex items-center gap-1">
           <img src="/logo.png" className="h-6" />
           TESTIFY
         </div>
@@ -33,27 +33,13 @@ export default function Navbar() {
       </div>
 
       {/* MOBILE OVERLAY */}
-      <div
-        onClick={() => setOpen(false)}
-        className={`
-          md:hidden fixed inset-0 bg-black/30 z-40
-          transition-opacity duration-300
-          ${open ? "opacity-100" : "opacity-0 pointer-events-none"}
-        `}
-      />
+      <div onClick={() => setOpen(false)} className={` md:hidden fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"} `} />
 
       {/* MOBILE MENU */}
-      <div
-        className={`
-          md:hidden fixed top-0 right-0 h-screen w-64 bg-secondary z-50 p-6
-          transform transition-transform duration-300 ease-out
-          flex flex-col justify-between
-          ${open ? "translate-x-0" : "translate-x-full"}
-        `}
-      >
+      <div className={` md:hidden fixed top-0 right-0 h-screen w-64 bg-secondary z-50 p-6 transform transition-transform duration-300 ease-out flex flex-col justify-between ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div>
           <div className="absolute top-7 left-5">
-            <ThemeToggle/>
+            <ThemeToggle />
           </div>
           <div className="flex justify-end mb-8">
             <button onClick={() => setOpen(false)}>
@@ -71,10 +57,7 @@ export default function Navbar() {
         </div>
 
         <div className="border-t pt-4">
-          <button
-            className="w-full"
-            onClick={() => nav("/auth/login")}
-          >
+          <button className="w-full" onClick={() => nav("/auth/login")}>
             Sign in
           </button>
         </div>
@@ -83,10 +66,7 @@ export default function Navbar() {
       {/* ================= DESKTOP NAVBAR ================= */}
       <div className="hidden md:flex border-b fixed z-50 w-full bg-(--surface)/80 backdrop-blur-lg border-black/10 px-10 py-3 items-center justify-between">
 
-        <div
-          onClick={() => nav("/")}
-          className="font-extrabold cursor-pointer text-primary flex items-center gap-1"
-        >
+        <div onClick={() => nav("/")} className="font-extrabold cursor-pointer text-primary flex items-center gap-1">
           <img src="/logo.png" className="h-7" />
           TESTIFY
         </div>
@@ -101,9 +81,10 @@ export default function Navbar() {
 
         <div className="flex items-center gap-5">
           <ThemeToggle />
-          <button onClick={() => nav("/auth/login")}>
-            Sign in
-          </button>
+          {!user &&
+            <button onClick={() => nav("/auth/login")}>
+              Sign out
+            </button>}
         </div>
 
       </div>

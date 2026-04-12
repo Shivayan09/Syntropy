@@ -1,10 +1,10 @@
-# 🚀 Testify
+# Testify
 
 A brutal, no-nonsense mock test platform designed to eliminate guesswork and provide **clear, actionable performance insights**.
 
 ---
 
-## 🧠 What is Testify?
+## What is Testify?
 
 Testify is a test-driven learning platform where users:
 
@@ -17,26 +17,26 @@ No fake progress. No fluff. Just clarity.
 
 ---
 
-## ✨ Features
+## Features
 
-* 📊 **Performance Analytics**
+* **Performance Analytics**
   Understand where you stand with clear breakdowns
 
-* 🎯 **Weak Area Detection**
+* **Weak Area Detection**
   Instantly identify topics that need attention
 
-* 🧪 **Mock Tests**
+* **Mock Tests**
   Practice under real test conditions
 
-* 📈 **Progress Tracking**
+* **Progress Tracking**
   Measure improvement over time
 
-* 🔐 **Step-Based Authentication**
+* **Step-Based Authentication**
   Smooth onboarding with multi-step registration
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 **Frontend**
 
@@ -53,7 +53,7 @@ No fake progress. No fluff. Just clarity.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 till now
 ```
 /app
@@ -70,7 +70,7 @@ till now
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
 ### 1. Clone the repo
 
@@ -99,7 +99,7 @@ not hosted yet
 
 ---
 
-## 🔐 Authentication Flow
+## Authentication Flow
 
 1. User enters basic details (name, email, phone)
 2. Email verification (OTP)
@@ -107,7 +107,7 @@ not hosted yet
 
 ---
 
-## 📌 Roadmap
+## Roadmap
 
 * [ ] Backend integration
 * [ ] Real test engine
@@ -118,20 +118,13 @@ not hosted yet
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome.
-If you have ideas to improve performance tracking or UX, feel free to open an issue or PR.
-
----
-
-## 📜 License
+## License
 
 MIT License
 
 ---
 
-## ⚡ Philosophy
+## Philosophy
 
 > Most people don’t improve because they don’t know what they’re doing wrong.
 
