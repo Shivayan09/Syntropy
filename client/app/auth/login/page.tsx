@@ -32,10 +32,11 @@ export default function LoginPage() {
                 return;
             } else {
                 await getMe();
-                toast.success("Logged in successfully")
-                router.push("/main/dashboard");
+                toast.success("Logged in successfully");
+                router.replace("/main/dashboard");
+                router.refresh();
             }
-        } catch (error:any) {
+        } catch (error: any) {
             console.error(error);
             toast.error(error)
         } finally {
