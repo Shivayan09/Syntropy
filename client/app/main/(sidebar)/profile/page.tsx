@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import Loader from "@/components/Loader";
 
 type UserForm = {
   name: string;
@@ -57,7 +58,10 @@ export default function Profile() {
     setDirty(JSON.stringify(form) !== JSON.stringify(original));
   }, [form, original]);
 
-  if (loading || !form) {
+  if(loading) {
+    return <Loader/>
+  }
+  if (!form) {
     return null;
   }
 

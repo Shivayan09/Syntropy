@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 type User = {
@@ -33,11 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getMe = async () => {
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/getMe",
-        {
-          credentials: "include",
-        }
-      );
+      const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/getMe", { credentials: "include" });
       if (!res.ok) {
         setUser(null);
       } else {
@@ -53,6 +50,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     getMe();
   }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, getMe }}>

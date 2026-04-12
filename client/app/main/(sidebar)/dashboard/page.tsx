@@ -9,35 +9,24 @@ export default function Dashboard() {
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
   const [attempts, setAttempts] = useState<any[]>([]);
-  const [visibleCount, setVisibleCount] = useState(3); // start with 3
+  const [visibleCount, setVisibleCount] = useState(3);
 
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        const res = await fetch(
-          BACKEND_URL + "/api/attempt/my",
-          { credentials: "include" }
-        );
-
+        const res = await fetch( BACKEND_URL + "/api/attempt/my", { credentials: "include" });
         const data = await res.json();
         setAttempts(data.attempts || []);
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchAttempts();
   }, []);
 
   const last = attempts[0];
 
-  const avgScore =
-    attempts.length > 0
-      ? Math.round(
-        attempts.reduce((a, b) => a + b.accuracy, 0) /
-        attempts.length
-      )
-      : 0;
+  const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((a, b) => a + b.accuracy, 0) /attempts.length): 0;
 
   return (
     <div className="p-8 pt-20 md:pt-8 py-8">
