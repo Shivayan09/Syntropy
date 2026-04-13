@@ -134,7 +134,7 @@ export default function Sidebar({
       {/* DESKTOP SIDEBAR */}
       <aside className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between transition-all duration-300 ease-in-out ${collapsed ? "w-18 px-2" : "w-54 px-3"} py-6`}>
 
-        <div className={`absolute bottom-6.5 right-5 ${collapsed ? 'hidden' : 'flex'}`}>
+        <div className={`absolute bottom-6.5 right-1 ${collapsed ? 'hidden' : 'flex'}`}>
           <ThemeToggle />
         </div>
         <div>
