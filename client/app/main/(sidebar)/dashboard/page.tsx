@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Loader2 from "@/components/Loader2";
+import NotFound from "@/components/NotFound";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -49,13 +50,9 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <img src="/NotFound2.png" className="w-65 mb-6" />
+          <NotFound/>
 
-          <h2 className="text-xl font-extrabold mb-2">
-            No tests attempted yet
-          </h2>
-
-          <p className="opacity-70 mb-6 max-w-md">
+          <p className="opacity-70 mt-5 mb-6 max-w-md">
             Start your first test to unlock analytics,
             performance tracking and insights
           </p>
