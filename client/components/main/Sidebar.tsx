@@ -1,13 +1,31 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { BarChart3, BookOpen, History, LayoutDashboard, LogOut, Menu, Pen, Settings, User2, X } from "lucide-react";
+import {
+  BarChart3,
+  BookOpen,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Pen,
+  Settings,
+  X,
+  PanelLeft
+} from "lucide-react";
+
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ThemeToggle from "../ThemeToggle";
 
-export default function Sidebar() {
+export default function Sidebar({
+  collapsed = false,
+  setCollapsed,
+}: {
+  collapsed?: boolean;
+  setCollapsed?: (v: boolean) => void;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -35,6 +53,7 @@ export default function Sidebar() {
         method: "POST",
         credentials: "include",
       });
+
       await getMe();
       toast.success("Logged out successfully");
       router.push("/auth/login");
@@ -45,7 +64,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ================= MOBILE TOP BAR ================= */}
+      {/* MOBILE TOP BAR */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-secondary flex items-center px-4 z-50">
         <button onClick={() => setOpen(true)}>
           <Menu size={22} />
@@ -56,20 +75,26 @@ export default function Sidebar() {
         </p>
       </div>
 
-      {/* ================= MOBILE OVERLAY ================= */}
-      <div onClick={() => setOpen(false)} className={` fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
+      {/* MOBILE OVERLAY */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      />
 
-      {/* ================= MOBILE SIDEBAR ================= */}
+      {/* MOBILE SIDEBAR */}
       <aside
-        className={` fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        className={`fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}
+      >
         <div>
           <div className="absolute bottom-4 right-5">
-            <ThemeToggle/>
+            <ThemeToggle />
           </div>
+
           <div className="flex justify-between items-center mb-6">
             <p onClick={() => navigate("/")} className="cursor-pointer font-extrabold text-lg text-primary">
               TESTIFY
             </p>
+
             <button onClick={() => setOpen(false)}>
               <X size={20} />
             </button>
@@ -82,24 +107,24 @@ export default function Sidebar() {
               Dashboard
             </div>
 
-            <div className={itemClass("/main/test")} onClick={() => navigate("/main/tests")}>
+            <div className={itemClass("/main/tests")} onClick={() => navigate("/main/tests")}>
               <BookOpen size={18} />
               All Tests
+            </div>
+
+            <div className={itemClass("/main/create")} onClick={() => navigate("/main/create")}>
+              <Pen size={18} />
+              Create test
+            </div>
+
+            <div className={itemClass("/main/history")} onClick={() => navigate("/main/history")}>
+              <History size={18} />
+              History
             </div>
 
             <div className={itemClass("/main/analytics")} onClick={() => navigate("/main/analytics")}>
               <BarChart3 size={18} />
               Analytics
-            </div>
-
-            <div className={itemClass("/main/history")} onClick={() => router.push("/main/history")}>
-              <History size={18} />
-              History
-            </div>
-
-            <div className={itemClass("/main/create")} onClick={() => router.push("/main/create")}>
-              <Pen size={18} />
-              Create test
             </div>
 
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
@@ -116,50 +141,81 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* ================= DESKTOP SIDEBAR ================= */}
-      <aside className="hidden relative md:flex w-54 h-screen bg-secondary py-6 px-3 flex-col justify-between">
+      {/* DESKTOP SIDEBAR */}
+      <aside
+        className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between
+        transition-all duration-300 ease-in-out
+        ${collapsed ? "w-[72px] px-2" : "w-[216px] px-3"} py-6`}
+      >
 
+
+        <div className={`absolute bottom-6.5 right-5 ${collapsed ? 'hidden' : 'flex'}`}>
+          <ThemeToggle />
+        </div>
         <div>
-          <div className="absolute top-5 right-5">
-            <ThemeToggle/>
-          </div>
-          <div className="flex items-center gap-1 mb-7 ml-2">
-            <img src="/logo.png" alt="" className="h-7" />
-            <p onClick={() => router.push("/")} className="cursor-pointer font-extrabold text-primary">
-              TESTIFY
-            </p>
-          </div>
+          {/* collapse button */}
+          {setCollapsed && (
+            <div
+              onClick={() => setCollapsed(!collapsed)}
+              className="absolute top-7 right-3 cursor-pointer"
+            >
+              <PanelLeft size={20} />
+            </div>
+          )}
 
-          <nav className="space-y-3 text-sm font-bold">
+          {!collapsed && <div className="flex items-center gap-1 mb-7 ml-2">
+            <img src="/logo.png" className="h-7" />
+
+            <span
+              className={`font-extrabold text-primary whitespace-nowrap transition-all duration-200
+              ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}
+            >
+              TESTIFY
+            </span>
+          </div>}
+
+          <nav className={`space-y-3 text-sm font-bold ${collapsed && 'mt-14'}`}>
 
             <div className={itemClass("/main/dashboard")} onClick={() => router.push("/main/dashboard")}>
               <LayoutDashboard size={18} />
-              Dashboard
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Dashboard
+              </span>
             </div>
 
             <div className={itemClass("/main/tests")} onClick={() => router.push("/main/tests")}>
               <BookOpen size={18} />
-              All Tests
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                All Tests
+              </span>
             </div>
 
             <div className={itemClass("/main/create")} onClick={() => router.push("/main/create")}>
               <Pen size={18} />
-              Create test
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Create test
+              </span>
             </div>
 
             <div className={itemClass("/main/history")} onClick={() => router.push("/main/history")}>
               <History size={18} />
-              History
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                History
+              </span>
             </div>
 
             <div className={itemClass("/main/analytics")} onClick={() => router.push("/main/analytics")}>
               <BarChart3 size={18} />
-              Analytics
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Analytics
+              </span>
             </div>
 
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
               <Settings size={18} />
-              Settings
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Settings
+              </span>
             </div>
 
           </nav>
@@ -167,7 +223,9 @@ export default function Sidebar() {
 
         <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={handleLogout}>
           <LogOut size={18} />
-          Logout
+          <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+            Logout
+          </span>
         </div>
 
       </aside>

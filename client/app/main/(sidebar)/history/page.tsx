@@ -32,7 +32,6 @@ export default function AttemptsPage() {
         const title = (a.test?.title || "AI Test").toLowerCase();
         const subject = (a.test?.subjects?.[0] || "").toLowerCase();
         const q = search.toLowerCase();
-
         return title.includes(q) || subject.includes(q);
     });
 
@@ -51,15 +50,7 @@ export default function AttemptsPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-                <input
-                    placeholder="Search test..."
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setVisible(5);
-                    }}
-                    className="flex-2 min-w-62.5"
-                />
+                <input placeholder="Search test..." value={search} onChange={(e) => { setSearch(e.target.value); setVisible(5);}} className="flex-2 min-w-62.5"/>
 
                 <select className="flex-1 min-w-40">
                     <option>All Subjects</option>
@@ -120,7 +111,7 @@ export default function AttemptsPage() {
                                         Review
                                     </button>
 
-                                    <button onClick={() => router.push(`/main/test/${attempt.test?._id}`)} >
+                                    <button onClick={() => router.push(`/main/test/preview/${attempt.test?._id}`)} >
                                         Retake
                                     </button>
                                 </div>
