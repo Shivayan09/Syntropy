@@ -2,7 +2,7 @@
 
 export default function Analytics() {
   return (
-    <div className="px-4 md:px-8 py-20 md:py-8 max-w-7xl">
+    <div>
 
       {/* HEADER */}
       <div className="mb-8">

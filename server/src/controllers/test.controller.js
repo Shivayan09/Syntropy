@@ -11,7 +11,7 @@ export const createTest = async (req, res) => {
                 message: "Title is required"
             });
         }
-        if(subjects.length<1) {
+        if (subjects.length < 1) {
             return res.status(400).json({
                 success: false,
                 message: "Enter atleast 1 subject"
@@ -67,7 +67,7 @@ export const createTest = async (req, res) => {
 
 export const getTest = async (req, res) => {
     try {
-        const test = await Test.findById(req.params.id);
+        const test = await Test.findOne({ _id: req.params.id, createdBy: req.user._id });
         if (!test) {
             return res.status(404).json({
                 success: false,
@@ -88,7 +88,7 @@ export const getTest = async (req, res) => {
 
 export const getAllTests = async (req, res) => {
     try {
-        const tests = await Test.find().select("-questions").sort({ createdAt: -1 });
+        const tests = await Test.find({ createdBy: req.user._id }).select("-questions").sort({ createdAt: -1 });
         res.status(200).json({
             success: true,
             tests
@@ -103,7 +103,7 @@ export const getAllTests = async (req, res) => {
 
 export const getTestForAttempt = async (req, res) => {
     try {
-        const test = await Test.findById(req.params.id).select("-questions.correctAnswer");
+        const test = await Test.findOne({ _id: req.params.id, createdBy: req.user._id }).select("-questions.correctAnswer");
         res.status(200).json({
             success: true,
             test

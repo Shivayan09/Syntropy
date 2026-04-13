@@ -9,11 +9,11 @@ export default function CreateTestPage() {
     const router = useRouter();
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="space-y-6">
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-extrabold">Create Test</h1>
-                <p className="opacity-70">Choose how you want to create your test</p>
+                <p className="opacity-70 mt-2">Choose how you want to create your test</p>
             </div>
 
             {/* Options */}

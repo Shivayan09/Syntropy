@@ -6,8 +6,8 @@ const testRouter = express.Router();
 
 testRouter.post("/create", protect, createTest);
 testRouter.post("/generate", protect, aiTest);
-testRouter.get("/all", getAllTests);
-testRouter.get("/:id", getTest);
+testRouter.get("/all", protect, getAllTests);
+testRouter.get("/:id", protect, getTest);
 testRouter.get("/:id/attempt", protect, getTestForAttempt);
 
 export default testRouter;

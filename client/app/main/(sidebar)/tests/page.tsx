@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, BookOpen, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, ClipboardPen, Sparkles } from "lucide-react";
+import NotFound from "@/components/NotFound";
+import Loader from "@/components/Loader";
+import Loader2 from "@/components/Loader2";
 
 type Test = {
     _id: string;
@@ -24,7 +27,7 @@ export default function TestsPage() {
     useEffect(() => {
         const fetchTests = async () => {
             try {
-                const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include"});
+                const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include" });
                 const data = await res.json();
                 if (!res.ok) return;
                 setTests(data.tests);
@@ -43,7 +46,7 @@ export default function TestsPage() {
             : tests.filter((t) => t.type === "generated");
 
     return (
-        <div className="p-8 pt-20 md:pt-8">
+        <div>
 
             <div className="mb-6">
                 <h1 className="text-3xl font-extrabold mb-1">Tests</h1>
@@ -64,12 +67,18 @@ export default function TestsPage() {
 
             <div className="space-y-3">
 
-                {loading && <p>Loading tests...</p>}
+                {loading && <Loader2 />}
 
                 {!loading && filtered.length === 0 && (
-                    <p className="text-gray-500">
-                        No tests found
-                    </p>
+                    <div>
+                        <NotFound/>
+                        <div className="w-full flex items-center justify-center">
+                            <button onClick={() => router.push('/main/create')} className="mt-10 flex items-center gap-2 group">
+                                Create a test
+                                <ArrowRight className="mt-0.5 transition-all duration-200 group-hover:translate-x-1"/>
+                            </button>
+                        </div>
+                    </div>
                 )}
 
                 {filtered.map((test) => (
@@ -95,7 +104,7 @@ export default function TestsPage() {
                             </div>
                         </div>
 
-                        <button className="button-secondary w-full md:w-fit flex items-center gap-1 group" onClick={() => router.push(`/main/test/preview/${test._id}`) }>
+                        <button className="button-secondary w-full md:w-fit flex items-center gap-1 group" onClick={() => router.push(`/main/test/preview/${test._id}`)}>
                             Attempt
                             <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
                         </button>

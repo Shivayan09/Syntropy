@@ -15,7 +15,7 @@ const testSchema = new mongoose.Schema(
         title: { type: String, required: true, trim: true },
         description: { type: String, default: "" },
         type: { type: String, enum: ["generated", "manual"], required: true },
-        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
         difficulty: { type: String, enum: ["Easy", "Medium", "Hard"] },
         subjects: { type: [String], default: [] },
         totalQuestions: { type: Number, required: true },

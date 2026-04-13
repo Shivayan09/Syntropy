@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
+import Loader2 from "@/components/Loader2";
 
 type UserForm = {
   name: string;
@@ -59,7 +60,7 @@ export default function Profile() {
   }, [form, original]);
 
   if(loading) {
-    return <Loader/>
+    return <Loader2/>
   }
   if (!form) {
     return null;
@@ -158,7 +159,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="mx-auto px-5 pt-20 md:pt-8 md:px-10 py-8">
+    <div>
 
       <div className="mb-10">
         <h1 className="text-3xl font-extrabold">Profile</h1>
