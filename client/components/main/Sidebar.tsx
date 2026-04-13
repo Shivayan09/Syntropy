@@ -145,7 +145,7 @@ export default function Sidebar({
       <aside
         className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between
         transition-all duration-300 ease-in-out
-        ${collapsed ? "w-[72px] px-2" : "w-[216px] px-3"} py-6`}
+        ${collapsed ? "w-18 px-2" : "w-54 px-3"} py-6`}
       >
 
 
