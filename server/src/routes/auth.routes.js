@@ -9,4 +9,4 @@ authRouter.post('/login', login);
 authRouter.post('/logout', logout);
 authRouter.get('/getMe', protect, getMe);
 
-export default authRouter
+export default authRouter;

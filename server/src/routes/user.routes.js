@@ -8,4 +8,4 @@ const userRouter = express.Router();
 userRouter.put('/update-profile', protect, updateProfile);
 userRouter.put("/update-avatar", protect, upload.single("avatar"), updateAvatar);
 
-export default userRouter
+export default userRouter;
