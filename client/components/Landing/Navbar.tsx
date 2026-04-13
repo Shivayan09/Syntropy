@@ -57,9 +57,10 @@ export default function Navbar() {
         </div>
 
         <div className="border-t pt-4">
-          <button className="w-full" onClick={() => nav("/auth/login")}>
-            Sign in
-          </button>
+          {!user &&
+            <button onClick={() => nav("/auth/login")}>
+              Sign in
+            </button>}
         </div>
       </div>
 
@@ -83,7 +84,7 @@ export default function Navbar() {
           <ThemeToggle />
           {!user &&
             <button onClick={() => nav("/auth/login")}>
-              Sign out
+              Sign in
             </button>}
         </div>
 

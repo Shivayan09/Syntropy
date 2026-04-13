@@ -50,39 +50,7 @@ export default function TestsPage() {
                 <p className="text-gray-600">Select a test to begin</p>
             </div>
 
-            <div className="card2 mb-6 flex flex-col md:flex-row mt-5 md:mt-0 justify-between items-center">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <Sparkles size={16} />
-                        <p className="font-bold">AI Test Generator</p>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                        Generate test using difficulty and topics
-                    </p>
-                </div>
-
-                <button className="w-full md:w-32 mt-5 md:mt-0" onClick={() => router.push("/main/test/generate")}>
-                    Generate
-                </button>
-            </div>
-
-            <div className="card2 mb-6 flex flex-col md:flex-row justify-between items-center">
-                <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <BookOpen size={16} />
-                        <p className="font-bold">Manual Test Builder</p>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                        Create a custom test with your own questions
-                    </p>
-                </div>
-
-                <button className="w-full md:w-32 mt-5 md:mt-0" onClick={() => router.push("/main/test/create")}>
-                    Create
-                </button>
-            </div>
-
-            <div className="flex gap-3 mb-6 mt-10">
+            <div className="flex gap-3 mb-6">
 
                 <button className={type === "manual" ? "" : "button-secondary"} onClick={() => setType("manual")}>
                     Manual Tests

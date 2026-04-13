@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
 import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
-
+    const { getMe } = useAuth();
     const [loading, setLoading] = useState(false);
 
     const [form, setForm] = useState({
@@ -50,9 +51,11 @@ export default function RegisterPage() {
             if (!res.ok) {
                 toast.warn(data.message)
                 return;
+            } else {
+                await getMe();
+                toast.success("Account created")
+                router.push("/main/dashboard");
             }
-            toast.success("Account created successfully")
-            router.replace("/main/dashboard");
         } catch (err: any) {
             console.error(err);
             toast.error(err)
