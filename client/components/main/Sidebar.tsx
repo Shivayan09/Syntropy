@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { BarChart3, BookOpen, LayoutDashboard, LogOut, Menu, User2, X } from "lucide-react";
+import { BarChart3, BookOpen, History, LayoutDashboard, LogOut, Menu, Pen, User2, X } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -84,12 +84,22 @@ export default function Sidebar() {
 
             <div className={itemClass("/main/test")} onClick={() => navigate("/main/test")}>
               <BookOpen size={18} />
-              Tests
+              All Tests
             </div>
 
             <div className={itemClass("/main/analytics")} onClick={() => navigate("/main/analytics")}>
               <BarChart3 size={18} />
               Analytics
+            </div>
+
+            <div className={itemClass("/main/attempts")} onClick={() => router.push("/main/attempts")}>
+              <History size={18} />
+              My Attempts
+            </div>
+
+            <div className={itemClass("/main/create")} onClick={() => router.push("/main/create")}>
+              <Pen size={18} />
+              Create test
             </div>
 
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
@@ -127,14 +137,24 @@ export default function Sidebar() {
               Dashboard
             </div>
 
-            <div className={itemClass("/main/test")} onClick={() => router.push("/main/test")}>
+            <div className={itemClass("/main/tests")} onClick={() => router.push("/main/tests")}>
               <BookOpen size={18} />
-              Tests
+              All Tests
             </div>
 
             <div className={itemClass("/main/analytics")} onClick={() => router.push("/main/analytics")}>
               <BarChart3 size={18} />
               Analytics
+            </div>
+
+            <div className={itemClass("/main/attempts")} onClick={() => router.push("/main/attempts")}>
+              <History size={18} />
+              My Attempts
+            </div>
+
+            <div className={itemClass("/main/create")} onClick={() => router.push("/main/create")}>
+              <Pen size={18} />
+              Create test
             </div>
 
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>

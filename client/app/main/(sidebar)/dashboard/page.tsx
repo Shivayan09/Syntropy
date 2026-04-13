@@ -14,7 +14,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        const res = await fetch( BACKEND_URL + "/api/attempt/my", { credentials: "include" });
+        const res = await fetch(BACKEND_URL + "/api/attempt/my", { credentials: "include" });
         const data = await res.json();
         setAttempts(data.attempts || []);
       } catch (err) {
@@ -26,7 +26,7 @@ export default function Dashboard() {
 
   const last = attempts[0];
 
-  const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((a, b) => a + b.accuracy, 0) /attempts.length): 0;
+  const avgScore = attempts.length > 0 ? Math.round(attempts.reduce((a, b) => a + b.accuracy, 0) / attempts.length) : 0;
 
   return (
     <div className="p-8 pt-20 md:pt-8 py-8">
@@ -137,27 +137,21 @@ export default function Dashboard() {
           <div className="space-y-3 text-sm">
 
             {attempts.slice(0, visibleCount).map((a) => (
-              <div
-                key={a._id}
-                className="flex card items-center"
-              >
-                <div className="w-1/3">
-                  <span>{a.test?.title || "AI Test"}</span>
+              <div key={a._id} className="flex flex-col md:flex-row card items-center">
+                <div className="flex w-full md:w-2/3">
+                  <div className="w-full md:w-1/2">
+                    <span>{a.test?.title || "AI Test"}</span>
+                  </div>
+
+                  <div className="w-full md:w-1/2 flex items-center justify-center">
+                    <span className="font-bold">
+                      {Math.round(a.accuracy)}%
+                    </span>
+                  </div>
                 </div>
 
-                <div className="w-1/3 flex items-center justify-center">
-                  <span className="font-bold">
-                    {Math.round(a.accuracy)}%
-                  </span>
-                </div>
-
-                <div className="w-1/3 flex justify-end">
-                  <button
-                    onClick={() =>
-                      router.push(`/main/attempt/${a._id}`)
-                    }
-                    className="flex items-center gap-1 group"
-                  >
+                <div className="w-full md:w-1/3 flex justify-end">
+                  <button onClick={() => router.push(`/main/attempt/${a._id}`)} className="w-full md:w-fit flex items-center gap-1 group" >
                     Analysis
                     <ArrowRight className="group-hover:translate-x-1 transition-all duration-200" />
                   </button>
