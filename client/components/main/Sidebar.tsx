@@ -33,12 +33,7 @@ export default function Sidebar({
 
   const isActive = (path: string) => pathname.startsWith(path);
 
-  const itemClass = (path: string) =>
-    `flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors
-     ${isActive(path)
-      ? "bg-primary text-white"
-      : "hover:bg-black/5 dark:hover:bg-white/5"
-    }`;
+  const itemClass = (path: string) => `flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors  ${isActive(path) ? "bg-primary text-white" : "hover:bg-black/5 dark:hover:bg-white/5"}`;
 
   const navigate = (path: string) => {
     router.push(path);
@@ -76,15 +71,10 @@ export default function Sidebar({
       </div>
 
       {/* MOBILE OVERLAY */}
-      <div
-        onClick={() => setOpen(false)}
-        className={`fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-      />
+      <div onClick={() => setOpen(false)} className={`fixed inset-0 bg-black/30 z-40 md:hidden transition-opacity duration-300 ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`} />
 
       {/* MOBILE SIDEBAR */}
-      <aside
-        className={`fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}
-      >
+      <aside className={`fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div>
           <div className="absolute bottom-4 right-5">
             <ThemeToggle />
@@ -142,23 +132,14 @@ export default function Sidebar({
       </aside>
 
       {/* DESKTOP SIDEBAR */}
-      <aside
-        className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between
-        transition-all duration-300 ease-in-out
-        ${collapsed ? "w-18 px-2" : "w-54 px-3"} py-6`}
-      >
-
+      <aside className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between transition-all duration-300 ease-in-out ${collapsed ? "w-18 px-2" : "w-54 px-3"} py-6`}>
 
         <div className={`absolute bottom-6.5 right-5 ${collapsed ? 'hidden' : 'flex'}`}>
           <ThemeToggle />
         </div>
         <div>
-          {/* collapse button */}
           {setCollapsed && (
-            <div
-              onClick={() => setCollapsed(!collapsed)}
-              className="absolute top-7 right-3 cursor-pointer"
-            >
+            <div onClick={() => setCollapsed(!collapsed)} className="absolute top-7 right-3 cursor-pointer">
               <PanelLeft size={20} />
             </div>
           )}
@@ -166,10 +147,7 @@ export default function Sidebar({
           {!collapsed && <div className="flex items-center gap-1 mb-7 ml-2">
             <img src="/logo.png" className="h-7" />
 
-            <span
-              className={`font-extrabold text-primary whitespace-nowrap transition-all duration-200
-              ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}
-            >
+            <span className={`font-extrabold text-primary whitespace-nowrap transition-all duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
               TESTIFY
             </span>
           </div>}
