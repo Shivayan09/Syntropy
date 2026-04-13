@@ -11,6 +11,7 @@ export default function AttemptsPage() {
     const [attempts, setAttempts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [visible, setVisible] = useState(5);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const fetchAttempts = async () => {
@@ -27,7 +28,15 @@ export default function AttemptsPage() {
         fetchAttempts();
     }, []);
 
-    const visibleAttempts = attempts.slice(0, visible);
+    const filteredAttempts = attempts.filter((a) => {
+        const title = (a.test?.title || "AI Test").toLowerCase();
+        const subject = (a.test?.subjects?.[0] || "").toLowerCase();
+        const q = search.toLowerCase();
+
+        return title.includes(q) || subject.includes(q);
+    });
+
+    const visibleAttempts = filteredAttempts.slice(0, visible);
 
     return (
         <div className="space-y-6">
@@ -42,7 +51,15 @@ export default function AttemptsPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-                <input placeholder="Search test..." className="flex-2 min-w-62.5" />
+                <input
+                    placeholder="Search test..."
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setVisible(5);
+                    }}
+                    className="flex-2 min-w-62.5"
+                />
 
                 <select className="flex-1 min-w-40">
                     <option>All Subjects</option>
@@ -58,12 +75,12 @@ export default function AttemptsPage() {
             <div className="space-y-4">
                 {loading ? (
                     <Loader2 />
-                ) : attempts.length === 0 ? (
+                ) : filteredAttempts.length === 0 ? (
                     <div className="flex flex-col items-center py-16">
                         <NotFound />
 
                         <p className="opacity-70 text-sm mt-1">
-                            Your test history will appear here
+                            No matching attempts found
                         </p>
                     </div>
                 ) : (
@@ -98,7 +115,6 @@ export default function AttemptsPage() {
                                     </p>
                                 </div>
 
-                                {/* right */}
                                 <div className="flex gap-3">
                                     <button className="button-secondary" onClick={() => router.push(`/main/attempt/${attempt._id}`)}>
                                         Review
@@ -111,7 +127,7 @@ export default function AttemptsPage() {
                             </div>
                         ))}
 
-                        {visible < attempts.length && (
+                        {visible < filteredAttempts.length && (
                             <div className="flex justify-end">
                                 <button className="button-secondary" onClick={() => setVisible((prev) => prev + 10)} >
                                     Load more
