@@ -147,12 +147,12 @@ export default function Sidebar({
           {!collapsed && <div className="flex items-center gap-1 mb-7 ml-2">
             <img src="/logo.png" className="h-7" />
 
-            <span className={`font-extrabold text-primary whitespace-nowrap transition-all duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+            <span onClick={() => router.push('/')} className={`cursor-pointer font-extrabold text-primary whitespace-nowrap transition-all duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
               TESTIFY
             </span>
           </div>}
 
-          <nav className={`space-y-3 text-sm font-bold ${collapsed && 'mt-14'}`}>
+          <nav className={`space-y-3 text-sm font-semibold ${collapsed && 'mt-14'}`}>
 
             <div className={itemClass("/main/dashboard")} onClick={() => router.push("/main/dashboard")}>
               <LayoutDashboard size={18} />
