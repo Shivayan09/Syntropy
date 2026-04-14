@@ -50,7 +50,15 @@ export default function AttemptsPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-                <input placeholder="Search test..." value={search} onChange={(e) => { setSearch(e.target.value); setVisible(5);}} className="flex-2 min-w-62.5"/>
+                <input
+                    placeholder="Search test..."
+                    value={search}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setVisible(5);
+                    }}
+                    className="flex-2 min-w-62.5"
+                />
 
                 <select className="flex-1 min-w-40">
                     <option>All Subjects</option>
@@ -77,13 +85,16 @@ export default function AttemptsPage() {
                 ) : (
                     <>
                         {visibleAttempts.map((attempt) => (
-                            <div key={attempt._id} className="card flex items-center justify-between">
+                            <div
+                                key={attempt._id}
+                                className="card flex flex-col md:flex-row md:items-center justify-between gap-4"
+                            >
                                 <div>
                                     <p className="font-extrabold text-lg">
                                         {attempt.test?.title || "AI Test"}
                                     </p>
 
-                                    <div className="flex gap-10 mt-2 text-sm">
+                                    <div className="flex flex-wrap gap-x-10 gap-y-1 mt-2 text-sm">
                                         <span>
                                             Subject: {attempt.test?.subjects?.[0] || "-"}
                                         </span>
@@ -106,12 +117,17 @@ export default function AttemptsPage() {
                                     </p>
                                 </div>
 
-                                <div className="flex gap-3">
-                                    <button className="button-secondary" onClick={() => router.push(`/main/history/review/${attempt._id}`)}>
+                                <div className="flex gap-3 w-full md:w-auto justify-end">
+                                    <button
+                                        className="button-secondary"
+                                        onClick={() => router.push(`/main/history/review/${attempt._id}`)}
+                                    >
                                         Review
                                     </button>
 
-                                    <button onClick={() => router.push(`/main/test/preview/${attempt.test?._id}`)} >
+                                    <button
+                                        onClick={() => router.push(`/main/test/preview/${attempt.test?._id}`)}
+                                    >
                                         Retake
                                     </button>
                                 </div>
@@ -120,7 +136,10 @@ export default function AttemptsPage() {
 
                         {visible < filteredAttempts.length && (
                             <div className="flex justify-end">
-                                <button className="button-secondary" onClick={() => setVisible((prev) => prev + 10)} >
+                                <button
+                                    className="button-secondary"
+                                    onClick={() => setVisible((prev) => prev + 10)}
+                                >
                                     Load more
                                 </button>
                             </div>

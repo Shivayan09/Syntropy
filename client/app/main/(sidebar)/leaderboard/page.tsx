@@ -11,7 +11,11 @@ export default function LeaderboardPage() {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const res = await fetch(BACKEND_URL + "/api/leaderboard", { credentials: "include" });
+                const res = await fetch(
+                    BACKEND_URL + "/api/leaderboard",
+                    { credentials: "include" }
+                );
+
                 const data = await res.json();
                 setUsers(data.users || []);
             } catch (err) {
@@ -20,6 +24,7 @@ export default function LeaderboardPage() {
                 setLoading(false);
             }
         };
+
         fetchLeaderboard();
     }, []);
 
@@ -42,7 +47,9 @@ export default function LeaderboardPage() {
 
             <div className="card p-0 overflow-hidden">
 
-                <div className="grid grid-cols-5 font-bold border-b px-4 py-3 bg-secondary">
+                {/* HEADER */}
+                <div className="hidden md:grid font-bold border-b px-4 py-3 bg-secondary
+                [grid-template-columns:80px_1fr_120px_100px_120px]">
                     <div>Rank</div>
                     <div>User</div>
                     <div>Accuracy</div>
@@ -51,26 +58,67 @@ export default function LeaderboardPage() {
                 </div>
 
                 {users.map((u, i) => (
-                    <div key={u._id} className="grid grid-cols-5 px-4 py-3 items-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        <div className="font-bold">
-                            #{i + 1}
+                    <div
+                        key={u._id}
+                        className="border-t md:border-0"
+                    >
+
+                        {/* DESKTOP ROW */}
+                        <div
+                            className="hidden md:grid px-4 py-3 items-center
+                            hover:bg-black/5 dark:hover:bg-white/5 transition-colors
+                            [grid-template-columns:80px_1fr_120px_100px_120px]"
+                        >
+                            <div className="font-bold">
+                                #{i + 1}
+                            </div>
+
+                            <div className="font-semibold truncate">
+                                {u.name}
+                            </div>
+
+                            <div>
+                                {Math.round(u.avgAccuracy)}%
+                            </div>
+
+                            <div>
+                                {u.testsTaken}
+                            </div>
+
+                            <div className="font-bold">
+                                {Math.round(u.avgScore)}
+                            </div>
                         </div>
 
-                        <div className="font-semibold">
-                            {u.name}
+                        {/* MOBILE CARD */}
+                        <div className="md:hidden px-4 py-3 space-y-2">
+
+                            <div className="flex justify-between">
+                                <span className="font-bold">
+                                    #{i + 1}
+                                </span>
+
+                                <span className="font-bold">
+                                    {Math.round(u.avgAccuracy)}%
+                                </span>
+                            </div>
+
+                            <div className="font-semibold">
+                                {u.name}
+                            </div>
+
+                            <div className="flex justify-between text-sm opacity-80">
+                                <span>
+                                    Tests: {u.testsTaken}
+                                </span>
+
+                                <span>
+                                    Score: {Math.round(u.avgScore)}
+                                </span>
+                            </div>
+
                         </div>
 
-                        <div>
-                            {Math.round(u.avgAccuracy)}%
-                        </div>
-
-                        <div>
-                            {u.testsTaken}
-                        </div>
-
-                        <div className="font-bold">
-                            {Math.round(u.avgScore)}
-                        </div>
                     </div>
                 ))}
 
