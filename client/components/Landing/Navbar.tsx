@@ -49,7 +49,7 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-6 font-semibold">
             <p onClick={() => nav("/")}>Home</p>
-            <p onClick={() => nav("/tests")}>Tests</p>
+            <p onClick={() => nav("/main/tests")}>Tests</p>
             <p onClick={() => nav("/main/dashboard")}>Dashboard</p>
             <p onClick={() => nav("/main/analytics")}>Analysis</p>
             <p>Contact</p>
