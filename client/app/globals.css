@@ -7,42 +7,41 @@ body {
   font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
-/* =========================
-   THEME VARIABLES (LIGHT)
-========================= */
 :root {
-  /* Core colors */
   --bg: #ffffff;
   --bg-secondary: #f5f5f5;
   --surface: #ffffff;
-
   --text: #111111;
-
+  --shadow: #000000;
   --primary: #00a85a;
   --primary-dark: #007a42;
   --accent: #00ffaa;
-
-  --border: #000000;
-
-  /* Neo-brutalism specifics */
+  --border: #505050;
   --radius: 0px;
-  --border-width: 2px;
+  --border-width: 1px;
   --shadow-offset: 4px;
-
-  /* Effects */
   --transition: 0.15s ease-in-out;
 }
 
-/* =========================
-   BASE STYLES
-========================= */
+.dark {
+  --bg: #0e0e0e;
+  --bg-secondary: #161616;
+  --surface: #111111;
+  --text: #f5f5f5;
+  --shadow: #2a2a2a;
+  --border-width: 1px;
+  --primary: #00c46a;
+  --primary-dark: #009452;
+  --accent: #00ffaa;
+  --border: #323232;
+}
+
 body {
   background-color: var(--bg);
   color: var(--text);
   line-height: 1.6;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -56,22 +55,11 @@ body {
   border: 2px solid var(--bg);
 }
 
-/* =========================
-   TYPOGRAPHY
-========================= */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-/* =========================
-   LINKS
-========================= */
 a {
   color: var(--primary);
   text-decoration: none;
@@ -83,26 +71,18 @@ a:hover {
   border-bottom: 2px solid var(--primary);
 }
 
-/* =========================
-   BUTTONS
-========================= */
 button {
   background: var(--primary);
   color: white;
   border: var(--border-width) solid black;
-
   padding: 0 20px;
   height: 40px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   font-weight: 700;
   cursor: pointer;
-
   border-radius: 999px;
-
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0px black;
   transition: var(--transition);
 }
@@ -124,9 +104,6 @@ button:active {
   border: var(--border-width) solid black;
 }
 
-/* =========================
-   UTILITIES
-========================= */
 .bg-primary {
   background-color: var(--primary);
 }
@@ -151,12 +128,7 @@ button:active {
   border-color: black;
 }
 
-/* =========================
-   INPUTS
-========================= */
-input,
-textarea,
-select {
+input, textarea, select {
   background: var(--bg-secondary);
   color: var(--text);
   border: var(--border-width) solid black;
@@ -166,58 +138,31 @@ select {
   transition: var(--transition);
 }
 
-input:focus,
-textarea:focus {
+input:focus, textarea:focus {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px black;
 }
 
-/* =========================
-   CARDS
-========================= */
 .card {
-  border: var(--border-width) solid black;
+  border: var(--border-width) solid var(--border);
   background-color: var(--bg-secondary);
   padding: 20px;
-  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px black;
+  box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--shadow);
 }
 
 .card2 {
-  border: var(--border-width) solid black;
+  border: var(--border-width) solid var(--border);
+  background-color: var(--bg-secondary);
   padding: 20px;
   box-shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--primary);
 }
 
-/* =========================
-   SELECTION
-========================= */
 ::selection {
   background: var(--primary);
   color: white;
 }
 
-/* =========================
-   FOCUS
-========================= */
 :focus-visible {
   outline: 2px dashed var(--primary);
   outline-offset: 3px;
-}
-
-
-/* =========================
-   DARK MODE
-========================= */
-.dark {
-  --bg: #0e0e0e;
-  --bg-secondary: #161616;
-  --surface: #111111;
-
-  --text: #f5f5f5;
-
-  --primary: #00c46a;
-  --primary-dark: #009452;
-  --accent: #00ffaa;
-
-  --border: #ffffff;
 }
