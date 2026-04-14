@@ -11,11 +11,7 @@ export default function LeaderboardPage() {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const res = await fetch(
-                    BACKEND_URL + "/api/leaderboard",
-                    { credentials: "include" }
-                );
-
+                const res = await fetch(BACKEND_URL + "/api/leaderboard", { credentials: "include" });
                 const data = await res.json();
                 setUsers(data.users || []);
             } catch (err) {
@@ -24,7 +20,6 @@ export default function LeaderboardPage() {
                 setLoading(false);
             }
         };
-
         fetchLeaderboard();
     }, []);
 
@@ -58,17 +53,10 @@ export default function LeaderboardPage() {
                 </div>
 
                 {users.map((u, i) => (
-                    <div
-                        key={u._id}
-                        className="border-t md:border-0"
-                    >
+                    <div key={u._id} className="border-t md:border-0" >
 
                         {/* DESKTOP ROW */}
-                        <div
-                            className="hidden md:grid px-4 py-3 items-center
-                            hover:bg-black/5 dark:hover:bg-white/5 transition-colors
-                            grid-cols-[80px_1fr_120px_100px_120px]"
-                        >
+                        <div className="hidden md:grid px-4 py-3 items-center hover:bg-black/5 dark:hover:bg-white/5 transition-colors grid-cols-[80px_1fr_120px_100px_120px]">
                             <div className="font-bold">
                                 #{i + 1}
                             </div>
