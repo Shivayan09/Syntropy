@@ -22,7 +22,12 @@ export const submitAttempt = async (req, res) => {
         });
         const score = correct;
         const accuracy = (correct / test.questions.length) * 100;
-        const attempt = await Attempt.create({ user: userId, test: testId, answers, score, correct, wrong, skipped, accuracy, status: "completed" });
+        const existing = await Attempt.findOne({
+            user: userId,
+            test: testId,
+            isFirstAttempt: true
+        });
+        const attempt = await Attempt.create({ user: userId, test: testId, answers, score, correct, wrong, skipped, accuracy, status: "completed", isFirstAttempt: !existing });
         res.json({ attemptId: attempt._id });
     } catch (error) {
         res.status(500).json({
@@ -55,9 +60,7 @@ export const getAttemptById = async (req, res) => {
 
 export const getMyAttempts = async (req, res) => {
     try {
-        const attempts = await Attempt.find({ user: req.user._id })
-            .populate("test", "title subjects duration")
-            .sort({ createdAt: -1 })
+        const attempts = await Attempt.find({ user: req.user._id }).populate("test", "title subjects duration").sort({ createdAt: -1 })
         res.json({
             success: true,
             attempts

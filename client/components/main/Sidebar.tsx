@@ -11,7 +11,8 @@ import {
   Pen,
   Settings,
   X,
-  PanelLeft
+  PanelLeft,
+  Trophy
 } from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
@@ -117,6 +118,13 @@ export default function Sidebar({
               Analytics
             </div>
 
+            <div className={itemClass("/main/leaderboard")} onClick={() => router.push("/main/leaderboard")}>
+              <Trophy size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Leaderboard
+              </span>
+            </div>
+
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
               <Settings size={18} />
               Settings
@@ -186,6 +194,13 @@ export default function Sidebar({
               <BarChart3 size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
                 Analytics
+              </span>
+            </div>
+
+            <div className={itemClass("/main/leaderboard")} onClick={() => router.push("/main/leaderboard")}>
+              <Trophy size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Leaderboard
               </span>
             </div>
 

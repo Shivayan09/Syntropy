@@ -29,11 +29,13 @@ export default function Dashboard() {
 
   const last = attempts[0];
 
-  const avgScore = attempts.length > 0
-    ? Math.round(attempts.reduce((a, b) => a + b.accuracy, 0) / attempts.length)
-    : 0;
+  const firstAttempts = attempts.filter(a => a.isFirstAttempt);
 
-  if (loading) return <Loader2 />
+  const avgScore = firstAttempts.length > 0 ? Math.round(firstAttempts.reduce((a, b) => a + b.accuracy, 0) / firstAttempts.length) : 0;
+
+  if (loading) {
+    return <Loader2 />
+  }
 
   return (
     <div>
@@ -51,55 +53,55 @@ export default function Dashboard() {
       <div className="card2 mb-8">
         {attempts.length === 0 ? (
           <div className="flex justify-between items-start">
-  <div>
-    <p className="text-sm text-gray-600 mb-1">
-      Last Test
-    </p>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">
+                Last Test
+              </p>
 
-    <h2 className="text-xl font-bold mb-2">
-      No tests yet
-    </h2>
+              <h2 className="text-xl font-bold mb-2">
+                No tests yet
+              </h2>
 
-    <div className="flex gap-8 text-sm opacity-70">
-      <div>
-        <p className="text-gray-600">
-          Score
-        </p>
-      </div>
+              <div className="flex gap-8 text-sm opacity-70">
+                <div>
+                  <p className="text-gray-600">
+                    Score
+                  </p>
+                </div>
 
-      <div>
-        <p className="text-gray-600">
-          Accuracy
-        </p>
-      </div>
+                <div>
+                  <p className="text-gray-600">
+                    Accuracy
+                  </p>
+                </div>
 
-      <div>
-        <p className="text-gray-600">
-          Time
-        </p>
-      </div>
-    </div>
+                <div>
+                  <p className="text-gray-600">
+                    Time
+                  </p>
+                </div>
+              </div>
 
-    <button onClick={() => router.push("/main/tests")} className="mt-4">
-      Take your first test
-    </button>
-  </div>
+              <button onClick={() => router.push("/main/tests")} className="mt-4">
+                Take your first test
+              </button>
+            </div>
 
-  <div className="text-sm text-right opacity-70">
-    <p className="text-gray-600">
-      Strongest
-    </p>
-    <p className="font-bold mb-2">
-      -
-    </p>
+            <div className="text-sm text-right opacity-70">
+              <p className="text-gray-600">
+                Strongest
+              </p>
+              <p className="font-bold mb-2">
+                -
+              </p>
 
-    <p className="text-gray-600">
-      Weakest
-    </p>
-    <p className="font-bold">
-    </p>
-  </div>
-</div>
+              <p className="text-gray-600">
+                Weakest
+              </p>
+              <p className="font-bold">
+              </p>
+            </div>
+          </div>
         ) : (
           <div className="flex justify-between items-start">
             <div>
@@ -178,7 +180,7 @@ export default function Dashboard() {
               </p>
             ) : (
               <p className="text-2xl font-bold">
-                {attempts.length}
+                {firstAttempts.length}
               </p>
             )}
           </div>

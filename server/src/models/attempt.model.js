@@ -4,6 +4,7 @@ const attemptSchema = new mongoose.Schema(
     {
         user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
         test: { type: mongoose.Schema.Types.ObjectId, ref: "Test", required: true, index: true },
+        isFirstAttempt: { type: Boolean, default: false },
         answers: { type: [Number], default: [] },
         score: { type: Number, default: 0 },
         correct: { type: Number, default: 0 },

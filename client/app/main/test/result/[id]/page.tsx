@@ -96,7 +96,7 @@ export default function ResultPage() {
         <div className="flex justify-between">
           <button
             className="button-secondary"
-            onClick={() => router.push("/main/test")}
+            onClick={() => router.push("/main/tests")}
           >
             Back to Tests
           </button>
