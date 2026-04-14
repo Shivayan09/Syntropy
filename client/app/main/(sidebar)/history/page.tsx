@@ -83,13 +83,13 @@ export default function AttemptsPage() {
                                         {attempt.test?.title || "AI Test"}
                                     </p>
 
-                                    <div className="flex gap-6 mt-1 text-sm">
+                                    <div className="flex gap-10 mt-2 text-sm">
                                         <span>
                                             Subject: {attempt.test?.subjects?.[0] || "-"}
                                         </span>
 
                                         <span>
-                                            Score: {Math.round(attempt.score)}%
+                                            Score: {Math.round(attempt.score)}
                                         </span>
 
                                         <span>
@@ -107,7 +107,7 @@ export default function AttemptsPage() {
                                 </div>
 
                                 <div className="flex gap-3">
-                                    <button className="button-secondary" onClick={() => router.push(`/main/attempt/${attempt._id}`)}>
+                                    <button className="button-secondary" onClick={() => router.push(`/main/history/review/${attempt._id}`)}>
                                         Review
                                     </button>
 

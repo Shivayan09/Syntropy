@@ -34,7 +34,7 @@ export const submitAttempt = async (req, res) => {
 
 export const getAttemptById = async (req, res) => {
     try {
-        const attempt = await Attempt.findOne({ _id: req.params.id, user: req.user._id });
+        const attempt = await Attempt.findOne({ _id: req.params.id, user: req.user._id }).populate({ path: "test", select: "title subjects duration questions" });
         if (!attempt) {
             return res.status(404).json({
                 success: false,

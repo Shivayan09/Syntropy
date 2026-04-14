@@ -40,10 +40,7 @@ export default function TestsPage() {
         fetchTests();
     }, []);
 
-    const filtered =
-        type === "manual"
-            ? tests.filter((t) => t.type === "manual")
-            : tests.filter((t) => t.type === "generated");
+    const filtered = type === "manual" ? tests.filter((t) => t.type === "manual") : tests.filter((t) => t.type === "generated");
 
     return (
         <div>

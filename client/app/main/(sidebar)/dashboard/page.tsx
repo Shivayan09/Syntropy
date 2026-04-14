@@ -254,7 +254,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-                  <button onClick={() => router.push(`/main/attempt/${a._id}`)} className="w-1/2 md:w-fit flex items-center gap-1 group">
+                  <button onClick={() => router.push(`/main/history/review/${a._id}`)} className="w-1/2 md:w-fit flex items-center gap-1 group">
                     Analysis
                     <ArrowRight className="hidden md:flex group-hover:translate-x-1 transition-all duration-200" />
                   </button>
