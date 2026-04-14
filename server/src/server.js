@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.routes.js";
 import testRouter from "./routes/test.routes.js";
 import attemptRouter from "./routes/attempt.routes.js";
+import leaderboardRouter from "./routes/leaderboard.routes.js";
 
 const app = express();
 await connectDB();
@@ -31,6 +32,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/test', testRouter);
 app.use("/api/attempt", attemptRouter);
+app.use("/api/leaderboard", leaderboardRouter);
 
 const PORT = process.env.PORT || 5000;
 
