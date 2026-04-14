@@ -73,11 +73,11 @@ export default function Navbar() {
         </div>
 
         <div className="flex font-semibold text-gray-600 items-center gap-10">
-          <p onClick={() => nav("/")} className="cursor-pointer hover:text-black">Home</p>
-          <p onClick={() => nav("/main/test")} className="cursor-pointer hover:text-black">Tests</p>
-          <p onClick={() => nav("/main/dashboard")} className="cursor-pointer hover:text-black">Dashboard</p>
-          <p onClick={() => nav("/main/analytics")} className="cursor-pointer hover:text-black">Analysis</p>
-          <p className="cursor-pointer hover:text-black">Contact</p>
+          <p onClick={() => nav("/")} className="cursor-pointer hover:text-(--text)">Home</p>
+          <p onClick={() => nav("/main/test")} className="cursor-pointer hover:text-(--text)">Tests</p>
+          <p onClick={() => nav("/main/dashboard")} className="cursor-pointer hover:text-(--text)">Dashboard</p>
+          <p onClick={() => nav("/main/analytics")} className="cursor-pointer hover:text-(--text)">Analysis</p>
+          <p className="cursor-pointer hover:text-(--text)">Contact</p>
         </div>
 
         <div className="flex items-center gap-5">
