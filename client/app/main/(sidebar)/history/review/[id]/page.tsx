@@ -159,7 +159,7 @@ export default function AttemptReviewPage() {
               const isCorrect = correct === i;
               const isSkipped = selected === undefined;
 
-              let cls = "p-3 border flex items-center justify-between";
+              let cls = "p-3 border border-primary flex items-center justify-between";
 
               if (isSelected && isCorrect) {
                 cls += " bg-primary text-white";
