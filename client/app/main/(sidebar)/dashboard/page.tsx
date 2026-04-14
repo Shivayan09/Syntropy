@@ -50,7 +50,7 @@ export default function Dashboard() {
       </div>
 
       {/* LAST TEST */}
-      <div className="card mb-8">
+      <div className="card2 mb-8">
         {attempts.length === 0 ? (
           <div className="flex justify-between items-start">
             <div>
@@ -242,7 +242,7 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-3 text-sm">
             {attempts.slice(0, visibleCount).map((a) => (
-              <div key={a._id} className="flex flex-col md:flex-row gap-5 card2 items-center">
+              <div key={a._id} className="flex flex-col md:flex-row gap-5 card items-center">
                 <div className="flex w-full md:w-2/3">
                   <div className="w-full md:w-1/2">
                     {a.test?.title || "AI Test"}

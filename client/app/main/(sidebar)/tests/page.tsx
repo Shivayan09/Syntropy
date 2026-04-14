@@ -79,7 +79,7 @@ export default function TestsPage() {
                 )}
 
                 {filtered.map((test) => (
-                    <div key={test._id} className="card2 flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
+                    <div key={test._id} className="card flex flex-col md:flex-row gap-5 md:gap-0 items-center justify-between">
                         <div>
                             <p className="font-semibold">
                                 {test.title}
