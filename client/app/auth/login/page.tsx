@@ -13,7 +13,6 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
     const handleLogin = async (e: React.FormEvent) => {

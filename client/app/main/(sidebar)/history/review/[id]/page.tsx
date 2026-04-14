@@ -7,7 +7,7 @@ import Loader2 from "@/components/Loader2";
 export default function AttemptReviewPage() {
   const { id } = useParams();
   const router = useRouter();
-
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
   const [attempt, setAttempt] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(0);
@@ -15,11 +15,7 @@ export default function AttemptReviewPage() {
   useEffect(() => {
     const fetchAttempt = async () => {
       try {
-        const res = await fetch(
-          process.env.NEXT_PUBLIC_BACKEND_URL + `/api/attempt/${id}`,
-          { credentials: "include" }
-        );
-
+        const res = await fetch(BACKEND_URL + `/api/attempt/${id}`, { credentials: "include" });
         const data = await res.json();
         setAttempt(data.attempt);
       } catch (err) {
@@ -28,16 +24,18 @@ export default function AttemptReviewPage() {
         setLoading(false);
       }
     };
-
     fetchAttempt();
   }, [id]);
 
-  if (loading) return <Loader2 />;
-  if (!attempt) return null;
+  if (loading) {
+    return <Loader2 />;
+  }
+  if (!attempt) {
+    return null;
+  }
 
   const questions = attempt.test?.questions || [];
   const answers = attempt.answers || [];
-
   const q = questions[active];
   const selected = answers[active];
 
@@ -45,7 +43,7 @@ export default function AttemptReviewPage() {
     <div className="space-y-8">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
         <div>
           <h1 className="text-2xl font-extrabold">
             {attempt.test?.title}
@@ -62,8 +60,8 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* SUMMARY */}
-      <div className="card2 flex justify-between items-center">
-        <div className="flex gap-20">
+      <div className="card2 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div className="flex flex-wrap md:flex-nowrap gap-6 md:gap-20">
 
           <div>
             <p className="text-sm opacity-70">
@@ -94,7 +92,7 @@ export default function AttemptReviewPage() {
 
         </div>
 
-        <div className="text-right">
+        <div className="text-left md:text-right">
           <p className="text-sm opacity-70">
             Questions
           </p>
@@ -105,8 +103,8 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* PERFORMANCE */}
-      <div className="flex gap-6">
-        <div className="card flex-1">
+      <div className="grid grid-cols-3 gap-3 md:gap-6">
+        <div className="card">
           <p className="text-sm opacity-70">
             Correct
           </p>
@@ -115,7 +113,7 @@ export default function AttemptReviewPage() {
           </p>
         </div>
 
-        <div className="card flex-1">
+        <div className="card">
           <p className="text-sm opacity-70">
             Wrong
           </p>
@@ -124,7 +122,7 @@ export default function AttemptReviewPage() {
           </p>
         </div>
 
-        <div className="card flex-1">
+        <div className="card">
           <p className="text-sm opacity-70">
             Skipped
           </p>
@@ -176,16 +174,16 @@ export default function AttemptReviewPage() {
 
               return (
                 <div key={i} className={cls}>
-                  <span>{opt}</span>
+                  <span className="pr-3">{opt}</span>
 
                   {isSelected && isCorrect && (
-                    <span className="font-bold">
+                    <span className="font-bold shrink-0">
                       ✓
                     </span>
                   )}
 
                   {isSelected && !isCorrect && (
-                    <span className="font-bold">
+                    <span className="font-bold shrink-0">
                       ✕
                     </span>
                   )}
@@ -195,13 +193,9 @@ export default function AttemptReviewPage() {
           </div>
 
           {/* NAV BUTTONS */}
-          <div className="flex justify-between items-center pt-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 pt-4">
 
-            <button
-              className="button-secondary"
-              disabled={active === 0}
-              onClick={() => setActive((p) => p - 1)}
-            >
+            <button className="button-secondary w-full md:w-auto" disabled={active === 0} onClick={() => setActive((p) => p - 1)}>
               ← Previous
             </button>
 
@@ -209,10 +203,7 @@ export default function AttemptReviewPage() {
               {active + 1} / {questions.length}
             </div>
 
-            <button
-              disabled={active === questions.length - 1}
-              onClick={() => setActive((p) => p + 1)}
-            >
+            <button className="w-full md:w-auto" disabled={active === questions.length - 1} onClick={() => setActive((p) => p + 1)}>
               Next →
             </button>
 
