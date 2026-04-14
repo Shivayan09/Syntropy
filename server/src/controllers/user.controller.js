@@ -1,25 +1,90 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
+import validator from 'validator'
 
 export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const { name, username, phoneNumber, email, college, semester, preferences } = req.body;
-        const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
-        if (existingUsername) {
-            return res.status(400).json({
-                success: false,
-                message: "Username is already taken"
-            });
+        if (username !== undefined) {
+            const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
+            if (existingUsername) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username is already taken"
+                });
+            }
         }
-        const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
-        if (existingEmail) {
-            return res.status(400).json({
-                success: false,
-                message: "Email already in use"
-            });
+        if (email !== undefined) {
+            const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
+            if (existingEmail) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Email already in use"
+                });
+            }
         }
-        const updateData = { name, username, phoneNumber, email, college, semester, };
+        const updateData = {};
+        if (name !== undefined) {
+            if (name.length < 2) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Name is too short (2 chars min)"
+                })
+            }
+            if (name.length > 50) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Name is too long (50 chars max)"
+                })
+            }
+            updateData.name = name;
+        }
+        if (username !== undefined) {
+            if (username.length < 3) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username is too short (3 chars min)"
+                })
+            }
+            if (username.length > 30) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Username is too long (30 chars max)"
+                })
+            }
+            updateData.username = username;
+        }
+        if (phoneNumber !== undefined) {
+            if (!validator.isMobilePhone(phoneNumber, "any")) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please enter a valid phone number!"
+                })
+            }
+            updateData.phoneNumber = phoneNumber;
+        }
+        if (email !== undefined) {
+            if (!validator.isEmail(email)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please enter a valid email!"
+                })
+            }
+            updateData.email = email;
+        }
+        if (college !== undefined) {
+            if(college.length<2) {
+                return res.status(400).json({
+                    success: false,
+                    message: "College name is too short (2 chars min)"
+                })
+            }
+            updateData.college = college;
+        }
+        if (semester !== undefined) {
+            updateData.semester = semester;
+        }
         if (preferences) {
             if (preferences.subjects) {
                 updateData["preferences.subjects"] = preferences.subjects;

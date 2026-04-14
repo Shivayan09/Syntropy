@@ -59,8 +59,8 @@ export default function Profile() {
     setDirty(JSON.stringify(form) !== JSON.stringify(original));
   }, [form, original]);
 
-  if(loading) {
-    return <Loader2/>
+  if (loading) {
+    return <Loader2 />
   }
   if (!form) {
     return null;
@@ -100,45 +100,70 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    try {
-      setSaving(true);
-      const res = await fetch(BACKEND_URL + "/api/user/update-profile",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            name: form.name,
-            username: form.username,
-            email: form.email,
-            phoneNumber: form.phone,
-            college: form.college,
-            semester: Number(form.semester),
-            preferences: {
-              targetRole: form.targetRole,
-              difficulty: form.difficulty,
-              questionsPerTest: Number(form.questions),
-              subjects: form.subjects,
-            },
-          }),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        toast.warn(data.message);
-        return;
-      }
-      toast.success("Profile updated")
-      setOriginal(form);
-      setDirty(false);
-    } catch (error) {
-      console.error("Profile update failed", error);
-    } finally {
-      setSaving(false);
+  try {
+    setSaving(true);
+
+    if (!original) return;
+
+    const payload: any = {};
+
+    if (form.name !== original.name) payload.name = form.name;
+    if (form.username !== original.username) payload.username = form.username;
+    if (form.email !== original.email) payload.email = form.email;
+    if (form.phone !== original.phone) payload.phoneNumber = form.phone;
+    if (form.college !== original.college) payload.college = form.college;
+    if (form.semester !== original.semester)
+      payload.semester = Number(form.semester);
+
+    const pref: any = {};
+
+    if (form.targetRole !== original.targetRole)
+      pref.targetRole = form.targetRole;
+
+    if (form.difficulty !== original.difficulty)
+      pref.difficulty = form.difficulty;
+
+    if (form.questions !== original.questions)
+      pref.questionsPerTest = Number(form.questions);
+
+    if (JSON.stringify(form.subjects) !== JSON.stringify(original.subjects))
+      pref.subjects = form.subjects;
+
+    if (Object.keys(pref).length) {
+      payload.preferences = pref;
     }
-  };
+
+    if (!Object.keys(payload).length) {
+      setSaving(false);
+      return;
+    }
+
+    const res = await fetch(
+      BACKEND_URL + "/api/user/update-profile",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      toast.warn(data.message);
+      return;
+    }
+
+    toast.success("Profile updated");
+    setOriginal(form);
+    setDirty(false);
+  } catch (error) {
+    console.error("Profile update failed", error);
+  } finally {
+    setSaving(false);
+  }
+};
 
   const addSubject = () => {
     if (!subjectInput.trim()) return;
