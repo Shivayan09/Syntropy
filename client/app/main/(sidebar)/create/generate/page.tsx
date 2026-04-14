@@ -76,7 +76,7 @@ export default function CreateAITest() {
     };
 
     return (
-        <div className="mx-auto px-4 md:px-10 py-20 md:py-8">
+        <div>
 
             <div className="mb-5">
                 <h1 className="text-3xl font-extrabold">

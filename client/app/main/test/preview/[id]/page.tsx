@@ -82,7 +82,7 @@ export default function TestPreview() {
                 </div>
 
                 <div className="flex justify-between">
-                    <button className="button-secondary" onClick={() => router.push("/main/test")}>
+                    <button className="button-secondary" onClick={() => router.back()}>
                         Back
                     </button>
 

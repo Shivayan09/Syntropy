@@ -99,7 +99,7 @@ export default function Create() {
     };
 
     return (
-        <div className="mx-auto px-4 md:px-10 py-20 md:py-8">
+        <div>
 
             <div className="mb-5">
                 <h1 className="text-3xl font-extrabold">
@@ -110,7 +110,7 @@ export default function Create() {
                 </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 mb-7">
+            <div className="grid md:grid-cols-3 gap-6 mb-5">
 
                 <div>
                     <p className="font-bold mb-2">Test Name</p>
@@ -135,7 +135,7 @@ export default function Create() {
 
             </div>
 
-            <div className="mb-7">
+            <div className="mb-5">
                 <p className="font-bold mb-2">Subjects</p>
 
                 <div className="flex gap-3 mb-3">
@@ -159,7 +159,7 @@ export default function Create() {
             </div>
 
             <div>
-                <div className="mb-3">
+                <div>
                     <h3 className="text-xl">
                         Add questions
                     </h3>
@@ -168,12 +168,12 @@ export default function Create() {
                     </p>
                 </div>
 
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-3">
                     {questions.map((q, qIndex) => (
                         <div key={qIndex}>
 
                             <div className="flex items-center justify-between mb-3">
-                                <p className="font-bold">
+                                <p className="font-bold mt-3">
                                     Question {qIndex + 1}
                                 </p>
 
