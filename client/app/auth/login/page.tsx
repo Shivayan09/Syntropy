@@ -35,7 +35,7 @@ export default function LoginPage() {
                 toast.success("Logged in successfully")
                 router.push("/main/dashboard");
             }
-        } catch (error:any) {
+        } catch (error: any) {
             console.error(error);
             toast.error(error)
         } finally {
@@ -132,26 +132,14 @@ export default function LoginPage() {
                                 <label className="text-sm font-bold mb-1 block">
                                     Email
                                 </label>
-                                <input
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="w-full"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
+                                <input type="email" placeholder="you@example.com" className="w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
                             </div>
 
                             <div>
                                 <label className="text-sm font-bold mb-1 block">
                                     Password
                                 </label>
-                                <input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    className="w-full"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
+                                <input type="password" placeholder="••••••••" className="w-full" value={password} onChange={(e) => setPassword(e.target.value)} />
                             </div>
 
                             <div className="flex justify-between text-sm">
@@ -160,11 +148,7 @@ export default function LoginPage() {
                                 </span>
                             </div>
 
-                            <button
-                                disabled={loading}
-                                className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                                type="submit"
-                            >
+                            <button disabled={loading} className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`} type="submit">
                                 Login
                             </button>
                         </form>
