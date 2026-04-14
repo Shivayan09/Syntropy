@@ -39,7 +39,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-5 md:mb-8">
         <h1 className="text-2xl font-extrabold">
           Dashboard
         </h1>
@@ -168,7 +168,7 @@ export default function Dashboard() {
           Overall Stats
         </h3>
 
-        <div className="flex flex-col md:flex-row gap-10">
+        <div className="flex flex-col md:flex-row gap-5 md:gap-10">
           <div className="card2 w-full md:w-1/3">
             <p className="text-sm text-gray-600">
               Tests Taken
