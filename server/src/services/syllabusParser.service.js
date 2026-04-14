@@ -28,7 +28,6 @@ Extract syllabus into structured format.
 Rules:
 - detect up to MAX 5 subjects
 - include ALL units/modules/chapters under each subject
-- LIMIT topics under each unit/module/chapter to max 3 per unit
 - clean numbering and symbols
 - DO NOT truncate units
 - return ONLY valid JSON
@@ -44,25 +43,22 @@ STRICT:
                     content: `
 Return format:
 {
-"subjects":[
-{
-"name":"Subject name",
-"units":[
-{
-"title":"Unit name",
-"topics":[
-{"name":"topic"}
-]
+    "subjects": [
+        {
+            "name": "Subject name",
+            "units": [
+                {
+                    "title": "Unit name",
+                }
+            ]
+        }
+    ]
 }
-]
-}
-]
-}
+
 
 IMPORTANT:
 - detect up to MAX 5 subjects
 - include ALL units/modules/chapters under each subject
-- LIMIT topics under each unit/module/chapter to max 3 per unit
 - clean numbering and symbols
 - DO NOT truncate units
 - return ONLY valid JSON
@@ -122,7 +118,6 @@ ${cleanedText}
                 ...subject,
                 units: (subject.units || []).map(unit => ({
                     ...unit,
-                    topics: (unit.topics || []).slice(0, 3)
                 }))
             }));
 
@@ -136,11 +131,6 @@ ${cleanedText}
                     units: [
                         {
                             title: "Topics",
-                            topics: rawText
-                                .split("\n")
-                                .slice(0, 20)
-                                .map(t => ({ name: t.trim() }))
-                                .filter(t => t.name.length > 5)
                         }
                     ]
                 }
