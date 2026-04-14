@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
 
                 {/* HEADER */}
                 <div className="hidden md:grid font-bold border-b px-4 py-3 bg-secondary
-                [grid-template-columns:80px_1fr_120px_100px_120px]">
+                grid-cols-[80px_1fr_120px_100px_120px]">
                     <div>Rank</div>
                     <div>User</div>
                     <div>Accuracy</div>
@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
                         <div
                             className="hidden md:grid px-4 py-3 items-center
                             hover:bg-black/5 dark:hover:bg-white/5 transition-colors
-                            [grid-template-columns:80px_1fr_120px_100px_120px]"
+                            grid-cols-[80px_1fr_120px_100px_120px]"
                         >
                             <div className="font-bold">
                                 #{i + 1}
