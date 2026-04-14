@@ -74,7 +74,7 @@ export const updateProfile = async (req, res) => {
             updateData.email = email;
         }
         if (college !== undefined) {
-            if(college.length<2) {
+            if (college.length < 2) {
                 return res.status(400).json({
                     success: false,
                     message: "College name is too short (2 chars min)"

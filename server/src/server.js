@@ -10,6 +10,7 @@ import userRouter from "./routes/user.routes.js";
 import testRouter from "./routes/test.routes.js";
 import attemptRouter from "./routes/attempt.routes.js";
 import leaderboardRouter from "./routes/leaderboard.routes.js";
+import syllabusRouter from "./routes/syllabus.routes.js";
 
 const app = express();
 await connectDB();
@@ -33,6 +34,7 @@ app.use('/api/user', userRouter);
 app.use('/api/test', testRouter);
 app.use("/api/attempt", attemptRouter);
 app.use("/api/leaderboard", leaderboardRouter);
+app.use("/api/syllabus", syllabusRouter);
 
 const PORT = process.env.PORT || 5000;
 

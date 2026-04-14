@@ -109,7 +109,7 @@ export default function Dashboard() {
                 Last Test
               </p>
 
-              <h2 className="text-xl font-bold mb-2">
+              <h2 className="text-xl mb-2">
                 {last?.test?.title}
               </h2>
 
