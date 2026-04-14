@@ -20,7 +20,7 @@ export default function CreateTestPage() {
             <div className="space-y-6">
 
                 {/* AI TEST */}
-                <div className="card flex items-center justify-between">
+                <div className="card2 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Sparkles size={22} />
 
@@ -40,7 +40,7 @@ export default function CreateTestPage() {
                 </div>
 
                 {/* MANUAL TEST */}
-                <div className="card flex items-center justify-between">
+                <div className="card2 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <ClipboardPen size={22} />
 

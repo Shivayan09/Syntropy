@@ -97,7 +97,6 @@ button:active {
   box-shadow: 2px 2px 0px black;
 }
 
-/* Secondary button */
 .button-secondary {
   background: var(--bg-secondary);
   color: var(--text);

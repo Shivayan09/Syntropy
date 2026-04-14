@@ -87,7 +87,7 @@ export default function AttemptsPage() {
                         {visibleAttempts.map((attempt) => (
                             <div
                                 key={attempt._id}
-                                className="card flex flex-col md:flex-row md:items-center justify-between gap-4"
+                                className="card2 flex flex-col md:flex-row md:items-center justify-between gap-4"
                             >
                                 <div>
                                     <p className="font-extrabold text-lg">
