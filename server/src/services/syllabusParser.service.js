@@ -2,11 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const MODELS = [
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-2.5-pro",
-];
+const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro"];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -16,10 +12,7 @@ async function generateWithFallback(prompt) {
         try {
             const model = genAI.getGenerativeModel({
                 model: modelName,
-                generationConfig: {
-                    temperature: 0,
-                    maxOutputTokens: 2048,
-                },
+                generationConfig: { temperature: 0, maxOutputTokens: 2048 },
             });
             const result = await model.generateContent(prompt);
             const text = result.response.text();
@@ -28,10 +21,7 @@ async function generateWithFallback(prompt) {
             }
             return text;
         } catch (err) {
-            const isRateLimit =
-                err.status === 429 ||
-                err.message?.toLowerCase().includes("quota");
-
+            const isRateLimit = err.status === 429 || err.message?.toLowerCase().includes("quota");
             if (isRateLimit) {
                 await sleep(1500);
                 lastError = err;
@@ -46,7 +36,6 @@ async function generateWithFallback(prompt) {
 export async function parseSyllabus(rawText) {
     try {
         const cleanedText = rawText.replace(/\n{2,}/g, "\n").replace(/\s+/g, " ").replace(/Page \d+ of \d+/gi, "").slice(0, 15000);
-
         const prompt = `
 You are a strict JSON generator.
 
@@ -79,7 +68,6 @@ Return format:
 Syllabus:
 ${cleanedText}
 `;
-
         let aiText = await generateWithFallback(prompt);
         aiText = aiText.replace(/```json/gi, "").replace(/```/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\u00A0/g, " ").trim();
         if (!aiText.endsWith("}")) {

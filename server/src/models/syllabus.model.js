@@ -13,7 +13,7 @@ const unitSchema = new mongoose.Schema({
 
 const subjectSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    code: { type: String }, // optional (like ECE181601)
+    code: { type: String },
     units: [unitSchema]
 });
 

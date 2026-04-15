@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import Loader from "@/components/Loader";
 import Loader2 from "@/components/Loader2";
+import { useRouter } from "next/navigation";
 
 type UserForm = {
   name: string;
@@ -28,6 +29,8 @@ export default function Profile() {
   const [subjectInput, setSubjectInput] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const router = useRouter();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -100,70 +103,70 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-  try {
-    setSaving(true);
+    try {
+      setSaving(true);
 
-    if (!original) return;
+      if (!original) return;
 
-    const payload: any = {};
+      const payload: any = {};
 
-    if (form.name !== original.name) payload.name = form.name;
-    if (form.username !== original.username) payload.username = form.username;
-    if (form.email !== original.email) payload.email = form.email;
-    if (form.phone !== original.phone) payload.phoneNumber = form.phone;
-    if (form.college !== original.college) payload.college = form.college;
-    if (form.semester !== original.semester)
-      payload.semester = Number(form.semester);
+      if (form.name !== original.name) payload.name = form.name;
+      if (form.username !== original.username) payload.username = form.username;
+      if (form.email !== original.email) payload.email = form.email;
+      if (form.phone !== original.phone) payload.phoneNumber = form.phone;
+      if (form.college !== original.college) payload.college = form.college;
+      if (form.semester !== original.semester)
+        payload.semester = Number(form.semester);
 
-    const pref: any = {};
+      const pref: any = {};
 
-    if (form.targetRole !== original.targetRole)
-      pref.targetRole = form.targetRole;
+      if (form.targetRole !== original.targetRole)
+        pref.targetRole = form.targetRole;
 
-    if (form.difficulty !== original.difficulty)
-      pref.difficulty = form.difficulty;
+      if (form.difficulty !== original.difficulty)
+        pref.difficulty = form.difficulty;
 
-    if (form.questions !== original.questions)
-      pref.questionsPerTest = Number(form.questions);
+      if (form.questions !== original.questions)
+        pref.questionsPerTest = Number(form.questions);
 
-    if (JSON.stringify(form.subjects) !== JSON.stringify(original.subjects))
-      pref.subjects = form.subjects;
+      if (JSON.stringify(form.subjects) !== JSON.stringify(original.subjects))
+        pref.subjects = form.subjects;
 
-    if (Object.keys(pref).length) {
-      payload.preferences = pref;
-    }
-
-    if (!Object.keys(payload).length) {
-      setSaving(false);
-      return;
-    }
-
-    const res = await fetch(
-      BACKEND_URL + "/api/user/update-profile",
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
+      if (Object.keys(pref).length) {
+        payload.preferences = pref;
       }
-    );
 
-    const data = await res.json();
+      if (!Object.keys(payload).length) {
+        setSaving(false);
+        return;
+      }
 
-    if (!res.ok) {
-      toast.warn(data.message);
-      return;
+      const res = await fetch(
+        BACKEND_URL + "/api/user/update-profile",
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.warn(data.message);
+        return;
+      }
+
+      toast.success("Profile updated");
+      setOriginal(form);
+      setDirty(false);
+    } catch (error) {
+      console.error("Profile update failed", error);
+    } finally {
+      setSaving(false);
     }
-
-    toast.success("Profile updated");
-    setOriginal(form);
-    setDirty(false);
-  } catch (error) {
-    console.error("Profile update failed", error);
-  } finally {
-    setSaving(false);
-  }
-};
+  };
 
   const addSubject = () => {
     if (!subjectInput.trim()) return;
@@ -230,31 +233,11 @@ export default function Profile() {
         </div>
       </section>
 
-      <section className="mb-8 card2">
-        <p className="font-bold mb-4">Educational Info</p>
-
-        <div className="grid md:grid-cols-3 gap-4">
-
-          <input placeholder="College" value={form.college} onChange={(e) => setForm({ ...form, college: e.target.value })} />
-
-          <select value={form.semester} onChange={(e) => setForm({ ...form, semester: e.target.value })} > <option value="">Semester</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-
-          <select value={form.targetRole} onChange={(e) => setForm({ ...form, targetRole: e.target.value })} >
-            <option value="">Preferred Role</option>
-            <option>SDE</option>
-            <option>Frontend</option>
-            <option>Backend</option>
-            <option>Full Stack</option>
-            <option>Data Analyst</option>
-          </select>
-
-        </div>
+      <section className="mb-8 card2 flex items-center justify-between">
+        <p className="font-bold">Educational Info</p>
+        <button onClick={() => router.push('/main/profile/education')} className="button-secondary">
+          View full details
+        </button>
       </section>
 
       <section className="mb-8 card2">
@@ -275,29 +258,6 @@ export default function Profile() {
             <option value="50">50 Questions</option>
           </select>
 
-        </div>
-      </section>
-
-      <section className="mb-10 card2">
-        <p className="font-bold mb-4">Subjects</p>
-
-        <div className="flex items-center gap-5 mb-3">
-          <input placeholder="Add subject" value={subjectInput} onChange={(e) => setSubjectInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addSubject()} />
-
-          <button className="button-secondary" onClick={addSubject}>
-            Add
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mt-5">
-          {form.subjects.map((sub) => (
-            <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-secondary">
-              {sub}
-              <button onClick={() => removeSubject(sub)} className="h-5! px-1! text-sm">
-                ×
-              </button>
-            </div>
-          ))}
         </div>
       </section>
 
