@@ -92,9 +92,9 @@ export default function SyllabusManager() {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-2">
-                <p className="font-bold mb-4">Uploaded syllabus</p>
-                <div className="flex justify-end">
+            <div className="flex items-center justify-between mb-5">
+                <p className="font-bold">Current uploaded syllabus</p>
+                <div className="hidden md:flex justify-end">
                     <button
                         onClick={save}
                         disabled={!hasChanges}
@@ -106,7 +106,7 @@ export default function SyllabusManager() {
             </div>
 
             {syllabus.subjects.map((sub: any, si: number) => (
-                <div key={si} className="mb-10">
+                <div key={si} className="mb-5 card">
 
                     {/* SUBJECT */}
                     <div className="flex items-center gap-3">
@@ -229,8 +229,17 @@ export default function SyllabusManager() {
 
             <button className="button-secondary" onClick={addSubject}>+ Add Subject</button>
 
-
+            <div className="flex md:hidden w-full mt-5">
+                <button
+                    onClick={save}
+                    disabled={!hasChanges}
+                    className={!hasChanges ? "opacity-70 cursor-not-allowed w-full" : " w-full"}
+                >
+                    Save syllabus
+                </button>
+            </div>
         </div>
+
     );
 
     function updateSubject(si: number, val: string) {

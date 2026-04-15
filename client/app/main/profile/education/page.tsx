@@ -34,18 +34,17 @@ export default function Education() {
 
   return (
     <div>
-
-      <div className="mb-10">
+      <div className="mb-5">
         <h1 className="text-2xl font-extrabold">
-          Education
+          Educational Info
         </h1>
-        <p className="text-sm opacity-70">
+        <p className="text-sm opacity-70 mt-2">
           Manage your academic details
         </p>
       </div>
 
-      <section className="mb-8 card2">
-        <p className="font-bold mb-4">Educational Info</p>
+      <section>
+        <p className="font-bold mb-4">College and Semester</p>
 
         <div className="grid md:grid-cols-3 gap-4 mb-10">
 
