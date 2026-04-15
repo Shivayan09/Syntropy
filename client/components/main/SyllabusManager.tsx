@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import Loader2 from "@/components/Loader2";
+import { toast } from "react-toastify";
 
 export default function SyllabusManager() {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [syllabus, setSyllabus] = useState<any>(null);
     const [original, setOriginal] = useState<any>(null);
-
-    // ✅ NEW: single subject editing
     const [editingSubject, setEditingSubject] = useState<number | null>(null);
 
     useEffect(() => {
@@ -20,9 +18,7 @@ export default function SyllabusManager() {
     }, []);
 
     const fetchSyllabus = async () => {
-        const res = await fetch(BACKEND_URL + "/api/syllabus/my", {
-            credentials: "include",
-        });
+        const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include", });
         const data = await res.json();
         const s = data.syllabus?.[0] || null;
         setSyllabus(s);
@@ -30,11 +26,11 @@ export default function SyllabusManager() {
     };
 
     const upload = async () => {
-        if (!file) return;
-
+        if (!file) {
+            return;
+        }
         const form = new FormData();
         form.append("file", file);
-
         setLoading(true);
         try {
             await fetch(BACKEND_URL + "/api/syllabus/upload", {
@@ -42,7 +38,6 @@ export default function SyllabusManager() {
                 body: form,
                 credentials: "include",
             });
-
             setFile(null);
             fetchSyllabus();
         } catch (err) {
@@ -56,21 +51,69 @@ export default function SyllabusManager() {
         setSyllabus(structuredClone(updated));
     };
 
-    const hasChanges =
-        JSON.stringify(syllabus?.subjects) !==
-        JSON.stringify(original?.subjects);
+    const hasChanges = JSON.stringify(syllabus?.subjects) !== JSON.stringify(original?.subjects);
 
-    const topicsToString = (topics: any[]) =>
-        topics?.map((t) => t.name).join(", ") || "";
+    const topicsToString = (topics: any[]) => topics?.map((t) => t.name).join(", ") || "";
 
-    const stringToTopics = (value: string) =>
-        value
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-            .map((t) => ({ name: t }));
+    const stringToTopics = (value: string) => value.split(",").map((t) => t.trim()).filter(Boolean).map((t) => ({ name: t }));
 
-    // ===== EMPTY STATE =====
+
+    const updateSubject = (si: number, val: string) => {
+        const s = structuredClone(syllabus);
+        s.subjects[si].name = val;
+        update(s);
+    }
+
+    const removeSubject = (si: number) => {
+        const s = structuredClone(syllabus);
+        s.subjects.splice(si, 1);
+        update(s);
+    }
+
+    const updateUnit = (si: number, ui: number, val: string) => {
+        const s = structuredClone(syllabus);
+        s.subjects[si].units[ui].title = val;
+        update(s);
+    }
+
+    const removeUnit = (si: number, ui: number) => {
+        const s = structuredClone(syllabus);
+        s.subjects[si].units.splice(ui, 1);
+        update(s);
+    }
+
+    const addUnit = (si: number) => {
+        const s = structuredClone(syllabus);
+        s.subjects[si].units.push({ title: "", topics: [] });
+        update(s);
+    }
+
+    const addSubject = () => {
+        const s = structuredClone(syllabus);
+        s.subjects.push({ name: "", units: [] });
+        update(s);
+    }
+
+    const save = async () => {
+        if (!hasChanges) return;
+        const res = await fetch(BACKEND_URL + "/api/syllabus/update", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                _id: syllabus._id,
+                subjects: syllabus.subjects,
+            }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            toast.warn(data.message)
+        } else {
+            toast.success("Syllabus update saved");
+        }
+        setOriginal(structuredClone(syllabus));
+    }
+
     if (!syllabus) {
         return (
             <div>
@@ -218,7 +261,7 @@ export default function SyllabusManager() {
 
                                     {editingSubject === si ? (
                                         <input
-                                        placeholder="Enter topics"
+                                            placeholder="Enter topics"
                                             value={topicsToString(
                                                 unit.topics
                                             )}
@@ -288,58 +331,4 @@ export default function SyllabusManager() {
             </div>
         </div>
     );
-
-    // ===== FUNCTIONS =====
-
-    function updateSubject(si: number, val: string) {
-        const s = structuredClone(syllabus);
-        s.subjects[si].name = val;
-        update(s);
-    }
-
-    function removeSubject(si: number) {
-        const s = structuredClone(syllabus);
-        s.subjects.splice(si, 1);
-        update(s);
-    }
-
-    function updateUnit(si: number, ui: number, val: string) {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units[ui].title = val;
-        update(s);
-    }
-
-    function removeUnit(si: number, ui: number) {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units.splice(ui, 1);
-        update(s);
-    }
-
-    function addUnit(si: number) {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units.push({ title: "", topics: [] });
-        update(s);
-    }
-
-    function addSubject() {
-        const s = structuredClone(syllabus);
-        s.subjects.push({ name: "", units: [] });
-        update(s);
-    }
-
-    async function save() {
-        if (!hasChanges) return;
-
-        await fetch(BACKEND_URL + "/api/syllabus/update", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({
-                _id: syllabus._id,
-                subjects: syllabus.subjects,
-            }),
-        });
-
-        setOriginal(structuredClone(syllabus));
-    }
 }
