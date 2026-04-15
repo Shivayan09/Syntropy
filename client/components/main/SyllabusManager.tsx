@@ -6,10 +6,8 @@ import Loader2 from "@/components/Loader2";
 
 export default function SyllabusManager() {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-
     const [syllabus, setSyllabus] = useState<any>(null);
     const [original, setOriginal] = useState<any>(null);
 
@@ -26,9 +24,7 @@ export default function SyllabusManager() {
     }, []);
 
     const fetchSyllabus = async () => {
-        const res = await fetch(BACKEND_URL + "/api/syllabus/my", {
-            credentials: "include",
-        });
+        const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include" });
         const data = await res.json();
         const s = data.syllabus?.[0] || null;
         setSyllabus(s);
@@ -36,20 +32,18 @@ export default function SyllabusManager() {
     };
 
     const upload = async () => {
-        if (!file) return;
-
+        if (!file) {
+            return;
+        }
         const form = new FormData();
         form.append("file", file);
-
         setLoading(true);
-
         try {
             await fetch(BACKEND_URL + "/api/syllabus/upload", {
                 method: "POST",
                 body: form,
                 credentials: "include",
             });
-
             setFile(null);
             fetchSyllabus();
         } catch (err) {
@@ -63,21 +57,12 @@ export default function SyllabusManager() {
         setSyllabus(structuredClone(updated));
     };
 
-    const hasChanges =
-        JSON.stringify(syllabus?.subjects) !==
-        JSON.stringify(original?.subjects);
+    const hasChanges = JSON.stringify(syllabus?.subjects) !== JSON.stringify(original?.subjects);
 
-    const topicsToString = (topics: any[]) =>
-        topics?.map((t) => t.name).join(", ") || "";
+    const topicsToString = (topics: any[]) => topics?.map((t) => t.name).join(", ") || "";
 
-    const stringToTopics = (value: string) =>
-        value
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean)
-            .map((t) => ({ name: t }));
+    const stringToTopics = (value: string) => value.split(",").map((t) => t.trim()).filter(Boolean).map((t) => ({ name: t }));
 
-    // ================= EMPTY STATE =================
     if (!syllabus) {
         return (
             <div>
@@ -105,7 +90,6 @@ export default function SyllabusManager() {
         );
     }
 
-    // ================= MAIN EDITOR =================
     return (
         <div>
             <div className="flex items-center justify-between mb-2">
@@ -136,18 +120,8 @@ export default function SyllabusManager() {
                         ) : (
                             <>
                                 <h2 className="text-lg font-semibold">{sub.name}</h2>
-
-                                <Pencil
-                                    size={14}
-                                    className="text-primary cursor-pointer"
-                                    onClick={() => setEditing({ subject: si })}
-                                />
-
-                                <Trash2
-                                    size={16}
-                                    className="text-red-500 cursor-pointer"
-                                    onClick={() => removeSubject(si)}
-                                />
+                                <Pencil size={14} className="text-primary cursor-pointer" onClick={() => setEditing({ subject: si })} />
+                                <Trash2 size={16} className="text-red-500 cursor-pointer" onClick={() => removeSubject(si)} />
                             </>
                         )}
                     </div>
@@ -224,10 +198,9 @@ export default function SyllabusManager() {
                                                 className="border-b bg-transparent p-0 shadow-none outline-none text-sm w-full"
                                             />
                                         ) : (
-                                            <div className="flex gap-2 flex-wrap">
+                                            <div className="flex items-center gap-2 flex-wrap">
                                                 <span className="text-sm text-gray-500">
-                                                    {topicsToString(unit.topics) ||
-                                                        "No topics added yet"}
+                                                    {topicsToString(unit.topics) || "No topics added yet"}
                                                 </span>
 
                                                 <span
@@ -254,13 +227,12 @@ export default function SyllabusManager() {
                 </div>
             ))}
 
-            <button onClick={addSubject}>+ Add Subject</button>
+            <button className="button-secondary" onClick={addSubject}>+ Add Subject</button>
 
 
         </div>
     );
 
-    // ===== reused functions =====
     function updateSubject(si: number, val: string) {
         const s = structuredClone(syllabus);
         s.subjects[si].name = val;
