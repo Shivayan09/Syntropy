@@ -68,11 +68,7 @@ export default function SyllabusManager() {
             <div>
                 <p className="text-gray-500 mb-3">No syllabus! Add it here:</p>
                 <div className="flex items-center gap-5">
-                    <input
-                        type="file"
-                        accept=".pdf,image/*"
-                        onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    />
+                    <input type="file" accept=".pdf,image/*" onChange={(e) => setFile(e.target.files?.[0] || null)}/>
 
                     <div className="flex items-center gap-3">
                         <button onClick={upload} disabled={!file || loading}>
@@ -95,11 +91,7 @@ export default function SyllabusManager() {
             <div className="flex items-center justify-between mb-5">
                 <p className="font-bold">Current uploaded syllabus</p>
                 <div className="hidden md:flex justify-end">
-                    <button
-                        onClick={save}
-                        disabled={!hasChanges}
-                        className={!hasChanges ? "opacity-70 cursor-not-allowed" : ""}
-                    >
+                    <button onClick={save} disabled={!hasChanges} className={!hasChanges ? "opacity-70 cursor-not-allowed" : ""}>
                         Save syllabus
                     </button>
                 </div>
@@ -108,15 +100,9 @@ export default function SyllabusManager() {
             {syllabus.subjects.map((sub: any, si: number) => (
                 <div key={si} className="mb-5 card">
 
-                    {/* SUBJECT */}
                     <div className="flex items-center gap-3">
                         {editing.subject === si ? (
-                            <input
-                                value={sub.name}
-                                onChange={(e) => updateSubject(si, e.target.value)}
-                                onBlur={() => setEditing({})}
-                                className="text-lg font-semibold border-b bg-transparent p-0 shadow-none outline-none"
-                            />
+                            <input value={sub.name} onChange={(e) => updateSubject(si, e.target.value)} onBlur={() => setEditing({})} className="text-lg font-semibold border-b bg-transparent p-0 shadow-none outline-none"/>
                         ) : (
                             <>
                                 <h2 className="text-lg font-semibold">{sub.name}</h2>
@@ -126,7 +112,6 @@ export default function SyllabusManager() {
                         )}
                     </div>
 
-                    {/* UNITS */}
                     <div className="ml-4 space-y-2 mt-2">
                         {sub.units.map((unit: any, ui: number) => {
                             const isEditingUnit = editing.unit === `${si}-${ui}`;
@@ -151,20 +136,11 @@ export default function SyllabusManager() {
                                             <>
                                                 <span className="font-semibold">{unit.title}</span>
 
-                                                <span
-                                                    className="text-primary cursor-pointer text-xs"
-                                                    onClick={() =>
-                                                        setEditing({ unit: `${si}-${ui}` })
-                                                    }
-                                                >
+                                                <span className="text-primary cursor-pointer text-xs" onClick={() => setEditing({ unit: `${si}-${ui}` }) } >
                                                     edit
                                                 </span>
 
-                                                <Trash2
-                                                    size={14}
-                                                    className="text-red-500 cursor-pointer"
-                                                    onClick={() => removeUnit(si, ui)}
-                                                />
+                                                <Trash2 size={14} className="text-red-500 cursor-pointer" onClick={() => removeUnit(si, ui)}/>
                                             </>
                                         )}
                                     </div>
@@ -230,11 +206,7 @@ export default function SyllabusManager() {
             <button className="button-secondary" onClick={addSubject}>+ Add Subject</button>
 
             <div className="flex md:hidden w-full mt-5">
-                <button
-                    onClick={save}
-                    disabled={!hasChanges}
-                    className={!hasChanges ? "opacity-70 cursor-not-allowed w-full" : " w-full"}
-                >
+                <button onClick={save} disabled={!hasChanges} className={!hasChanges ? "opacity-70 cursor-not-allowed w-full" : " w-full"}>
                     Save syllabus
                 </button>
             </div>
