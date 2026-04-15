@@ -204,6 +204,7 @@ export default function Create() {
                     <input
                         placeholder="Add subject"
                         value={subjectInput}
+                        className="w-full"
                         onChange={(e) => setSubjectInput(e.target.value)}
                     />
 
