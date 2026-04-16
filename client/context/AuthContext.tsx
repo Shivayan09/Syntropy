@@ -1,6 +1,6 @@
 "use client";
 
-import Loader from "@/components/Loader";
+import Loader from "@/components/utils/Loader";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 type User = {

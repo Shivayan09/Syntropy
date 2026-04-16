@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Loader from "../components/Loader";
+import Loader from "../components/utils/Loader";
 
 export default function OnboardingRoute({ children }: { children: React.ReactNode }) {
     const { user, loading } = useAuth();

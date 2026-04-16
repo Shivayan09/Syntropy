@@ -1,6 +1,6 @@
 "use client";
 
-import Loader2 from "@/components/Loader2";
+import Loader2 from "@/components/utils/Loader2";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

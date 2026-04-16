@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import ThemeToggle from "../ThemeToggle";
+import ThemeToggle from "../utils/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {

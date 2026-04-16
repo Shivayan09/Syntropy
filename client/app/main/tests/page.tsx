@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, ClipboardPen, Sparkles } from "lucide-react";
-import NotFound from "@/components/NotFound";
-import Loader from "@/components/Loader";
-import Loader2 from "@/components/Loader2";
+import NotFound from "@/components/utils/NotFound";
+import Loader from "@/components/utils/Loader";
+import Loader2 from "@/components/utils/Loader2";
 
 type Test = {
     _id: string;

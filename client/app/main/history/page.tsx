@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Loader2 from "@/components/Loader2";
-import NotFound from "@/components/NotFound";
+import Loader2 from "@/components/utils/Loader2";
+import NotFound from "@/components/utils/NotFound";
 
 export default function AttemptsPage() {
     const router = useRouter();

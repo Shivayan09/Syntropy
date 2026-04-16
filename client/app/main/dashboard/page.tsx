@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import Loader2 from "@/components/Loader2";
+import Loader2 from "@/components/utils/Loader2";
 
 export default function Dashboard() {
   const router = useRouter();

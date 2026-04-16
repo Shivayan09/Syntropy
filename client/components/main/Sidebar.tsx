@@ -18,7 +18,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import ThemeToggle from "../ThemeToggle";
+import ThemeToggle from "../utils/ThemeToggle";
 
 export default function Sidebar({
   collapsed = false,

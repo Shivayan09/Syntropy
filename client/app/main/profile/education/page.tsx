@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import Loader2 from "@/components/Loader2";
+import Loader2 from "@/components/utils/Loader2";
 import SyllabusManager from "@/components/main/SyllabusManager";
 
 type EducationForm = {
@@ -29,6 +29,14 @@ export default function Education() {
       targetRole: user.preferences?.targetRole || "",
     });
   }, [user]);
+
+  // ✅ helper added (only addition)
+  const getSemesterLabel = (num: number) => {
+    if (num === 1) return "1st semester";
+    if (num === 2) return "2nd semester";
+    if (num === 3) return "3rd semester";
+    return `${num}th semester`;
+  };
 
   if (loading) return <Loader2 />;
 
@@ -63,9 +71,11 @@ export default function Education() {
             }
           >
             <option value="">Semester</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
-              <option key={s} value={s}>
-                {s}
+
+            {/* ✅ fixed options only */}
+            {[1,2,3,4,5,6,7,8].map((num) => (
+              <option key={num} value={num.toString()}>
+                {getSemesterLabel(num)}
               </option>
             ))}
           </select>

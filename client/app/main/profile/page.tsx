@@ -3,8 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import Loader from "@/components/Loader";
-import Loader2 from "@/components/Loader2";
+import Loader from "@/components/utils/Loader";
+import Loader2 from "@/components/utils/Loader2";
 import { useRouter } from "next/navigation";
 
 type UserForm = {

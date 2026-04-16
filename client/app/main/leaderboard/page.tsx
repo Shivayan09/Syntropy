@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Loader2 from "@/components/Loader2";
+import Loader2 from "@/components/utils/Loader2";
 
 export default function LeaderboardPage() {
     const [users, setUsers] = useState<any[]>([]);
