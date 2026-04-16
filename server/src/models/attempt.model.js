@@ -11,9 +11,10 @@ const attemptSchema = new mongoose.Schema({
     skipped: { type: Number, default: 0 },
     accuracy: { type: Number, default: 0 },
     startedAt: { type: Date, default: Date.now },
-    submittedAt: { type: Date },
-    timeTaken: { type: Number },
-    status: { type: String, enum: ["in-progress", "completed"], default: "in-progress" }
+    completedAt: { type: Date },
+    duration: { type: Number, required: true },
+    lastActiveAt: { type: Date, default: Date.now },
+    status: { type: String, enum: ["in_progress", "completed", "expired", "abandoned"], default: "in_progress" }
 },
     { timestamps: true }
 );

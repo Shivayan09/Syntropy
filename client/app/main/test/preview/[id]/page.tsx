@@ -23,7 +23,32 @@ export default function TestPreview() {
         if (id) fetchTest();
     }, [id]);
 
-    if (!test) return null;
+    if (!test) {
+        return null;
+    }
+
+    const startTest = async () => {
+        try {
+            const res = await fetch(BACKEND_URL + "/api/attempt/start",
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ testId: id }),
+                }
+            );
+            const data = await res.json();
+            if (!res.ok) {
+                return;
+            } else {
+                router.push(`/main/test/attempt/${data.attemptId}`);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-secondary">
@@ -86,7 +111,7 @@ export default function TestPreview() {
                         Back
                     </button>
 
-                    <button onClick={() => router.push(`/main/test/attempt/${id}`)} >
+                    <button onClick={startTest} >
                         Start Test
                     </button>
                 </div>

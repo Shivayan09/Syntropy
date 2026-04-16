@@ -97,7 +97,7 @@ export default function AttemptsPage() {
                                         </span>
 
                                         <span>
-                                            Time: {Math.round(attempt.timeTaken / 60)} min
+                                            Time: {attempt.completedAt ? Math.round((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000) : "-"} min
                                         </span>
                                     </div>
 
