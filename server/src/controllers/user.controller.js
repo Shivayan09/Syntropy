@@ -5,7 +5,7 @@ import validator from 'validator'
 export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { name, username, phoneNumber, email, college, semester, preferences } = req.body;
+        const { name, username, phoneNumber, email, college, semester, preferences, onboardingCompleted } = req.body;
         if (username !== undefined) {
             const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
             if (existingUsername) {
@@ -84,6 +84,9 @@ export const updateProfile = async (req, res) => {
         }
         if (semester !== undefined) {
             updateData.semester = semester;
+        }
+        if (onboardingCompleted !== undefined) {
+            updateData.onboardingCompleted = onboardingCompleted;
         }
         if (preferences) {
             if (preferences.subjects) {

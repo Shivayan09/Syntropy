@@ -12,6 +12,7 @@ type User = {
   avatar?: string;
   college?: string;
   semester?: number;
+  onboardingCompleted?: boolean;
   preferences?: {
     subjects?: string[];
     difficulty?: "Easy" | "Medium" | "Hard";

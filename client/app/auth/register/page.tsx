@@ -53,8 +53,8 @@ export default function RegisterPage() {
                 return;
             } else {
                 await getMe();
-                toast.success("Account created")
-                router.push("/main/dashboard");
+                toast.success("Account created");
+                router.push("/onboarding");
             }
         } catch (err: any) {
             console.error(err);
@@ -65,7 +65,7 @@ export default function RegisterPage() {
     };
 
     return (
-        <section className="min-h-screen flex">
+        <section className="h-screen flex">
 
             {/* LEFT SIDE */}
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">

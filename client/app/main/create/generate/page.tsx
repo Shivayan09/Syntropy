@@ -131,6 +131,11 @@ export default function CreateAITest() {
 
             <div className="mb-7">
                 <p className="font-bold">Subjects</p>
+                {!subjects.length && (
+                    <p className="text-xs text-red-500 mt-3">
+                        Select at least one subject
+                    </p>
+                )}
                 <div className="flex flex-wrap gap-2 my-3">
                     {subjects.map((sub) => (
                         <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-secondary">
@@ -161,11 +166,7 @@ export default function CreateAITest() {
                         </div>
                     </div>
                 )}
-                {!subjects.length && (
-                    <p className="text-xs text-red-500 mt-3">
-                        Select at least one subject
-                    </p>
-                )}
+                
             </div>
 
             <div className="grid md:grid-cols-3 gap-10 mb-3">

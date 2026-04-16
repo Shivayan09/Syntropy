@@ -11,12 +11,14 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     useEffect(() => {
         if (!loading && !user) {
             router.replace("/auth/login");
+        } else if (!loading && user && !user.onboardingCompleted) {
+            router.replace("/onboarding");
         }
     }, [user, loading]);
     if (loading) {
         return <Loader />;
     }
-    if (!user) {
+    if (!user || !user.onboardingCompleted) {
         return null;
     }
     return <>{children}</>;

@@ -43,7 +43,7 @@ export default function LoginPage() {
     };
 
     return (
-        <section className="min-h-screen flex">
+        <section className="h-screen flex">
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
@@ -105,7 +105,7 @@ export default function LoginPage() {
                         </div>
                     </div>
                 </div>
-                <div className="mt-12 border-2 border-black p-4 bg-primary max-w-sm">
+                <div className="mt-12 border-2 border-black p-4 bg-primary text-white max-w-sm">
                     <p className="text-sm font-bold">
                         No shortcuts. Just results.
                     </p>
