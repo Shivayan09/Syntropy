@@ -4,7 +4,7 @@ import Test from "../models/test.model.js";
 export async function generateTest(data, userId) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-    const { subjects, difficulty, questions, time } = data;
+    const { subjects, difficulty, questions, time, college, semester } = data;
 
     const perSubject = Math.floor(questions / subjects.length);
     let remaining = questions % subjects.length;
@@ -29,7 +29,17 @@ export async function generateTest(data, userId) {
             {
                 role: "user",
                 content: `
-Generate ${questions} MCQs
+Generate ${questions} MCQs.
+
+Student Context:
+- College: ${college || "Not specified"}
+- Semester: ${semester || "Not specified"}
+
+Instructions:
+- Adjust question depth based on semester:
+  - Lower semester → more basic and conceptual questions
+  - Higher semester → more advanced, analytical, and application-based questions
+- Consider college-level rigor (assume standard engineering curriculum for subjects related to engineering unless specified)
 
 Difficulty: ${difficulty}
 

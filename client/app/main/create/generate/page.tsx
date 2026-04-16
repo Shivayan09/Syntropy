@@ -61,6 +61,9 @@ export default function CreateAITest() {
 
     const canGenerate = subjects.length > 0;
 
+    const college = user?.college;
+    const semester = user?.semester;
+
     const generateTest = async () => {
         if (!subjects.length) {
             return;
@@ -73,14 +76,7 @@ export default function CreateAITest() {
                     "Content-Type": "application/json"
                 },
                 credentials: "include",
-                body: JSON.stringify({
-                    subjects,
-                    difficulty,
-                    questions,
-                    time,
-                    topicFocus,
-                    mixedSubjects
-                })
+                body: JSON.stringify({ subjects, difficulty, questions, time, topicFocus, mixedSubjects, college, semester })
             });
             const data = await res.json();
             if (!res.ok) {
@@ -166,7 +162,7 @@ export default function CreateAITest() {
                         </div>
                     </div>
                 )}
-                
+
             </div>
 
             <div className="grid md:grid-cols-3 gap-10 mb-3">
