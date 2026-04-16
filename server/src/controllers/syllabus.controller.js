@@ -2,6 +2,7 @@ import Syllabus from "../models/syllabus.model.js";
 import cloudinary from "../config/cloudinary.js";
 import { extractTextFromFile } from "../services/ocr.service.js";
 import { parseSyllabus } from "../services/syllabusParser.service.js";
+import fs from "fs";
 
 export const uploadSyllabus = async (req, res) => {
     try {
@@ -16,6 +17,7 @@ export const uploadSyllabus = async (req, res) => {
         const upload = await cloudinary.uploader.upload(file.path, {
             resource_type: "raw",
         });
+        await fs.promises.unlink(file.path);
         const syllabus = await Syllabus.create({
             user: userId, title: file.originalname, fileUrl: upload.secure_url, parsed: false
         });
