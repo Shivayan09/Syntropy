@@ -12,17 +12,27 @@ export default function SyllabusManager() {
     const [syllabus, setSyllabus] = useState<any>(null);
     const [original, setOriginal] = useState<any>(null);
     const [editingSubject, setEditingSubject] = useState<number | null>(null);
+    const [fetching, setFetching] = useState(true);
 
     useEffect(() => {
         fetchSyllabus();
     }, []);
 
     const fetchSyllabus = async () => {
-        const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include", });
-        const data = await res.json();
-        const s = data.syllabus?.[0] || null;
-        setSyllabus(s);
-        setOriginal(structuredClone(s));
+        try {
+            setFetching(true);
+            const res = await fetch(BACKEND_URL + "/api/syllabus/my", {
+                credentials: "include",
+            });
+            const data = await res.json();
+            const s = data.syllabus?.[0] || null;
+            setSyllabus(s);
+            setOriginal(structuredClone(s));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setFetching(false);
+        }
     };
 
     const upload = async () => {
@@ -112,6 +122,14 @@ export default function SyllabusManager() {
             toast.success("Syllabus update saved");
         }
         setOriginal(structuredClone(syllabus));
+    }
+
+    if (fetching) {
+        return (
+            <div className="flex justify-center py-10">
+                <Loader2 />
+            </div>
+        );
     }
 
     if (!syllabus) {

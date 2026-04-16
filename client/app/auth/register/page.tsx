@@ -68,7 +68,7 @@ export default function RegisterPage() {
         <section className="min-h-screen flex">
 
             {/* LEFT SIDE */}
-            <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-neutral-100 border-r-2 border-black">
+            <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
                     <img src="/logo.png" alt="" className="h-7" />
@@ -133,7 +133,7 @@ export default function RegisterPage() {
                     </div>
                 </div>
 
-                <div className="mt-12 border-2 border-black p-4 bg-white max-w-sm">
+                <div className="mt-12 border-2 border-black p-4 bg-primary max-w-sm">
                     <p className="text-sm font-bold">
                         No shortcuts. Just results.
                     </p>
