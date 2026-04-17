@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, ClipboardPen } from "lucide-react";
+import { Sparkles, ClipboardPen, ClipboardList, FlaskConical } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function CreateTestPage() {
@@ -8,6 +8,11 @@ export default function CreateTestPage() {
 
     return (
         <div className="max-w-5xl mx-auto space-y-8">
+
+            <div className="mb-5 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+                        <FlaskConical size={18} />
+                        Test laboratory
+                      </div>
 
             <div className="card2">
                 <p className="text-sm opacity-70 mb-2">CREATE MODE</p>

@@ -11,12 +11,9 @@ import {
   ClipboardPen,
   Clock3,
   Flame,
-  Medal,
-  Sparkles,
   Target,
   Trophy,
   TrendingUp,
-  Zap,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
@@ -101,7 +98,6 @@ export default function Dashboard() {
   );
 
   const uniqueAttempts = firstAttempts.length > 0 ? firstAttempts : attempts;
-  const lastAttempt = attempts[0];
   const bestAttempt = attempts.reduce<Attempt | undefined>((best, attempt) => {
     if (!best) return attempt;
     return (attempt.score || 0) > (best.score || 0) ? attempt : best;
@@ -124,19 +120,6 @@ export default function Dashboard() {
       : 0;
 
   const readiness = attempts.length > 0 ? clampPercent(averageScore * 0.65 + averageAccuracy * 0.35) : 0;
-  const totalPracticeMinutes = attempts.reduce((total, attempt) => {
-    if (!attempt.completedAt || !attempt.startedAt) return total;
-    return (
-      total +
-      Math.max(
-        1,
-        Math.round(
-          (new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) /
-          60000
-        )
-      )
-    );
-  }, 0);
 
   const subjectStats = useMemo<SubjectStat[]>(() => {
     const subjectMap = new Map<string, { total: number; count: number }>();
@@ -159,9 +142,6 @@ export default function Dashboard() {
       .sort((a, b) => b.average - a.average);
   }, [attempts]);
 
-  const strongestSubject = subjectStats[0];
-  const focusSubject = [...subjectStats].sort((a, b) => a.average - b.average)[0];
-
   const scoreTone =
     readiness >= 80
       ? "Exam-ready"
@@ -176,21 +156,12 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-9">
-      <section>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="font-extrabold text-3xl">Dashboard</p>
-          </div>
-          <div className="flex gap-3 sm:flex-row">
-            <button onClick={() => router.push("/main/tests")} className="gap-2">
-              <BookOpenCheck size={18} />
-              Attempt
-            </button>
-            <button onClick={() => router.push("/main/create")} className="button-secondary gap-2">
-              <ClipboardPen size={18} />
-              Create
-            </button>
+    <div className="mx-auto space-y-9">
+      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+            <BarChart3 size={18} />
+            Dashboard
           </div>
         </div>
       </section>

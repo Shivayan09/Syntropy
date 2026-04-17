@@ -1,11 +1,22 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import Loader from "@/components/utils/Loader";
+import {
+  ArrowRight,
+  BookOpenCheck,
+  Camera,
+  GraduationCap,
+  Mail,
+  Phone,
+  Save,
+  Settings,
+  Target,
+  UserRound,
+} from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
-import { useRouter } from "next/navigation";
 
 type UserForm = {
   name: string;
@@ -21,8 +32,35 @@ type UserForm = {
   subjects: string[];
 };
 
+type ProfilePayload = {
+  name?: string;
+  username?: string;
+  email?: string;
+  phoneNumber?: string;
+  college?: string;
+  semester?: number;
+  preferences?: {
+    targetRole?: string;
+    difficulty?: string;
+    questionsPerTest?: number;
+    subjects?: string[];
+  };
+};
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+const semesterLabel = (value: string) => {
+  if (!value) return "Not set";
+  if (value === "1") return "1st semester";
+  if (value === "2") return "2nd semester";
+  if (value === "3") return "3rd semester";
+  return `${value}th semester`;
+};
+
 export default function Profile() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [original, setOriginal] = useState<UserForm | null>(null);
   const [form, setForm] = useState<UserForm | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -30,14 +68,9 @@ export default function Profile() {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const router = useRouter();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
+
     const normalized: UserForm = {
       name: user.name || "",
       username: user.username || "",
@@ -51,50 +84,46 @@ export default function Profile() {
       questions: user.preferences?.questionsPerTest?.toString() || "20",
       subjects: user.preferences?.subjects || [],
     };
+
     setOriginal(normalized);
     setForm(normalized);
   }, [user]);
 
   useEffect(() => {
-    if (!form || !original) {
-      return;
-    }
+    if (!form || !original) return;
     setDirty(JSON.stringify(form) !== JSON.stringify(original));
   }, [form, original]);
 
-  if (loading) {
-    return <Loader2 />
-  }
-  if (!form) {
-    return null;
-  }
+  const updateForm = (patch: Partial<UserForm>) => {
+    setForm((current) => (current ? { ...current, ...patch } : current));
+  };
 
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = e.target.files?.[0];
-      if (!file) {
-        return;
-      }
+      if (!form) return;
+
+      const file = event.target.files?.[0];
+      if (!file) return;
+
       const preview = URL.createObjectURL(file);
-      setForm({ ...form, avatar: preview });
+      updateForm({ avatar: preview });
+
       const formData = new FormData();
       formData.append("avatar", file);
-      const res = await fetch(
-        BACKEND_URL + "/api/user/update-avatar",
-        {
-          method: "PUT",
-          credentials: "include",
-          body: formData,
-        }
-      );
+
+      const res = await fetch(BACKEND_URL + "/api/user/update-avatar", {
+        method: "PUT",
+        credentials: "include",
+        body: formData,
+      });
       const data = await res.json();
+
       if (!res.ok) {
         toast.warn(data.message);
         return;
       }
-      setForm({ ...form, avatar: data.avatar });
+
+      updateForm({ avatar: data.avatar });
       toast.success("Photo updated");
     } catch (error) {
       console.error("Avatar upload failed", error);
@@ -104,52 +133,37 @@ export default function Profile() {
 
   const handleSave = async () => {
     try {
+      if (!form || !original) return;
       setSaving(true);
 
-      if (!original) return;
-
-      const payload: any = {};
+      const payload: ProfilePayload = {};
 
       if (form.name !== original.name) payload.name = form.name;
       if (form.username !== original.username) payload.username = form.username;
       if (form.email !== original.email) payload.email = form.email;
       if (form.phone !== original.phone) payload.phoneNumber = form.phone;
       if (form.college !== original.college) payload.college = form.college;
-      if (form.semester !== original.semester)
-        payload.semester = Number(form.semester);
+      if (form.semester !== original.semester) payload.semester = Number(form.semester);
 
-      const pref: any = {};
+      const preferences: ProfilePayload["preferences"] = {};
 
-      if (form.targetRole !== original.targetRole)
-        pref.targetRole = form.targetRole;
-
-      if (form.difficulty !== original.difficulty)
-        pref.difficulty = form.difficulty;
-
-      if (form.questions !== original.questions)
-        pref.questionsPerTest = Number(form.questions);
-
-      if (JSON.stringify(form.subjects) !== JSON.stringify(original.subjects))
-        pref.subjects = form.subjects;
-
-      if (Object.keys(pref).length) {
-        payload.preferences = pref;
+      if (form.targetRole !== original.targetRole) preferences.targetRole = form.targetRole;
+      if (form.difficulty !== original.difficulty) preferences.difficulty = form.difficulty;
+      if (form.questions !== original.questions) preferences.questionsPerTest = Number(form.questions);
+      if (JSON.stringify(form.subjects) !== JSON.stringify(original.subjects)) {
+        preferences.subjects = form.subjects;
       }
 
-      if (!Object.keys(payload).length) {
-        setSaving(false);
-        return;
-      }
+      if (Object.keys(preferences).length) payload.preferences = preferences;
 
-      const res = await fetch(
-        BACKEND_URL + "/api/user/update-profile",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        }
-      );
+      if (!Object.keys(payload).length) return;
+
+      const res = await fetch(BACKEND_URL + "/api/user/update-profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
 
       const data = await res.json();
 
@@ -163,109 +177,266 @@ export default function Profile() {
       setDirty(false);
     } catch (error) {
       console.error("Profile update failed", error);
+      toast.error("Could not save profile");
     } finally {
       setSaving(false);
     }
   };
 
   const addSubject = () => {
-    if (!subjectInput.trim()) return;
-    if (form.subjects.includes(subjectInput)) return;
-    setForm({
-      ...form,
-      subjects: [...form.subjects, subjectInput],
-    });
+    if (!form) return;
 
+    const subject = subjectInput.trim();
+    if (!subject || form.subjects.includes(subject)) return;
+
+    updateForm({ subjects: [...form.subjects, subject] });
     setSubjectInput("");
   };
 
-  const removeSubject = (sub: string) => {
-    setForm({
-      ...form,
-      subjects: form.subjects.filter((s) => s !== sub),
-    });
+  const removeSubject = (subject: string) => {
+    if (!form) return;
+    updateForm({ subjects: form.subjects.filter((item) => item !== subject) });
   };
 
+  if (loading) {
+    return <Loader2 />;
+  }
+
+  if (!form) {
+    return null;
+  }
+
   return (
-    <div>
-
-      <div className="mb-10">
-        <h1 className="text-3xl font-extrabold">Profile</h1>
-        <p className="text-gray-600 text-sm">
-          Manage your account and preferences
-        </p>
-      </div>
-
-      <div className="flex items-center gap-6 mb-10">
-        <div className="relative w-24 h-24 overflow-hidden rounded-full">
-
-          {!imgLoaded && (
-            <div className="absolute inset-0 rounded-full bg-gray-200 animate-pulse flex items-center justify-center text-xs text-gray-500">
-              photo
-            </div>
-          )}
-          <img src={form.avatar || `https://picsum.photos/seed/${encodeURIComponent(form.email || form.name || "user")}/200`} onLoad={() => setImgLoaded(true)} className={`h-full w-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`} />
-        </div>
-
+    <div className="mx-auto space-y-7">
+      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="font-bold text-lg">{form.name}</p>
-          <p className="text-sm text-gray-600">{form.email}</p>
-
-          <button className="mt-2" onClick={() => fileInputRef.current?.click()}>
-            Change Photo
-          </button>
-
-          <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+          <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+            <Settings size={18} />
+            Settings
+          </div>
         </div>
-      </div>
 
-      <section className="mb-8 card2">
-        <p className="font-bold mb-4">Account</p>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <input placeholder="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-
-          <input placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-
-          <input placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-
-          <input placeholder="Username" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} />
-        </div>
-      </section>
-
-      <section className="mb-8 card2 flex items-center justify-between">
-        <p className="font-bold">Educational Info</p>
-        <button onClick={() => router.push('/main/profile/education')} className="button-secondary">
-          View full details
+        <button
+          onClick={handleSave}
+          disabled={!dirty || saving}
+          className={`gap-2 ${!dirty || saving ? "cursor-not-allowed opacity-55" : ""}`}
+        >
+          <Save size={18} />
+          {saving ? "Saving" : dirty ? "Save changes" : "Saved"}
         </button>
       </section>
 
-      <section className="mb-8 card2">
-        <p className="font-bold mb-4">Test Preferences</p>
+      <section className="space-y-6">
+        <div className="flex flex-col md:flex-row gap-5">
+          <div className="card2 p-6 md:p-7 w-full md:w-1/2">
+            <div className="flex items-start gap-5">
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-black bg-(--surface) shadow-[4px_4px_0px_black]">
+                {!imgLoaded && (
+                  <div className="absolute inset-0 grid place-items-center bg-(--bg-secondary) text-xs font-bold opacity-70">
+                    photo
+                  </div>
+                )}
+                <img
+                  alt={`${form.name || "User"} avatar`}
+                  src={
+                    form.avatar ||
+                    `https://picsum.photos/seed/${encodeURIComponent(form.email || form.name || "user")}/200`
+                  }
+                  onLoad={() => setImgLoaded(true)}
+                  className={`h-full w-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                />
+              </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+              <div className="min-w-0">
+                <p className="truncate text-2xl font-extrabold">{form.name || "Unnamed user"}</p>
+                <p className="truncate text-sm opacity-65">{form.email || "No email"}</p>
+                <button className="button-secondary mt-4 gap-2" onClick={() => fileInputRef.current?.click()}>
+                  <Camera size={18} />
+                  Photo
+                </button>
+                <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handleAvatarUpload} />
+              </div>
+            </div>
+          </div>
 
-          <select value={form.difficulty} onChange={(e) => setForm({ ...form, difficulty: e.target.value })}>
-            <option>Easy</option>
-            <option>Medium</option>
-            <option>Hard</option>
-          </select>
+          <div className="card2 p-5 w-1/2">
+            <p className="text-sm font-bold opacity-60">Profile status</p>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">College</span>
+                <span className="font-extrabold">{form.college || "Not set"}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Semester</span>
+                <span className="font-extrabold">{semesterLabel(form.semester)}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Target</span>
+                <span className="font-extrabold">{form.targetRole || "Not set"}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-          <select value={form.questions} onChange={(e) => setForm({ ...form, questions: e.target.value })}>
-            <option value="10">10 Questions</option>
-            <option value="20">20 Questions</option>
-            <option value="25">25 Questions</option>
-            <option value="50">50 Questions</option>
-          </select>
+        <div className="space-y-6">
+          <section className="card p-6 md:p-7">
+            <div className="mb-5 flex items-center gap-3">
+              <div>
+                <p className="text-sm font-bold opacity-60">Account</p>
+                <h2 className="text-2xl font-extrabold">Personal information</h2>
+              </div>
+            </div>
 
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Name</span>
+                <input value={form.name} onChange={(event) => updateForm({ name: event.target.value })} className="w-full" />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Username</span>
+                <input value={form.username} onChange={(event) => updateForm({ username: event.target.value })} className="w-full" />
+              </label>
+
+              <label className="space-y-2">
+                <span className="flex items-center gap-2 text-sm font-bold opacity-70">
+                  <Mail size={16} />
+                  Email
+                </span>
+                <input type="email" value={form.email} onChange={(event) => updateForm({ email: event.target.value })} className="w-full" />
+              </label>
+
+              <label className="space-y-2">
+                <span className="flex items-center gap-2 text-sm font-bold opacity-70">
+                  <Phone size={16} />
+                  Phone
+                </span>
+                <input value={form.phone} onChange={(event) => updateForm({ phone: event.target.value })} className="w-full" />
+              </label>
+            </div>
+          </section>
+
+          <section className="card p-6 md:p-7">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className="text-sm font-bold opacity-60">Education</p>
+                  <h2 className="text-2xl font-extrabold">Academic details</h2>
+                </div>
+              </div>
+
+              <button onClick={() => router.push("/main/profile/education")} className="button-secondary gap-2">
+                Syllabus
+                <ArrowRight size={18} />
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <label className="space-y-2 md:col-span-1">
+                <span className="text-sm font-bold opacity-70">College</span>
+                <input value={form.college} onChange={(event) => updateForm({ college: event.target.value })} className="w-full" />
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Semester</span>
+                <select value={form.semester} onChange={(event) => updateForm({ semester: event.target.value })} className="w-full">
+                  <option value="">Select semester</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((semester) => (
+                    <option key={semester} value={semester.toString()}>
+                      {semesterLabel(semester.toString())}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Target role</span>
+                <select value={form.targetRole} onChange={(event) => updateForm({ targetRole: event.target.value })} className="w-full">
+                  <option value="">Preferred role</option>
+                  <option>SDE</option>
+                  <option>Frontend</option>
+                  <option>Backend</option>
+                  <option>Full Stack</option>
+                  <option>Data Analyst</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section className="card p-6 md:p-7">
+            <div className="mb-5 flex items-center gap-3">
+              <div>
+                <p className="text-sm font-bold opacity-60">Mock test defaults</p>
+                <h2 className="text-2xl font-extrabold">Practice preferences</h2>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Default difficulty</span>
+                <select value={form.difficulty} onChange={(event) => updateForm({ difficulty: event.target.value })} className="w-full">
+                  <option>Easy</option>
+                  <option>Medium</option>
+                  <option>Hard</option>
+                </select>
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-bold opacity-70">Questions per test</span>
+                <select value={form.questions} onChange={(event) => updateForm({ questions: event.target.value })} className="w-full">
+                  <option value="10">10 Questions</option>
+                  <option value="20">20 Questions</option>
+                  <option value="25">25 Questions</option>
+                  <option value="50">50 Questions</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="mt-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Target size={18} className="text-primary" />
+                <p className="font-extrabold">Preferred subjects</p>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  value={subjectInput}
+                  onChange={(event) => setSubjectInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addSubject();
+                    }
+                  }}
+                  placeholder="Add subject..."
+                  className="flex-1"
+                />
+                <button type="button" onClick={addSubject} className="button-secondary">
+                  Add
+                </button>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-3">
+                {form.subjects.length === 0 ? (
+                  <span className="text-sm opacity-65">No preferred subjects added yet.</span>
+                ) : (
+                  form.subjects.map((subject) => (
+                    <button
+                      key={subject}
+                      type="button"
+                      onClick={() => removeSubject(subject)}
+                      className="button-secondary h-9 rounded-none px-3 text-sm shadow-[3px_3px_0px_black]"
+                      title="Remove subject"
+                    >
+                      {subject}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
         </div>
       </section>
-
-      <div className="flex justify-end">
-        <button onClick={handleSave} disabled={!dirty || saving} className={`px-6 py-2 font-bold ${!dirty ? "opacity-50 cursor-not-allowed" : ""}`}> {saving ? "Saving..." : "Save Changes"}
-        </button>
-      </div>
-
     </div>
   );
 }
