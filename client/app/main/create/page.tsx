@@ -50,7 +50,7 @@ export default function CreateTestPage() {
                     </div>
                 </div>
 
-                <div className="card2 flex flex-col justify-between min-h-85">
+                <div className="card flex flex-col justify-between min-h-85">
 
                     <div>
                         <div className="flex items-center gap-3 mb-4">
@@ -83,7 +83,7 @@ export default function CreateTestPage() {
 
             <div className="grid md:grid-cols-3 gap-4 text-sm">
                 <div className="card">Quick to start</div>
-                <div className="card2">Fits your workflow</div>
+                <div className="card">Fits your workflow</div>
                 <div className="card">Works with timed attempts</div>
             </div>
 
