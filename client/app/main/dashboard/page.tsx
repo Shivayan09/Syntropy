@@ -137,7 +137,7 @@ export default function Dashboard() {
                     Time
                   </p>
                   <p className="font-bold">
-                    {Math.round(last.timeTaken / 60)} min
+                    {last?.completedAt ? Math.round((new Date(last.completedAt).getTime() - new Date(last.startedAt).getTime()) / 60000) : "-"} min
                   </p>
                 </div>
               </div>

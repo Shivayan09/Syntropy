@@ -30,7 +30,6 @@ export default function Education() {
     });
   }, [user]);
 
-  // ✅ helper added (only addition)
   const getSemesterLabel = (num: number) => {
     if (num === 1) return "1st semester";
     if (num === 2) return "2nd semester";
@@ -72,7 +71,6 @@ export default function Education() {
           >
             <option value="">Semester</option>
 
-            {/* ✅ fixed options only */}
             {[1,2,3,4,5,6,7,8].map((num) => (
               <option key={num} value={num.toString()}>
                 {getSemesterLabel(num)}
