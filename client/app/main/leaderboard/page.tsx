@@ -64,7 +64,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-7">
-      <section className="flex flex-col gap-5 border-b border-[var(--border)] pb-2 lg:flex-row lg:items-end lg:justify-between">
+      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
             <Trophy size={18} />
@@ -143,7 +143,7 @@ export default function LeaderboardPage() {
                   <div className="flex items-center gap-3">
                     <span
                       className={`grid h-10 w-10 place-items-center border border-black text-sm font-extrabold shadow-[3px_3px_0px_black] ${
-                        isTopThree ? "bg-primary text-white" : "bg-[var(--surface)]"
+                        isTopThree ? "bg-primary text-white" : "bg-(--surface)"
                       }`}
                     >
                       #{rank}
