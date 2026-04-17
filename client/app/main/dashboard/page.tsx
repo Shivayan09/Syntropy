@@ -254,7 +254,7 @@ export default function Dashboard() {
                 background: `conic-gradient(var(--primary) ${readiness * 3.6}deg, var(--surface) 0deg)`,
               }}
             >
-              <div className="grid h-32 w-32 place-items-center rounded-full border border-black bg-[var(--bg-secondary)] text-center">
+              <div className="grid h-32 w-32 place-items-center rounded-full border border-black bg-(--bg-secondary) text-center">
                 <div>
                   <p className="text-4xl font-extrabold">{readiness}%</p>
                   <p className="text-xs font-bold opacity-60">overall</p>
