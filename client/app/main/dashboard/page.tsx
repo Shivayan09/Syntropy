@@ -1,21 +1,88 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  BookOpenCheck,
+  BrainCircuit,
+  CalendarDays,
+  ClipboardPen,
+  Clock3,
+  Flame,
+  Medal,
+  Sparkles,
+  Target,
+  Trophy,
+  TrendingUp,
+  Zap,
+} from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+
+type TestSummary = {
+  _id?: string;
+  title?: string;
+  type?: "manual" | "generated";
+  subjects?: string[];
+};
+
+type Attempt = {
+  _id: string;
+  score?: number;
+  accuracy?: number;
+  createdAt?: string;
+  startedAt?: string;
+  completedAt?: string;
+  isFirstAttempt?: boolean;
+  test?: TestSummary;
+};
+
+type SubjectStat = {
+  name: string;
+  attempts: number;
+  average: number;
+};
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+
+const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+
+const formatDate = (value?: string) => {
+  if (!value) return "Not attempted";
+
+  return new Date(value).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  });
+};
+
+const getDuration = (attempt?: Attempt) => {
+  if (!attempt?.completedAt || !attempt.startedAt) return "-";
+
+  const minutes = Math.max(
+    1,
+    Math.round(
+      (new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) /
+      60000
+    )
+  );
+
+  return `${minutes} min`;
+};
 
 export default function Dashboard() {
   const router = useRouter();
-  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-  const [attempts, setAttempts] = useState<any[]>([]);
-  const [visibleCount, setVisibleCount] = useState(3);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/attempt/my", { credentials: "include" });
+        const res = await fetch(BACKEND_URL + "/api/attempt/my", {
+          credentials: "include",
+        });
         const data = await res.json();
         setAttempts(data.attempts || []);
       } catch (err) {
@@ -24,256 +91,310 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
+
     fetchAttempts();
   }, []);
 
-  const last = attempts[0];
+  const firstAttempts = useMemo(
+    () => attempts.filter((attempt) => attempt.isFirstAttempt),
+    [attempts]
+  );
 
-  const firstAttempts = attempts.filter(a => a.isFirstAttempt);
+  const uniqueAttempts = firstAttempts.length > 0 ? firstAttempts : attempts;
+  const lastAttempt = attempts[0];
+  const bestAttempt = attempts.reduce<Attempt | undefined>((best, attempt) => {
+    if (!best) return attempt;
+    return (attempt.score || 0) > (best.score || 0) ? attempt : best;
+  }, undefined);
 
-  const avgScore = firstAttempts.length > 0 ? Math.round(firstAttempts.reduce((a, b) => a + b.accuracy, 0) / firstAttempts.length) : 0;
+  const averageScore =
+    uniqueAttempts.length > 0
+      ? clampPercent(
+        uniqueAttempts.reduce((total, attempt) => total + (attempt.score || 0), 0) /
+        uniqueAttempts.length
+      )
+      : 0;
+
+  const averageAccuracy =
+    uniqueAttempts.length > 0
+      ? clampPercent(
+        uniqueAttempts.reduce((total, attempt) => total + (attempt.accuracy || 0), 0) /
+        uniqueAttempts.length
+      )
+      : 0;
+
+  const readiness = attempts.length > 0 ? clampPercent(averageScore * 0.65 + averageAccuracy * 0.35) : 0;
+  const totalPracticeMinutes = attempts.reduce((total, attempt) => {
+    if (!attempt.completedAt || !attempt.startedAt) return total;
+    return (
+      total +
+      Math.max(
+        1,
+        Math.round(
+          (new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) /
+          60000
+        )
+      )
+    );
+  }, 0);
+
+  const subjectStats = useMemo<SubjectStat[]>(() => {
+    const subjectMap = new Map<string, { total: number; count: number }>();
+
+    attempts.forEach((attempt) => {
+      const subject = attempt.test?.subjects?.[0] || "Mixed practice";
+      const current = subjectMap.get(subject) || { total: 0, count: 0 };
+      subjectMap.set(subject, {
+        total: current.total + (attempt.accuracy || 0),
+        count: current.count + 1,
+      });
+    });
+
+    return Array.from(subjectMap.entries())
+      .map(([name, stat]) => ({
+        name,
+        attempts: stat.count,
+        average: clampPercent(stat.total / stat.count),
+      }))
+      .sort((a, b) => b.average - a.average);
+  }, [attempts]);
+
+  const strongestSubject = subjectStats[0];
+  const focusSubject = [...subjectStats].sort((a, b) => a.average - b.average)[0];
+
+  const scoreTone =
+    readiness >= 80
+      ? "Exam-ready"
+      : readiness >= 60
+        ? "Building well"
+        : attempts.length > 0
+          ? "Needs reps"
+          : "Start baseline";
 
   if (loading) {
-    return <Loader2 />
+    return <Loader2 />;
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-5 md:mb-8">
-        <h1 className="text-2xl font-extrabold">
-          Dashboard
-        </h1>
-
-        <button onClick={() => router.push("/main/tests")}>
-          Take Test
-        </button>
-      </div>
-
-      {/* LAST TEST */}
-      <div className="card2 mb-8">
-        {attempts.length === 0 ? (
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">
-                Last Test
-              </p>
-
-              <h2 className="text-xl font-bold mb-2">
-                No tests yet
-              </h2>
-
-              <div className="flex gap-8 text-sm opacity-70">
-                <div>
-                  <p className="text-gray-600">
-                    Score
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-600">
-                    Accuracy
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-600">
-                    Time
-                  </p>
-                </div>
-              </div>
-
-              <button onClick={() => router.push("/main/tests")} className="mt-4">
-                Take your first test
-              </button>
-            </div>
-
-            <div className="text-sm text-right opacity-70">
-              <p className="text-gray-600">
-                Strongest
-              </p>
-              <p className="font-bold mb-2">
-                -
-              </p>
-
-              <p className="text-gray-600">
-                Weakest
-              </p>
-              <p className="font-bold">
-              </p>
-            </div>
+    <div className="mx-auto max-w-7xl space-y-9">
+      <section>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="font-extrabold text-3xl">Dashboard</p>
           </div>
-        ) : (
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">
-                Last Test
-              </p>
-
-              <h2 className="text-xl mb-2">
-                {last?.test?.title}
-              </h2>
-
-              <div className="flex gap-8 text-sm">
-                <div>
-                  <p className="text-gray-600">
-                    Score
-                  </p>
-                  <p className="font-bold">
-                    {Math.round(last.score)}%
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-600">
-                    Accuracy
-                  </p>
-                  <p className="font-bold">
-                    {Math.round(last.accuracy)}%
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-600">
-                    Time
-                  </p>
-                  <p className="font-bold">
-                    {last?.completedAt ? Math.round((new Date(last.completedAt).getTime() - new Date(last.startedAt).getTime()) / 60000) : "-"} min
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-sm text-right">
-              <p className="text-gray-600">
-                Strongest
-              </p>
-              <p className="font-bold mb-2">
-                {last?.test?.subjects?.[0] || "-"}
-              </p>
-
-              <p className="text-gray-600">
-                Weakest
-              </p>
-              <p className="font-bold">
-                -
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* STATS */}
-      <div className="my-7">
-        <h3 className="font-bold text-2xl mb-4">
-          Overall Stats
-        </h3>
-
-        <div className="flex flex-col md:flex-row gap-5 md:gap-10">
-          <div className="card2 w-full md:w-1/3">
-            <p className="text-sm text-gray-600">
-              Tests Taken
-            </p>
-
-            {attempts.length === 0 ? (
-              <p className="text-sm opacity-70 mt-2">
-                Take a test to see stats
-              </p>
-            ) : (
-              <p className="text-2xl font-bold">
-                {firstAttempts.length}
-              </p>
-            )}
-          </div>
-
-          <div className="card2 w-full md:w-1/3">
-            <p className="text-sm text-gray-600">
-              Avg Score
-            </p>
-
-            {attempts.length === 0 ? (
-              <p className="text-sm opacity-70 mt-2">
-                Your average will appear here
-              </p>
-            ) : (
-              <p className="text-2xl font-bold">
-                {avgScore}%
-              </p>
-            )}
-          </div>
-
-          <div className="card2 w-full md:w-1/3">
-            <p className="text-sm text-gray-600">
-              Rank
-            </p>
-
-            {attempts.length === 0 ? (
-              <p className="text-sm opacity-70 mt-2">
-                Attempt tests to get ranked
-              </p>
-            ) : (
-              <p className="text-2xl font-bold">
-                #124
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* RECENT TESTS */}
-      <div>
-        <h3 className="font-bold text-2xl mb-4">
-          Recent Tests
-        </h3>
-
-        {attempts.length === 0 ? (
-          <div className="card text-center py-10">
-            <p className="font-bold mb-2">
-              No recent tests
-            </p>
-
-            <p className="opacity-70 text-sm mb-4">
-              Your test history will appear here
-            </p>
-
-            <button onClick={() => router.push("/main/tests")}>
-              Take a Test
+          <div className="flex gap-3 sm:flex-row">
+            <button onClick={() => router.push("/main/tests")} className="gap-2">
+              <BookOpenCheck size={18} />
+              Attempt
+            </button>
+            <button onClick={() => router.push("/main/create")} className="button-secondary gap-2">
+              <ClipboardPen size={18} />
+              Create
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          {
+            label: "Tests taken",
+            value: uniqueAttempts.length || "--",
+            note: attempts.length > 0 ? `${attempts.length} total attempts` : "Awaiting first run",
+            icon: Target,
+          },
+          {
+            label: "Average score",
+            value: attempts.length > 0 ? `${averageScore}%` : "--",
+            note: "First attempts counted",
+            icon: BarChart3,
+          },
+          {
+            label: "Accuracy",
+            value: attempts.length > 0 ? `${averageAccuracy}%` : "--",
+            note: "Across completed tests",
+            icon: TrendingUp,
+          },
+          {
+            label: "Best score",
+            value: bestAttempt ? `${clampPercent(bestAttempt.score || 0)}%` : "--",
+            note: bestAttempt?.test?.title || "No top score yet",
+            icon: Trophy,
+          },
+        ].map((stat) => {
+          const Icon = stat.icon;
+
+          return (
+            <div key={stat.label} className="card min-h-36 p-5">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm font-bold opacity-60">{stat.label}</p>
+                <Icon size={22} className="text-primary" />
+              </div>
+              <p className="mt-4 text-4xl font-extrabold">{stat.value}</p>
+              <p className="mt-1 line-clamp-1 text-xs opacity-60">{stat.note}</p>
+            </div>
+          );
+        })}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[0.7fr_1.3fr]">
+        <div className="card flex flex-col justify-between gap-6 p-6 md:p-7">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold opacity-60">Exam readiness</p>
+              <h2 className="mt-1 text-3xl font-extrabold">{scoreTone}</h2>
+            </div>
+            <Flame className="text-primary" size={30} />
+          </div>
+
+          <div className="flex items-center justify-center py-2">
+            <div
+              className="grid h-48 w-48 place-items-center rounded-full border border-black shadow-[5px_5px_0px_black]"
+              style={{
+                background: `conic-gradient(var(--primary) ${readiness * 3.6}deg, var(--surface) 0deg)`,
+              }}
+            >
+              <div className="grid h-32 w-32 place-items-center rounded-full border border-black bg-[var(--bg-secondary)] text-center">
+                <div>
+                  <p className="text-4xl font-extrabold">{readiness}%</p>
+                  <p className="text-xs font-bold opacity-60">overall</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={() => router.push("/main/create/generate")} className="w-full gap-2">
+            <BrainCircuit size={18} />
+            Generate AI test
+          </button>
+        </div>
+
+        <div className="card p-6 md:p-7">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-bold opacity-60">Subject map</p>
+              <h2 className="text-2xl font-extrabold">Accuracy by practice zone</h2>
+            </div>
+            <button onClick={() => router.push("/main/analytics")} className="button-secondary gap-2">
+              Analytics
+              <ArrowRight size={18} />
+            </button>
+          </div>
+
+          {subjectStats.length === 0 ? (
+            <div className="grid min-h-44 place-items-center border border-dashed border-black p-6 text-center">
+              <div>
+                <p className="font-extrabold">No subjects mapped yet</p>
+                <p className="mt-1 text-sm opacity-60">Your first attempt will unlock this view.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {subjectStats.slice(0, 4).map((subject) => (
+                <div key={subject.name} className="py-1">
+                  <div className="mb-2 flex items-center justify-between gap-4 text-sm">
+                    <p className="font-bold">{subject.name}</p>
+                    <p className="font-extrabold">{subject.average}%</p>
+                  </div>
+                  <div className="h-4 border border-black bg-secondary rounded-full overflow-clip">
+                    <div
+                      className="h-full border-r border-black bg-primary"
+                      style={{ width: `${subject.average}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs opacity-60">{subject.attempts} attempts</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section>
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-sm font-bold opacity-60 mb-2">Recent attempts</p>
+            <h2 className="text-3xl font-extrabold">Test history that still teaches</h2>
+          </div>
+          <button onClick={() => router.push("/main/history")} className="button-secondary gap-2">
+            History
+            <ArrowRight size={18} />
+          </button>
+        </div>
+
+        {attempts.length === 0 ? (
+          <div className="card grid min-h-52 place-items-center p-7 text-center">
+            <div>
+              <p className="text-2xl font-extrabold">Your dashboard is waiting for data.</p>
+              <p className="mx-auto mt-2 max-w-md text-sm opacity-60">
+                Attempt a manual mock or generate one with AI to start seeing trends here.
+              </p>
+              <button onClick={() => router.push("/main/tests")} className="mt-5 gap-2">
+                Browse tests
+                <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
         ) : (
-          <div className="space-y-3 text-sm">
-            {attempts.slice(0, visibleCount).map((a) => (
-              <div key={a._id} className="flex flex-col md:flex-row gap-5 card items-center">
-                <div className="flex w-full md:w-2/3">
-                  <div className="w-full md:w-1/2">
-                    {a.test?.title || "AI Test"}
+          <div className="space-y-3">
+            {attempts.slice(0, visibleCount).map((attempt) => (
+              <div
+                key={attempt._id}
+                className="card grid gap-5 p-5 md:grid-cols-[1fr_auto_auto] md:items-center"
+              >
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-lg font-bold">{attempt.test?.title || "AI Test"}</p>
+
                   </div>
 
-                  <div className="w-full md:w-1/2 flex items-center justify-end md:justify-center">
-                    <span className="font-bold">
-                      {Math.round(a.accuracy)}%
+                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs opacity-70">
+                    <span className="inline-flex items-center gap-1">
+                      <CalendarDays size={14} />
+                      {formatDate(attempt.createdAt)}
                     </span>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock3 size={14} />
+                      {getDuration(attempt)}
+                    </span>
+                    <span>{attempt.test?.subjects?.[0] || "Mixed practice"}</span>
                   </div>
                 </div>
 
-                <div className="w-full md:w-1/3 flex justify-center md:justify-end">
-                  <button onClick={() => router.push(`/main/history/review/${a._id}`)} className="w-1/2 md:w-fit flex items-center gap-1 group">
-                    Analysis
-                    <ArrowRight className="hidden md:flex group-hover:translate-x-1 transition-all duration-200" />
-                  </button>
+                <div className="grid grid-cols-2 gap-3 text-sm md:w-48">
+                  <div>
+                    <p className="opacity-60">Score</p>
+                    <p className="text-xl font-bold">{clampPercent(attempt.score || 0)}%</p>
+                  </div>
+                  <div>
+                    <p className="opacity-60">Accuracy</p>
+                    <p className="text-xl font-bold">{clampPercent(attempt.accuracy || 0)}%</p>
+                  </div>
                 </div>
+
+                <button
+                  onClick={() => router.push(`/main/history/review/${attempt._id}`)}
+                  className="button-secondary w-full gap-2 md:w-fit"
+                >
+                  Review
+                  <ArrowRight size={18} />
+                </button>
               </div>
             ))}
 
             {visibleCount < attempts.length && (
-              <div className="w-full flex justify-end">
-                <button onClick={() => setVisibleCount((prev) => prev + 10)} className="button-secondary mt-2">
-                  Load more tests
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 8)}
+                  className="button-secondary"
+                >
+                  Load more
                 </button>
               </div>
             )}
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
