@@ -394,7 +394,6 @@ export default function Profile() {
 
             <div className="mt-6">
               <div className="mb-3 flex items-center gap-2">
-                <Target size={18} className="text-primary" />
                 <p className="font-extrabold">Preferred subjects</p>
               </div>
 
