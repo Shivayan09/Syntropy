@@ -98,7 +98,9 @@ export const getAttemptById = async (req, res) => {
 
 export const getMyAttempts = async (req, res) => {
     try {
-        const attempts = await Attempt.find({ user: req.user._id, status: "completed" }).populate("test", "title subjects duration").sort({ createdAt: -1 })
+        const attempts = await Attempt.find({ user: req.user._id, status: "completed" })
+            .populate("test", "title subjects duration difficulty totalQuestions type questions")
+            .sort({ createdAt: -1 })
         res.json({
             success: true,
             attempts

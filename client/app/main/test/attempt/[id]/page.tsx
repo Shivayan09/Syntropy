@@ -3,12 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  Bookmark,
+  BookmarkCheck,
   CheckCircle2,
   Circle,
   Clock3,
-  FileQuestion,
+  Eraser,
   Flag,
   ListChecks,
   Send,
@@ -54,6 +57,7 @@ export default function AttemptPage() {
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Array<number | undefined>>([]);
+  const [markedForReview, setMarkedForReview] = useState<boolean[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -62,8 +66,10 @@ export default function AttemptPage() {
   const currentQuestion = questions[current];
   const answeredCount = answers.filter((answer) => answer !== undefined).length;
   const unansweredCount = Math.max(0, questions.length - answeredCount);
-  const progress = questions.length > 0 ? Math.round(((current + 1) / questions.length) * 100) : 0;
+  const reviewCount = markedForReview.filter(Boolean).length;
+  const progress = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0;
   const isLastQuestion = current === questions.length - 1;
+  const timeWarning = timeLeft > 0 && timeLeft <= 300;
 
   const submitTest = useCallback(async () => {
     if (submitting || !attemptId) return;
@@ -115,6 +121,7 @@ export default function AttemptPage() {
         setAttempt(fetchedAttempt);
         setTest(fetchedAttempt.test);
         setAnswers(Array(fetchedQuestions.length).fill(undefined));
+        setMarkedForReview(Array(fetchedQuestions.length).fill(false));
       } catch (err) {
         console.error(err);
       } finally {
@@ -167,6 +174,22 @@ export default function AttemptPage() {
     });
   };
 
+  const clearAnswer = () => {
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[current] = undefined;
+      return updated;
+    });
+  };
+
+  const toggleReview = () => {
+    setMarkedForReview((prev) => {
+      const updated = [...prev];
+      updated[current] = !updated[current];
+      return updated;
+    });
+  };
+
   const goToQuestion = (index: number) => {
     setCurrent(Math.max(0, Math.min(index, questions.length - 1)));
   };
@@ -191,68 +214,40 @@ export default function AttemptPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-(--bg) text-(--text)">
-      <header className="shrink-0 border-b border-black bg-(--bg-secondary) px-4 py-3 md:px-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="min-w-0">
-            <div className="mb-1 flex items-center gap-2 text-xs font-extrabold uppercase text-primary">
-              <FileQuestion size={15} />
-              Live attempt
-            </div>
-            <h1 className="truncate text-2xl font-extrabold md:text-3xl">
-              {test.title || "Mock Test"}
-            </h1>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-3 lg:min-w-136">
-            <div className="border border-black bg-(--surface) px-4 py-2 shadow-[3px_3px_0px_var(--shadow)]">
-              <p className="text-xs font-bold opacity-60">Question</p>
-              <p className="text-lg font-extrabold">
-                {current + 1}/{questions.length}
-              </p>
-            </div>
-            <div className="border border-black bg-(--surface) px-4 py-2 shadow-[3px_3px_0px_var(--shadow)]">
-              <p className="text-xs font-bold opacity-60">Answered</p>
-              <p className="text-lg font-extrabold text-primary">{answeredCount}</p>
-            </div>
-            <div className="border border-black bg-(--surface) px-4 py-2 shadow-[3px_3px_0px_var(--shadow)]">
-              <p className="text-xs font-bold opacity-60">Time left</p>
-              <p className={`text-lg font-extrabold ${timeLeft <= 300 ? "text-primary" : ""}`}>
-                {formatTime(timeLeft)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 h-3 border border-black bg-(--surface)">
-          <div className="h-full border-r border-black bg-primary" style={{ width: `${progress}%` }} />
-        </div>
-      </header>
-
-      <main className="grid min-h-0 flex-1 lg:grid-cols-[1fr_20rem]">
-        <section className="min-h-0 overflow-y-auto p-4 md:p-6">
+    <div className="grid h-screen overflow-hidden bg-(--bg-secondary) text-(--text) xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <section className="flex min-h-0 flex-col">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 md:px-8">
           <div className="mx-auto max-w-5xl space-y-5">
-            <div className="card p-6 md:p-8">
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black]">
-                  <ListChecks size={14} />
-                  Single correct option
+            {timeWarning && (
+              <div className="flex items-start gap-3 border border-primary bg-(--surface) p-4 text-sm font-semibold text-(--text)">
+                <AlertTriangle className="mt-0.5 shrink-0 text-primary" size={18} />
+                <p>Less than five minutes remain. Confirm pending answers and submit before the timer expires.</p>
+              </div>
+            )}
+
+            <div className="border border-(--border) bg-(--surface) px-5 py-5 shadow-[4px_4px_0px_var(--shadow)] md:px-7 md:py-6">
+              <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-2 border border-(--border) bg-(--bg-secondary) px-3 py-1 text-xs font-extrabold uppercase">
+                    <ListChecks size={14} />
+                    Single correct option
+                  </span>
+                  {markedForReview[current] && (
+                    <span className="inline-flex items-center gap-2 border border-primary bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white">
+                      <BookmarkCheck size={14} />
+                      Marked for review
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-2 text-sm font-bold opacity-65">
-                  <Clock3 size={17} />
-                  {formatTime(timeLeft)}
-                </div>
+                <p className="text-sm font-bold opacity-65">Question {current + 1} of {questions.length}</p>
               </div>
 
-              <p className="mb-3 text-sm font-bold uppercase opacity-60">
-                Question {current + 1}
-              </p>
-              <h2 className="text-2xl font-extrabold leading-relaxed md:text-3xl">
+              <h2 className="text-xl font-extrabold leading-relaxed md:text-2xl">
                 {currentQuestion.question}
               </h2>
             </div>
 
-            <div className="grid gap-4">
+            <div className="space-y-3 pb-4">
               {currentQuestion.options.map((option, index) => {
                 const selected = answers[current] === index;
 
@@ -260,32 +255,50 @@ export default function AttemptPage() {
                   <div
                     key={`${option}-${index}`}
                     onClick={() => selectOption(index)}
-                    className={`h-auto cursor-pointer rounded-full overflow-clip min-h-18 w-full justify-start px-0 py-0 text-left shadow-none hover:transform-none hover:shadow-none ${
+                    className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${
                       selected
                         ? "bg-primary text-white"
-                        : "button-secondary bg-(--bg-secondary) text-(--text)"
+                        : "button-secondary bg-(--surface) text-(--text)"
                     }`}
                   >
-                    <span
-                      className={`flex h-full w-full items-start gap-4 p-5 ${
-                        selected ? "bg-primary text-white" : ""
-                      }`}
-                    >
+                    <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
                       <span
-                        className={`grid h-9 w-9 shrink-0 place-items-center border border-black text-sm font-extrabold shadow-[2px_2px_0px_black] ${
-                          selected ? "bg-white text-black" : "bg-(--bg-secondary)"
+                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${
+                          selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
                         }`}
                       >
                         {optionLabels[index] || index + 1}
                       </span>
-                      <span className="pt-1 text-base font-bold leading-relaxed">{option}</span>
+                      <span className="pt-1 text-base font-semibold leading-relaxed">{option}</span>
                     </span>
                   </div>
                 );
               })}
             </div>
+          </div>
+        </div>
 
-            <div className="flex flex-col gap-3 border-t border-(--border) pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="shrink-0 px-4 py-5 md:px-8">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row">
+              <button
+                className="button-secondary gap-2"
+                onClick={toggleReview}
+              >
+                {markedForReview[current] ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+                {markedForReview[current] ? "Reviewed" : "Mark review"}
+              </button>
+              <button
+                className="button-secondary gap-2"
+                onClick={clearAnswer}
+                disabled={answers[current] === undefined}
+              >
+                <Eraser size={18} />
+                Clear response
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:justify-end">
               <button
                 className="button-secondary gap-2"
                 onClick={() => goToQuestion(current - 1)}
@@ -306,68 +319,104 @@ export default function AttemptPage() {
                 </button>
               ) : (
                 <button className="gap-2" onClick={() => goToQuestion(current + 1)}>
-                  Next
+                  Save & next
                   <ArrowRight size={18} />
+                </button>
+              )}
+
+              {!isLastQuestion && (
+                <button
+                  disabled={submitting}
+                  className={`gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
+                  onClick={submitTest}
+                >
+                  {submitting ? "Submitting" : "Submit test"}
+                  <Send size={18} />
                 </button>
               )}
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <aside className="min-h-0 overflow-y-auto border-t border-black bg-(--bg-secondary) p-4 lg:border-l lg:border-t-0 lg:p-5">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-bold opacity-60">Question palette</p>
-              <h2 className="text-2xl font-extrabold">Navigate</h2>
-            </div>
-            <Flag className="text-primary" size={24} />
+      <aside className="min-h-0 overflow-y-auto border-t border-(--border) bg-(--surface) p-4 xl:border-l xl:border-t-0 xl:p-5">
+        <div className="mb-5 border-b border-(--border) pb-5">
+          <p className="mb-1 text-xs font-extrabold uppercase text-primary">Mock test attempt</p>
+          <h1 className="truncate text-xl font-extrabold leading-tight">{test.title || "Mock Test"}</h1>
+
+          <div className={`mt-4 border px-4 py-3 ${timeWarning ? "border-primary bg-primary text-white" : "border-(--border) bg-(--bg-secondary)"}`}>
+            <p className="text-xs font-bold uppercase opacity-70">Time left</p>
+            <p className="mt-1 flex items-center gap-2 text-3xl font-extrabold">
+              <Clock3 size={22} />
+              {formatTime(timeLeft)}
+            </p>
           </div>
 
-          <div className="mb-5 grid grid-cols-2 gap-3 text-sm">
-            <div className="border border-black bg-(--surface) p-3 shadow-[3px_3px_0px_var(--shadow)]">
-              <p className="font-extrabold text-primary">{answeredCount}</p>
-              <p className="text-xs opacity-60">Answered</p>
+          <div className="mt-4">
+            <div className="mb-2 flex items-center justify-between text-xs font-bold uppercase opacity-65">
+              <span>Answered</span>
+              <span>{answeredCount}/{questions.length}</span>
             </div>
-            <div className="border border-black bg-(--surface) p-3 shadow-[3px_3px_0px_var(--shadow)]">
-              <p className="font-extrabold">{unansweredCount}</p>
-              <p className="text-xs opacity-60">Remaining</p>
+            <div className="h-2 bg-(--bg-secondary)">
+              <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-5 gap-2 lg:grid-cols-4">
-            {questions.map((_, index) => {
-              const answered = answers[index] !== undefined;
-              const active = current === index;
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-bold opacity-60">Answer sheet</p>
+            <h2 className="text-2xl font-extrabold">Palette</h2>
+          </div>
+          <Flag className="text-primary" size={23} />
+        </div>
 
-              return (
-                <button
-                  key={index}
-                  onClick={() => goToQuestion(index)}
-                  className={`h-11 rounded-none px-0 text-sm shadow-[3px_3px_0px_black] hover:transform-none ${
-                    active || answered
+        <div className="mb-5 grid grid-cols-3 gap-2 text-sm">
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold text-primary">{answeredCount}</p>
+            <p className="text-xs opacity-60">Done</p>
+          </div>
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold">{unansweredCount}</p>
+            <p className="text-xs opacity-60">Left</p>
+          </div>
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold">{reviewCount}</p>
+            <p className="text-xs opacity-60">Review</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-5 gap-2 xl:grid-cols-4">
+          {questions.map((_, index) => {
+            const answered = answers[index] !== undefined;
+            const active = current === index;
+            const marked = markedForReview[index];
+
+            return (
+              <button
+                key={index}
+                type="button"
+                onClick={() => goToQuestion(index)}
+                className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${
+                  active
+                    ? "bg-black text-white"
+                    : answered
                       ? "bg-primary text-white"
-                      : "button-secondary bg-(--surface) text-(--text)"
-                  }`}
-                >
-                  <span className="flex items-center justify-center gap-1">
-                    {answered ? <CheckCircle2 size={14} /> : <Circle size={12} />}
-                    {index + 1}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            disabled={submitting}
-            onClick={submitTest}
-            className={`mt-6 w-full justify-between ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-          >
-            {submitting ? "Submitting" : "Submit"}
-            <Send size={18} />
-          </button>
-        </aside>
-      </main>
+                      : marked
+                        ? "button-secondary border-primary bg-(--surface) text-primary"
+                        : "button-secondary bg-(--surface) text-(--text)"
+                }`}
+                aria-label={`Go to question ${index + 1}`}
+              >
+                <span className="flex items-center justify-center gap-1">
+                  {answered ? <CheckCircle2 size={14} /> : marked ? <Bookmark size={13} /> : <Circle size={12} />}
+                  {index + 1}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </aside>
     </div>
   );
 }

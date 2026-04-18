@@ -8,11 +8,14 @@ export default function CreateTestPage() {
 
     return (
         <div className="max-w-5xl mx-auto space-y-8">
-
-            <div className="mb-5 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+            <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                    <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
                         <FlaskConical size={18} />
                         Test laboratory
-                      </div>
+                    </div>
+                </div>
+            </section>
 
             <div className="card2">
                 <p className="text-sm opacity-70 mb-2">CREATE MODE</p>

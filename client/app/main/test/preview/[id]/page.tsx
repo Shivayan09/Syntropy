@@ -149,7 +149,7 @@ export default function TestPreview() {
           <div className="card p-6 md:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <span className="inline-flex items-center gap-2 border border-black bg-(--primary) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black]">
+                <span className="inline-flex items-center text-white gap-2 border border-black bg-(--primary) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black]">
                   <TestTypeIcon size={14} />
                   {isGenerated ? "AI Generated" : "Manual"}
                 </span>
@@ -229,7 +229,6 @@ export default function TestPreview() {
         <aside className="space-y-6">
           <div className="card p-6 md:p-7">
             <div className="mb-5 flex items-center gap-3">
-              <ShieldCheck size={26} className="text-primary" />
               <div>
                 <p className="text-sm font-bold opacity-60">Readiness check</p>
                 <h2 className="text-2xl font-extrabold">Before you begin</h2>
