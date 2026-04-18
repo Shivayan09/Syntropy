@@ -304,7 +304,7 @@ export default function AttemptsPage() {
                     <span className="font-semibold">{formatDate(completedAt)}</span>
                   </div>
 
-                  <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+                  <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
                     <button className="button-secondary w-full gap-2 px-3 lg:w-fit" onClick={() => router.push(`/main/history/review/${attempt._id}`)}>
                       Review
                       <ArrowRight size={17} />

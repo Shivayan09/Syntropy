@@ -15,6 +15,7 @@ import {
   Flag,
   ListChecks,
   Send,
+  X,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
@@ -60,6 +61,7 @@ export default function AttemptPage() {
   const [markedForReview, setMarkedForReview] = useState<boolean[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
 
   const questions = useMemo(() => test?.questions || [], [test]);
@@ -92,6 +94,7 @@ export default function AttemptPage() {
       const data = await res.json();
       if (!res.ok) return;
 
+      setConfirmOpen(false);
       router.replace(`/main/test/result/${data.attemptId}`);
     } catch (err) {
       console.error(err);
@@ -194,6 +197,11 @@ export default function AttemptPage() {
     setCurrent(Math.max(0, Math.min(index, questions.length - 1)));
   };
 
+  const openSubmitModal = () => {
+    if (submitting) return;
+    setConfirmOpen(true);
+  };
+
   if (loading) {
     return <Loader2 />;
   }
@@ -255,17 +263,15 @@ export default function AttemptPage() {
                   <div
                     key={`${option}-${index}`}
                     onClick={() => selectOption(index)}
-                    className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${
-                      selected
+                    className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected
                         ? "bg-primary text-white"
                         : "button-secondary bg-(--surface) text-(--text)"
-                    }`}
+                      }`}
                   >
                     <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
                       <span
-                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${
-                          selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
-                        }`}
+                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
+                          }`}
                       >
                         {optionLabels[index] || index + 1}
                       </span>
@@ -312,7 +318,7 @@ export default function AttemptPage() {
                 <button
                   disabled={submitting}
                   className={`gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-                  onClick={submitTest}
+                  onClick={openSubmitModal}
                 >
                   {submitting ? "Submitting" : "Submit test"}
                   <Send size={18} />
@@ -321,17 +327,6 @@ export default function AttemptPage() {
                 <button className="gap-2" onClick={() => goToQuestion(current + 1)}>
                   Save & next
                   <ArrowRight size={18} />
-                </button>
-              )}
-
-              {!isLastQuestion && (
-                <button
-                  disabled={submitting}
-                  className={`gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-                  onClick={submitTest}
-                >
-                  {submitting ? "Submitting" : "Submit test"}
-                  <Send size={18} />
                 </button>
               )}
             </div>
@@ -397,15 +392,14 @@ export default function AttemptPage() {
                 key={index}
                 type="button"
                 onClick={() => goToQuestion(index)}
-                className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${
-                  active
+                className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${active
                     ? "bg-black text-white"
                     : answered
                       ? "bg-primary text-white"
                       : marked
                         ? "button-secondary border-primary bg-(--surface) text-primary"
                         : "button-secondary bg-(--surface) text-(--text)"
-                }`}
+                  }`}
                 aria-label={`Go to question ${index + 1}`}
               >
                 <span className="flex items-center justify-center gap-1">
@@ -416,7 +410,145 @@ export default function AttemptPage() {
             );
           })}
         </div>
+        <div className="py-5 mt-5 border-t border-(--border)">
+          <button
+            disabled={submitting}
+            className={`gap-2 w-full ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
+            onClick={openSubmitModal}
+          >
+            {submitting ? "Submitting" : "Submit test"}
+            <Send size={18} />
+          </button>
+        </div>
       </aside>
+
+      <SubmitConfirmModal
+        open={confirmOpen}
+        loading={submitting}
+        answeredCount={answeredCount}
+        reviewCount={reviewCount}
+        totalQuestions={questions.length}
+        unansweredCount={unansweredCount}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={submitTest}
+      />
+    </div>
+  );
+}
+
+function SubmitConfirmModal({
+  answeredCount,
+  loading,
+  onClose,
+  onConfirm,
+  open,
+  reviewCount,
+  totalQuestions,
+  unansweredCount,
+}: {
+  answeredCount: number;
+  loading: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  open: boolean;
+  reviewCount: number;
+  totalQuestions: number;
+  unansweredCount: number;
+}) {
+  useEffect(() => {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !loading) onClose();
+    };
+
+    if (open) {
+      window.addEventListener("keydown", handleEsc);
+    }
+
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [loading, onClose, open]);
+
+  if (!open) return null;
+
+  const hasUnanswered = unansweredCount > 0;
+  const hasReview = reviewCount > 0;
+  const title = hasUnanswered
+    ? "Submit with unanswered questions?"
+    : hasReview
+      ? "Submit with questions marked for review?"
+      : "Submit test?";
+  const description = hasUnanswered
+    ? "Some questions are still unanswered. Once submitted, your responses cannot be changed."
+    : hasReview
+      ? "You still have questions marked for review. Confirm only if you are done reviewing them."
+      : "All questions are answered and none are marked for review. Confirm to complete this attempt.";
+
+  const safeClose = () => {
+    if (!loading) onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/50" onClick={safeClose} />
+      <div
+        className="relative w-full max-w-md rounded-lg border border-primary bg-surface p-6 shadow-lg"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div
+          role="button"
+          tabIndex={loading ? -1 : 0}
+          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full ${
+            loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-70"
+          }`}
+          onClick={safeClose}
+          onKeyDown={(event) => {
+            if ((event.key === "Enter" || event.key === " ") && !loading) {
+              event.preventDefault();
+              onClose();
+            }
+          }}
+          aria-disabled={loading}
+          aria-label="Close submit confirmation"
+        >
+          <X size={18} />
+        </div>
+
+        <div className="pr-8">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full border border-primary bg-primary text-white">
+            <AlertTriangle size={22} />
+          </div>
+          <h2 className="text-xl font-extrabold">{title}</h2>
+          <p className="mt-2 text-sm opacity-70">{description}</p>
+        </div>
+
+        <div className="mt-5 grid grid-cols-3 gap-2 text-sm">
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold text-primary">{answeredCount}</p>
+            <p className="text-xs opacity-60">Answered</p>
+          </div>
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold">{unansweredCount}</p>
+            <p className="text-xs opacity-60">Left</p>
+          </div>
+          <div className="border border-(--border) bg-(--bg-secondary) p-3">
+            <p className="font-extrabold">{reviewCount}</p>
+            <p className="text-xs opacity-60">Review</p>
+          </div>
+        </div>
+
+        <div className="mt-4 border border-(--border) bg-(--bg-secondary) p-3 text-sm font-semibold opacity-80">
+          {answeredCount}/{totalQuestions} questions attempted
+        </div>
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <button className="button-secondary" onClick={safeClose} disabled={loading}>
+            Cancel
+          </button>
+          <button onClick={onConfirm} disabled={loading} className={`gap-2 ${loading ? "cursor-not-allowed opacity-70" : ""}`}>
+            {loading ? "Submitting..." : "Confirm submit"}
+            <Send size={18} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
