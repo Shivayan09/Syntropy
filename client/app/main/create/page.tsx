@@ -20,7 +20,7 @@ export default function CreateTestPage() {
                     Build a test that fits your goal.
                 </h1>
                 <p className="opacity-70 mt-3 max-w-2xl">
-                    Choose between speed and control — or use both smartly.
+                    Choose between speed and control or use both smartly.
                 </p>
             </div>
 

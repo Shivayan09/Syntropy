@@ -53,9 +53,7 @@ export default function TestsPage() {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/test/all", {
-          credentials: "include",
-        });
+        const res = await fetch(BACKEND_URL + "/api/test/all", {credentials: "include"});
         const data = await res.json();
         if (!res.ok) return;
         setTests(data.tests || []);
@@ -217,7 +215,7 @@ export default function TestsPage() {
                         {isGenerated ? "AI" : "Manual"}
                       </span>
                     </div>
-                    <h2 className="truncate text-xl font-extrabold">{test.title || "Untitled test"}</h2>
+                    <p   className="truncate text-xl font-bold">{test.title || "Untitled test"}</p  >
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
