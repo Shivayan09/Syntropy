@@ -287,21 +287,21 @@ export default function AttemptsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-extrabold">{Math.round(attempt.score || 0)}</span>
+                    <span className="font-semibold">{Math.round(attempt.score || 0)}</span>
                     <span className="opacity-60 lg:hidden">score</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-extrabold">{percent(attempt.accuracy)}</span>
+                    <span className="font-semibold">{percent(attempt.accuracy)}</span>
                     <span className="opacity-60 lg:hidden">accuracy</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-extrabold">{duration === null ? "--" : `${duration} min`}</span>
+                    <span className="font-semibold">{duration === null ? "--" : `${duration} min`}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="font-extrabold">{formatDate(completedAt)}</span>
+                    <span className="font-semibold">{formatDate(completedAt)}</span>
                   </div>
 
                   <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
