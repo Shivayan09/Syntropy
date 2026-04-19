@@ -12,7 +12,8 @@ import {
   Settings,
   X,
   PanelLeft,
-  Trophy
+  Trophy,
+  Crown
 } from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
@@ -201,6 +202,13 @@ export default function Sidebar({
               <Trophy size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
                 Leaderboard
+              </span>
+            </div>
+
+            <div className={itemClass("/main/subscription")} onClick={() => router.push("/main/subscription")}>
+              <Crown size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Subscription
               </span>
             </div>
 

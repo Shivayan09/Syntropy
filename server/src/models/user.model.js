@@ -12,9 +12,11 @@ const userSchema = new mongoose.Schema({
     provider: { type: String, enum: ["local", "google"], default: "local" },
     college: { type: String, trim: true, minLength: 2 },
     semester: { type: Number, min: 1, max: 8 },
-    onboardingCompleted: {type: Boolean, default: false},
-    aiTokens: {type: Number, default: 1},
+    onboardingCompleted: { type: Boolean, default: false },
+    aiTokens: { type: Number, default: 1 },
     lastTokenReset: { type: Date, default: Date.now },
+    plan: { type: String, enum: ["free", "pro", "elite"], default: "free" },
+    planExpiry: { type: Date },
     preferences: {
         type: {
             subjects: { type: [String], default: [] },
