@@ -1,10 +1,13 @@
 "use client";
 
-import { Sparkles, ClipboardPen, ClipboardList, FlaskConical } from "lucide-react";
+import { Sparkles, ClipboardPen, FlaskConical } from "lucide-react";
 import { useRouter } from "next/navigation";
+import AiTokenStatus from "@/components/main/AiTokenStatus";
+import { useAiTokens } from "@/context/AiTokenContext";
 
 export default function CreateTestPage() {
     const router = useRouter();
+    const { tokenStatus } = useAiTokens();
 
     return (
         <div className="max-w-5xl mx-auto space-y-8">
@@ -49,6 +52,8 @@ export default function CreateTestPage() {
                             <li>Daily problem-solving routine</li>
                             <li>Test weak areas instantly</li>
                         </ul>
+
+                        <AiTokenStatus status={tokenStatus} compact />
                     </div>
 
                     <div className="mt-6 flex justify-end">
@@ -78,6 +83,13 @@ export default function CreateTestPage() {
                             <li>Practice important questions</li>
                             <li>Test conceptual understanding</li>
                         </ul>
+
+                        <div className="mt-5 border border-black bg-(--surface) p-4">
+                            <p className="text-sm font-extrabold">Unlimited manual tests</p>
+                            <p className="mt-1 text-xs opacity-65">
+                                Manual creation never uses AI tokens.
+                            </p>
+                        </div>
                     </div>
 
                     <div className="mt-6 flex justify-end">

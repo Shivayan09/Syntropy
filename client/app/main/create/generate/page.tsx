@@ -3,27 +3,45 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { ClipboardPen, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+import AiTokenStatus from "@/components/main/AiTokenStatus";
+import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
+
+type Difficulty = "Easy" | "Medium" | "Hard";
+
+type SyllabusResponse = {
+    syllabus?: {
+        subjects?: {
+            name: string;
+        }[];
+    }[];
+};
 
 export default function CreateAITest() {
-    const { user } = useAuth();
+    const router = useRouter();
+    const { user, getMe } = useAuth();
+    const { tokenStatus, refreshTokenStatus, setTokenStatus } = useAiTokens();
     const [subjects, setSubjects] = useState<string[]>([]);
     const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
     const [input, setInput] = useState("");
-    const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Medium");
+    const [difficulty, setDifficulty] = useState<Difficulty>("Medium");
     const [questions, setQuestions] = useState(20);
     const [time, setTime] = useState(30);
     const [loading, setLoading] = useState(false);
     const [topicFocus, setTopicFocus] = useState("");
-    const [mixedSubjects, setMixedSubjects] = useState(true);
+    const [mixedSubjects] = useState(true);
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+    const hasTokens = tokenStatus?.hasTokens ?? false;
+    const tokenStatusUnavailable = !tokenStatus;
 
     useEffect(() => {
         const fetchSyllabus = async () => {
             try {
                 const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include" });
-                const data = await res.json();
-                const subs = data.syllabus?.[0]?.subjects?.map((s: any) => s.name) || [];
+                const data = (await res.json()) as SyllabusResponse;
+                const subs = data.syllabus?.[0]?.subjects?.map((subject) => subject.name) || [];
                 setSyllabusSubjects(subs);
 
             } catch (err) {
@@ -31,7 +49,7 @@ export default function CreateAITest() {
             }
         };
         fetchSyllabus();
-    }, []);
+    }, [BACKEND_URL]);
 
     useEffect(() => {
         if (user?.preferences) {
@@ -59,13 +77,17 @@ export default function CreateAITest() {
         }
     };
 
-    const canGenerate = subjects.length > 0;
+    const canGenerate = subjects.length > 0 && (tokenStatusUnavailable || hasTokens);
 
     const college = user?.college;
     const semester = user?.semester;
 
     const generateTest = async () => {
         if (!subjects.length) {
+            return;
+        }
+        if (tokenStatus && !hasTokens) {
+            toast.warn("No AI tokens left today. Manual tests are still unlimited.");
             return;
         }
         try {
@@ -81,9 +103,20 @@ export default function CreateAITest() {
             const data = await res.json();
             if (!res.ok) {
                 toast.warn(data.message);
+                if (data.aiTokenStatus) {
+                    setTokenStatus(data.aiTokenStatus as AiTokenStatusType);
+                } else {
+                    await refreshTokenStatus();
+                }
                 return;
             } else {
                 toast.success("Test created");
+                await getMe();
+                if (data.aiTokenStatus) {
+                    setTokenStatus(data.aiTokenStatus as AiTokenStatusType);
+                } else {
+                    await refreshTokenStatus();
+                }
                 window.location.href = `/main/test/preview/${data.testId}`;
             }
         } catch (err) {
@@ -94,12 +127,16 @@ export default function CreateAITest() {
     };
 
     return (
-        <div>
+        <div className="mx-auto max-w-5xl">
             <div className="mb-5">
-                <h1 className="text-3xl font-extrabold">
+                <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+                    <Sparkles size={18} />
                     AI Test Generator
-                </h1>
+                </div>
+                <h1 className="text-3xl font-extrabold">Generate a focused practice test.</h1>
             </div>
+
+            <AiTokenStatus status={tokenStatus} showManualAction />
 
             <div className="mb-7 border-2 border-black px-5 py-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-6 text-sm">
@@ -121,6 +158,10 @@ export default function CreateAITest() {
                         <p className="text-xs text-gray-500">Time</p>
                         <p className="font-bold">{time} min</p>
                     </div>
+                    <div>
+                        <p className="text-xs text-gray-500">AI Token</p>
+                        <p className="font-bold">{tokenStatusUnavailable ? "Checked on submit" : hasTokens ? "Ready" : "Resets tomorrow"}</p>
+                    </div>
 
                 </div>
             </div>
@@ -137,7 +178,7 @@ export default function CreateAITest() {
                         <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-secondary">
                             {sub}
                             <button onClick={() => removeSubject(sub)} className="h-5! px-1! text-sm">
-                                ×
+                                x
                             </button>
                         </div>
                     ))}
@@ -169,7 +210,7 @@ export default function CreateAITest() {
 
                 <div>
                     <p className="font-bold mb-3">Difficulty</p>
-                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as any)} className="w-full">
+                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} className="w-full">
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium</option>
                         <option value="Hard">Hard</option>
@@ -195,9 +236,17 @@ export default function CreateAITest() {
                 <input placeholder="Focus topics (optional)" value={topicFocus} onChange={(e) => setTopicFocus(e.target.value)} className="w-full" />
             </div>
 
-            <button onClick={generateTest} disabled={!canGenerate || loading} className={`w-full text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
-                {loading ? "Generating.." : "Generate AI Test"}
+            <button onClick={generateTest} disabled={!canGenerate || loading} className={`w-full gap-2 text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
+                <Sparkles size={20} />
+                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? "Generate AI Test" : "No AI tokens left"}
             </button>
+
+            {tokenStatus && !hasTokens && (
+                <button type="button" onClick={() => router.push("/main/create/manual")} className="button-secondary mt-4 w-full gap-2 text-lg">
+                    <ClipboardPen size={20} />
+                    Create Manual Test Instead
+                </button>
+            )}
         </div>
     );
 }

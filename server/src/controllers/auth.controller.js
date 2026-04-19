@@ -130,7 +130,7 @@ export const logout = (req, res) => {
 
 export const getMe = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id).select('-password');
+        const user = await User.findById(req.user._id).select('-password -aiTokens -lastTokenReset');
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }

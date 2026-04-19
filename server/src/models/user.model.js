@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
     college: { type: String, trim: true, minLength: 2 },
     semester: { type: Number, min: 1, max: 8 },
     onboardingCompleted: {type: Boolean, default: false},
+    aiTokens: {type: Number, default: 1},
+    lastTokenReset: { type: Date, default: Date.now },
     preferences: {
         type: {
             subjects: { type: [String], default: [] },

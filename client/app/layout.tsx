@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { AiTokenProvider } from "@/context/AiTokenContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -74,7 +75,9 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          {children}
+          <AiTokenProvider>
+            {children}
+          </AiTokenProvider>
         </AuthProvider>
         <ToastContainer
           position="top-center"

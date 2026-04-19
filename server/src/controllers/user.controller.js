@@ -1,6 +1,31 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
 import validator from 'validator'
+import { buildAiTokenStatus, syncDailyAiTokens } from "../utils/aiToken.utils.js";
+
+export const getAiTokenStatus = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        await syncDailyAiTokens(user);
+
+        return res.status(200).json({
+            success: true,
+            aiTokenStatus: buildAiTokenStatus(user)
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 
 export const updateProfile = async (req, res) => {
     try {

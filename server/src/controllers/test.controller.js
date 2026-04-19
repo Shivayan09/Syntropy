@@ -1,5 +1,7 @@
 import Test from "../models/test.model.js";
+import User from "../models/user.model.js";
 import { generateTest } from "../services/test.service.js";
+import { buildAiTokenStatus, syncDailyAiTokens } from "../utils/aiToken.utils.js";
 
 export const createTest = async (req, res) => {
     try {
@@ -118,16 +120,34 @@ export const getTestForAttempt = async (req, res) => {
 
 export const aiTest = async (req, res) => {
     try {
-        const test = await generateTest(req.body, req.user._id);
-        res.json({
+        const userId = req.user._id;
+        let user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        await syncDailyAiTokens(user);
+        user = await User.findOneAndUpdate({ _id: userId, aiTokens: { $gt: 0 } }, { $inc: { aiTokens: -1 } }, { new: true });
+        if (!user) {
+            return res.status(403).json({
+                success: false,
+                message: "No AI tokens left today. You can still create unlimited manual tests.",
+                aiTokenStatus: buildAiTokenStatus(await User.findById(userId))
+            });
+        }
+        const test = await generateTest(req.body, userId);
+        return res.status(200).json({
             success: true,
             testId: test._id,
-            data: test
+            data: test,
+            aiTokenStatus: buildAiTokenStatus(user)
         });
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            error: err.message
+            message: err.message
         });
     }
 };
