@@ -202,67 +202,7 @@ export default function PlansPage() {
     const currentRank = getPlanRank(currentPlanKey);
 
     const handleUpgrade = async (plan: string) => {
-        try {
-            setLoading(plan);
-            const res = await fetch(BACKEND_URL + "/api/payment/create-order",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({ plan }),
-                }
-            );
-            const order = await res.json();
-            const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-                amount: order.amount,
-                currency: "INR",
-                name: "Testify",
-                description: `${plan} Plan Upgrade`,
-                order_id: order.id,
-                handler: async function (response: RazorpayResponse) {
-                    try {
-                        const verifyRes = await fetch(BACKEND_URL + "/api/payment/verify-payment",
-                            {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                credentials: "include",
-                                body: JSON.stringify({
-                                    ...response,
-                                    plan,
-                                }),
-                            }
-                        );
-                        const data = await verifyRes.json();
-                        if (data.success) {
-                            toast.success("Payment successful");
-                            window.location.reload();
-                        } else {
-                            toast.error("Payment verification failed");
-                        }
-                    } catch (error: unknown) {
-                        toast.error(getErrorMessage(error));
-                    }
-                },
-                prefill: {
-                    name: user?.name || "",
-                    email: user?.email || "",
-                },
-                theme: {
-                    color: "#00c46a",
-                },
-            };
-            const rzp = new window.Razorpay(options);
-            rzp.open();
-        } catch (error: unknown) {
-            toast.error(getErrorMessage(error));
-        } finally {
-            setLoading(null);
-        }
+        toast.warn("Coming soon")
     };
 
     return (
@@ -358,7 +298,6 @@ export default function PlansPage() {
                                 ))}
                             </div>
 
-                            {/* Upgrade hint */}
                             {nextPlan && (
                                 <div className="border border-dashed border-black p-4 bg-(--surface)">
                                     <p className="text-xs font-bold uppercase opacity-60">
