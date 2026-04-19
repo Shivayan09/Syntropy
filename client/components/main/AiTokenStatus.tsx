@@ -55,12 +55,12 @@ export default function AiTokenStatus({ status, compact = false, showManualActio
                     <div>
                         <p className="flex items-center gap-2 text-sm font-extrabold">
                             <TicketCheck size={17} className={hasTokens ? "text-primary" : "text-red-500"} />
-                            {remaining} AI token{remaining === 1 ? "" : "s"} left
+                            {remaining} Token{remaining === 1 ? "" : "s"} left
                         </p>
                         <p className="mt-1 text-xs opacity-65">
                             {hasTokens
                                 ? "AI generation uses 1 token."
-                                : `Next AI token resets at ${resetTime}.`}
+                                : `Next token resets at ${resetTime}.`}
                         </p>
                     </div>
                     <span className={`shrink-0 border border-black px-2 py-1 text-xs font-extrabold ${hasTokens ? "bg-primary text-white" : "bg-red-500 text-white"}`}>
@@ -79,7 +79,7 @@ export default function AiTokenStatus({ status, compact = false, showManualActio
                 </div>
                 <div>
                     <p className="text-xl font-extrabold">
-                        {hasTokens ? "AI token available" : "No AI tokens left today"}
+                        {hasTokens ? "AI token available" : "No tokens left today"}
                     </p>
                     <p className="mt-1 text-sm opacity-70">
                         {hasTokens

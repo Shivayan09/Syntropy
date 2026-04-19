@@ -243,7 +243,7 @@ export default function CreateAITest() {
 
             <button onClick={generateTest} disabled={!canGenerate || loading} className={`w-full gap-2 text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
                 <Sparkles size={20} />
-                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? "Generate AI Test" : "No AI tokens left"}
+                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? "Generate AI Test" : "No tokens left"}
             </button>
 
             {tokenStatus && !hasTokens && (

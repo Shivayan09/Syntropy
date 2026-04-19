@@ -160,7 +160,7 @@ export default function Sidebar({
             </span>
           </div>}
 
-          <nav className={`space-y-3 text-sm font-semibold ${collapsed && 'mt-14'}`}>
+          <nav className={`space-y-3 text-sm font-bold ${collapsed && 'mt-14'}`}>
 
             <div className={itemClass("/main/dashboard")} onClick={() => router.push("/main/dashboard")}>
               <LayoutDashboard size={18} />
