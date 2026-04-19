@@ -7,6 +7,7 @@ import { ClipboardPen, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
+import Loader2 from "@/components/utils/Loader2";
 
 type Difficulty = "Easy" | "Medium" | "Hard";
 
@@ -108,6 +109,7 @@ export default function CreateAITest() {
                 } else {
                     await refreshTokenStatus();
                 }
+                setLoading(false);
                 return;
             } else {
                 toast.success("Test created");
@@ -121,10 +123,13 @@ export default function CreateAITest() {
             }
         } catch (err) {
             console.error("Failed to generate test", err);
-        } finally {
             setLoading(false);
         }
     };
+
+    if(loading) {
+        return <Loader2/>
+    }
 
     return (
         <div className="mx-auto max-w-5xl">
