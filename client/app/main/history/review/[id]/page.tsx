@@ -326,7 +326,7 @@ export default function AttemptReviewPage() {
                       : state === "correct"
                         ? "button-secondary bg-(--surface) text-(--text)"
                         : state === "wrong"
-                          ? "bg-white text-black border border-[#ef4444]"
+                          ? "border border-[#ef4444]"
                           : "button-secondary bg-(--surface) text-(--text)"
                   }`}
                   aria-label={`Review question ${index + 1}`}
