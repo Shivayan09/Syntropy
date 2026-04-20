@@ -92,7 +92,7 @@ export default function TestsPage() {
       : "No AI generated tests match this view. Generate a new set for fast topic practice.";
 
   return (
-    <div className="mx-auto max-w-7xl space-y-7">
+    <div className="space-y-7">
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">

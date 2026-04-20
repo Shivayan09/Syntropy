@@ -13,7 +13,9 @@ import {
   X,
   PanelLeft,
   Trophy,
-  Crown
+  Crown,
+  Contact,
+  Headphones
 } from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
@@ -94,29 +96,39 @@ export default function Sidebar({
 
           <nav className="space-y-3 text-sm font-bold">
 
-            <div className={itemClass("/main/dashboard")} onClick={() => navigate("/main/dashboard")}>
+            <div className={itemClass("/main/dashboard")} onClick={() => router.push("/main/dashboard")}>
               <LayoutDashboard size={18} />
-              Dashboard
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Dashboard
+              </span>
             </div>
 
-            <div className={itemClass("/main/tests")} onClick={() => navigate("/main/tests")}>
+            <div className={itemClass("/main/tests")} onClick={() => router.push("/main/tests")}>
               <BookOpen size={18} />
-              All Tests
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Test Bank
+              </span>
             </div>
 
-            <div className={itemClass("/main/create")} onClick={() => navigate("/main/create")}>
+            <div className={itemClass("/main/create")} onClick={() => router.push("/main/create")}>
               <Pen size={18} />
-              Create test
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Create test
+              </span>
             </div>
 
-            <div className={itemClass("/main/history")} onClick={() => navigate("/main/history")}>
+            <div className={itemClass("/main/history")} onClick={() => router.push("/main/history")}>
               <History size={18} />
-              History
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                My attempts
+              </span>
             </div>
 
-            <div className={itemClass("/main/analytics")} onClick={() => navigate("/main/analytics")}>
+            <div className={itemClass("/main/analytics")} onClick={() => router.push("/main/analytics")}>
               <BarChart3 size={18} />
-              Analytics
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Test Analytics
+              </span>
             </div>
 
             <div className={itemClass("/main/leaderboard")} onClick={() => router.push("/main/leaderboard")}>
@@ -126,9 +138,25 @@ export default function Sidebar({
               </span>
             </div>
 
+            <div className={itemClass("/main/subscription")} onClick={() => router.push("/main/subscription")}>
+              <Crown size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Subscription
+              </span>
+            </div>
+
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
               <Settings size={18} />
-              Settings
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                My Account
+              </span>
+            </div>
+
+            <div className={itemClass("/main/support")} onClick={() => navigate("/main/support")}>
+              <Headphones size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Contact Us
+              </span>
             </div>
 
           </nav>
@@ -216,6 +244,13 @@ export default function Sidebar({
               <Settings size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
                 My Account
+              </span>
+            </div>
+
+            <div className={itemClass("/main/support")} onClick={() => navigate("/main/support")}>
+              <Headphones size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Contact Us
               </span>
             </div>
 
