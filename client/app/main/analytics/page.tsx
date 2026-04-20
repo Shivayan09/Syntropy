@@ -550,7 +550,7 @@ function MetricBar({ label, value, note }: { label: string; value: number; note:
         </div>
         <p className="font-extrabold">{value}%</p>
       </div>
-      <div className="h-3 border border-(--border) bg-(--surface)">
+      <div className="h-3 border border-(--border) bg-(--surface) rounded-full overflow-clip">
         <div className="h-full bg-primary" style={{ width: `${value}%` }} />
       </div>
     </div>

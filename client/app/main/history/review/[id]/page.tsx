@@ -17,18 +17,29 @@ import Loader2 from "@/components/utils/Loader2";
 
 type Question = {
   question: string;
-  options: string[];
-  correctAnswer: number;
+  options?: string[];
+  correctAnswer?: number;
+  marks?: number;
 };
+
+type AnswerEntry = {
+  answer?: string | number | null;
+  marksAwarded?: number;
+  feedback?: string;
+};
+
+type RawAnswer = AnswerEntry | number | null | undefined;
 
 type ReviewAttempt = {
   _id: string;
-  answers?: Array<number | null | undefined>;
+  answers?: AnswerEntry[];
   score?: number;
   correct?: number;
   wrong?: number;
   skipped?: number;
   accuracy?: number;
+  obtainedMarks?: number;
+  totalMarks?: number;
   startedAt?: string;
   completedAt?: string;
   createdAt?: string;
@@ -39,10 +50,12 @@ type ReviewAttempt = {
     title?: string;
     subjects?: string[];
     questions?: Question[];
+    testFormat?: "mcq" | "subjective";
+    totalMarks?: number;
   };
 };
 
-type QuestionState = "correct" | "wrong" | "skipped";
+type QuestionState = "correct" | "wrong" | "skipped" | "answered";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 const optionLabels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -71,9 +84,49 @@ const getDuration = (attempt: ReviewAttempt) => {
   return attempt.duration ? `${attempt.duration} min` : "--";
 };
 
-const getQuestionState = (question: Question, selected?: number | null): QuestionState => {
-  if (selected === undefined || selected === null) return "skipped";
+const normalizeAnswerEntry = (entry?: RawAnswer): AnswerEntry => {
+  if (typeof entry === "number" || entry === null || entry === undefined) {
+    return {
+      answer: entry ?? null,
+      marksAwarded: 0,
+      feedback: "",
+    };
+  }
+
+  return {
+    answer: entry.answer ?? null,
+    marksAwarded: entry.marksAwarded ?? 0,
+    feedback: entry.feedback ?? "",
+  };
+};
+
+const getQuestionState = (
+  question: Question,
+  answerEntry?: AnswerEntry,
+  isMCQ?: boolean,
+): QuestionState => {
+  if (!isMCQ) {
+    const answer = typeof answerEntry?.answer === "string" ? answerEntry.answer.trim() : answerEntry?.answer;
+    return answer === undefined || answer === null || answer === "" ? "skipped" : "answered";
+  }
+
+  const selected =
+    typeof answerEntry?.answer === "number" ? answerEntry.answer : null;
+
+  if (selected === null) return "skipped";
   return selected === question.correctAnswer ? "correct" : "wrong";
+};
+
+const getStateBadgeClasses = (state: QuestionState) => {
+  if (state === "correct" || state === "answered") {
+    return "border-primary bg-primary text-white";
+  }
+
+  if (state === "wrong") {
+    return "border-[#ef4444] bg-[#ef4444] text-white";
+  }
+
+  return "border-(--border) bg-(--bg-secondary)";
 };
 
 export default function AttemptReviewPage() {
@@ -105,16 +158,38 @@ export default function AttemptReviewPage() {
   }, [attemptId]);
 
   const questions = useMemo(() => attempt?.test?.questions || [], [attempt]);
-  const answers = useMemo(() => attempt?.answers || [], [attempt]);
+  const answers = useMemo(
+    () => (attempt?.answers || []).map((entry) => normalizeAnswerEntry(entry as RawAnswer)),
+    [attempt],
+  );
+  const isMCQ =
+    attempt?.test?.testFormat === "mcq" ||
+    questions.some((question) => Array.isArray(question.options) && question.options.length > 0);
   const currentQuestion = questions[active];
-  const selected = answers[active];
-  const currentState = currentQuestion ? getQuestionState(currentQuestion, selected) : "skipped";
-  const correctCount = attempt?.correct ?? questions.filter((q, index) => getQuestionState(q, answers[index]) === "correct").length;
-  const wrongCount = attempt?.wrong ?? questions.filter((q, index) => getQuestionState(q, answers[index]) === "wrong").length;
+  const currentAnswer = answers[active];
+  const currentState = currentQuestion ? getQuestionState(currentQuestion, currentAnswer, isMCQ) : "skipped";
+  const answeredCount = questions.filter((q, index) => getQuestionState(q, answers[index], isMCQ) !== "skipped").length;
+  const correctCount = isMCQ
+    ? attempt?.correct ?? questions.filter((q, index) => getQuestionState(q, answers[index], true) === "correct").length
+    : answeredCount;
+  const wrongCount = isMCQ
+    ? attempt?.wrong ?? questions.filter((q, index) => getQuestionState(q, answers[index], true) === "wrong").length
+    : Math.max(0, questions.length - answeredCount);
   const skippedCount =
-    attempt?.skipped ?? questions.filter((q, index) => getQuestionState(q, answers[index]) === "skipped").length;
-  const accuracy = Math.round(attempt?.accuracy || 0);
+    attempt?.skipped ?? questions.filter((q, index) => getQuestionState(q, answers[index], isMCQ) === "skipped").length;
+  const totalMarks = attempt?.totalMarks ?? attempt?.test?.totalMarks ?? questions.reduce((sum, q) => sum + (q.marks || 0), 0);
+  const obtainedMarks = attempt?.obtainedMarks ?? answers.reduce((sum, entry) => sum + (entry?.marksAwarded || 0), 0);
+  const accuracy = Math.round(
+    typeof attempt?.accuracy === "number"
+      ? attempt.accuracy
+      : isMCQ
+        ? 0
+        : totalMarks > 0
+          ? (obtainedMarks / totalMarks) * 100
+          : 0,
+  );
   const subjectLabel = attempt?.test?.subjects?.join(", ") || "General";
+  const selectedOption = typeof currentAnswer?.answer === "number" ? currentAnswer.answer : null;
 
   if (loading) {
     return <Loader2 />;
@@ -166,8 +241,8 @@ export default function AttemptReviewPage() {
           <Target size={22} className="mb-3 text-primary" />
           <p className="text-sm font-bold opacity-60">Score</p>
           <p className="mt-1 text-3xl font-extrabold">
-            {attempt.score ?? correctCount}
-            <span className="text-base opacity-55">/{questions.length}</span>
+            {isMCQ ? attempt.score ?? correctCount : obtainedMarks}
+            <span className="text-base opacity-55">/{isMCQ ? questions.length : totalMarks}</span>
           </p>
         </div>
 
@@ -198,18 +273,11 @@ export default function AttemptReviewPage() {
                 <span className="inline-flex items-center gap-2 border border-(--border) bg-(--bg-secondary) px-3 py-1 text-xs font-extrabold uppercase">
                   Question {active + 1}
                 </span>
-                <span
-                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase ${
-                    currentState === "correct"
-                      ? "border-primary bg-primary text-white"
-                      : currentState === "wrong"
-                        ? "border-[#ef4444] bg-[#ef4444] text-white"
-                        : "border-(--border) bg-(--bg-secondary)"
-                  }`}
-                >
+                <span className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase ${getStateBadgeClasses(currentState)}`}>
                   {currentState === "correct" && <CheckCircle2 size={14} />}
                   {currentState === "wrong" && <XCircle size={14} />}
                   {currentState === "skipped" && <Circle size={13} />}
+                  {currentState === "answered" && <CheckCircle2 size={14} />}
                   {currentState}
                 </span>
               </div>
@@ -221,42 +289,72 @@ export default function AttemptReviewPage() {
             <h2 className="text-xl font-extrabold leading-relaxed md:text-2xl">{currentQuestion.question}</h2>
           </article>
 
-          <div className="space-y-3">
-            {currentQuestion.options.map((option, index) => {
-              const isSelected = selected === index;
-              const isCorrect = currentQuestion.correctAnswer === index;
-              const isWrongSelection = isSelected && !isCorrect;
+          {isMCQ ? (
+            <div className="space-y-3">
+              {currentQuestion.options?.map((option, index) => {
+                const isSelected = selectedOption === index;
+                const isCorrect = currentQuestion.correctAnswer === index;
+                const isWrongSelection = isSelected && !isCorrect;
 
-              return (
-                <div
-                  key={`${option}-${index}`}
-                  className={`flex min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${
-                    isCorrect
-                      ? "border-primary bg-primary text-white"
-                      : isWrongSelection
-                        ? "border-[#ef4444] bg-[#ef4444] text-white"
-                        : "border-(--border) bg-(--surface)"
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <span
-                      className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${
-                        isCorrect || isWrongSelection ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
-                      }`}
-                    >
-                      {optionLabels[index] || index + 1}
-                    </span>
-                    <p className="pt-1 font-semibold leading-relaxed">{option}</p>
-                  </div>
+                return (
+                  <div
+                    key={`${option}-${index}`}
+                    className={`flex min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${
+                      isCorrect
+                        ? "border-primary bg-primary text-white"
+                        : isWrongSelection
+                          ? "border-[#ef4444] bg-[#ef4444] text-white"
+                          : "border-(--border) bg-(--surface)"
+                    }`}
+                  >
+                    <div className="flex items-start gap-4">
+                      <span
+                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${
+                          isCorrect || isWrongSelection ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
+                        }`}
+                      >
+                        {optionLabels[index] || index + 1}
+                      </span>
+                      <p className="pt-1 font-semibold leading-relaxed">{option}</p>
+                    </div>
 
-                  <div className="shrink-0 pt-1 text-sm font-extrabold uppercase">
-                    {isCorrect && "Correct"}
-                    {isWrongSelection && "Your answer"}
+                    <div className="shrink-0 pt-1 text-sm font-extrabold uppercase">
+                      {isCorrect && "Correct"}
+                      {isWrongSelection && "Your answer"}
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="border border-(--border) bg-(--surface) p-5">
+                <p className="text-sm font-bold opacity-60">Your answer</p>
+                <p className="mt-3 whitespace-pre-wrap font-semibold leading-relaxed">
+                  {typeof currentAnswer?.answer === "string" && currentAnswer.answer.trim()
+                    ? currentAnswer.answer
+                    : "No answer submitted."}
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-[12rem_1fr]">
+                <div className="border border-(--border) bg-(--surface) p-5">
+                  <p className="text-sm font-bold opacity-60">Marks awarded</p>
+                  <p className="mt-3 text-3xl font-extrabold">
+                    {currentAnswer?.marksAwarded || 0}
+                    <span className="text-base opacity-55">/{currentQuestion.marks || 0}</span>
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+
+                <div className="border border-(--border) bg-(--surface) p-5">
+                  <p className="text-sm font-bold opacity-60">Feedback</p>
+                  <p className="mt-3 whitespace-pre-wrap font-semibold leading-relaxed">
+                    {currentAnswer?.feedback?.trim() || "No feedback available."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 border-t border-(--border) pt-5 sm:flex-row sm:items-center sm:justify-between">
             <button
@@ -287,18 +385,37 @@ export default function AttemptReviewPage() {
           <div className="card p-5">
             <p className="text-sm font-bold opacity-60">Outcome</p>
             <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-              <div className="border border-(--border) bg-(--surface) p-3">
-                <p className="font-extrabold text-primary">{correctCount}</p>
-                <p className="text-xs opacity-60">Correct</p>
-              </div>
-              <div className="border border-(--border) bg-(--surface) p-3">
-                <p className="font-extrabold text-[#ef4444]">{wrongCount}</p>
-                <p className="text-xs opacity-60">Wrong</p>
-              </div>
-              <div className="border border-(--border) bg-(--surface) p-3">
-                <p className="font-extrabold">{skippedCount}</p>
-                <p className="text-xs opacity-60">Skipped</p>
-              </div>
+              {isMCQ ? (
+                <>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold text-primary">{correctCount}</p>
+                    <p className="text-xs opacity-60">Correct</p>
+                  </div>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold text-[#ef4444]">{wrongCount}</p>
+                    <p className="text-xs opacity-60">Wrong</p>
+                  </div>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold">{skippedCount}</p>
+                    <p className="text-xs opacity-60">Skipped</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold text-primary">{answeredCount}</p>
+                    <p className="text-xs opacity-60">Answered</p>
+                  </div>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold">{obtainedMarks}</p>
+                    <p className="text-xs opacity-60">Marks</p>
+                  </div>
+                  <div className="border border-(--border) bg-(--surface) p-3">
+                    <p className="font-extrabold">{skippedCount}</p>
+                    <p className="text-xs opacity-60">Skipped</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -312,46 +429,50 @@ export default function AttemptReviewPage() {
             </div>
 
             <div className="grid grid-cols-5 gap-2 xl:grid-cols-4">
-            {questions.map((question, index) => {
-              const state = getQuestionState(question, answers[index]);
-              const isActive = active === index;
+              {questions.map((question, index) => {
+                const state = getQuestionState(question, answers[index], isMCQ);
+                const isActive = active === index;
 
-              return (
-                <div
-                  key={index}
-                  onClick={() => setActive(index)}
-                  className={`h-11 flex items-center justify-center cursor-pointer rounded-lg px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : state === "correct"
-                        ? "button-secondary bg-(--surface) text-(--text)"
-                        : state === "wrong"
-                          ? "border border-[#ef4444]"
-                          : "button-secondary bg-(--surface) text-(--text)"
-                  }`}
-                  aria-label={`Review question ${index + 1}`}
-                >
-                  <span className="flex items-center justify-center gap-1.5">
-                    {/* CORRECT */}
-                    {state === "correct" && (
+                return (
+                  <div
+                    key={index}
+                    onClick={() => setActive(index)}
+                    className={`h-11 cursor-pointer items-center justify-center rounded-lg px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${
                       isActive
-                        ? <CheckCircle2 size={14} className="text-white" />
-                        : <CheckCircle2 size={14} className="text-primary" />
-                    )}
+                        ? "flex bg-primary text-white"
+                        : state === "correct" || state === "answered"
+                          ? "button-secondary flex bg-(--surface) text-(--text)"
+                          : state === "wrong"
+                            ? "flex border border-[#ef4444]"
+                            : "button-secondary flex bg-(--surface) text-(--text)"
+                    }`}
+                    aria-label={`Review question ${index + 1}`}
+                  >
+                    <span className="flex items-center justify-center gap-1.5">
+                      {state === "correct" && (
+                        isActive
+                          ? <CheckCircle2 size={14} className="text-white" />
+                          : <CheckCircle2 size={14} className="text-primary" />
+                      )}
 
-                    {/* WRONG */}
-                    {state === "wrong" && (
-                      isActive
-                        ? <XCircle size={14} className="text-white" />
-                        : <XCircle size={14} className="text-[#ef4444]" />
-                    )}
+                      {state === "answered" && (
+                        isActive
+                          ? <CheckCircle2 size={14} className="text-white" />
+                          : <CheckCircle2 size={14} className="text-primary" />
+                      )}
 
-                    {index + 1}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                      {state === "wrong" && (
+                        isActive
+                          ? <XCircle size={14} className="text-white" />
+                          : <XCircle size={14} className="text-[#ef4444]" />
+                      )}
+
+                      {index + 1}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </aside>
       </section>

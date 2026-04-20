@@ -10,6 +10,7 @@ import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTok
 import Loader2 from "@/components/utils/Loader2";
 
 type Difficulty = "Easy" | "Medium" | "Hard";
+type TestFormat = "mcq" | "subjective";
 
 type SyllabusResponse = {
     syllabus?: {
@@ -23,6 +24,11 @@ export default function CreateAITest() {
     const router = useRouter();
     const { user, getMe } = useAuth();
     const { tokenStatus, refreshTokenStatus, setTokenStatus } = useAiTokens();
+
+    // ✅ NEW
+    const [testFormat, setTestFormat] = useState<TestFormat>("mcq");
+    const [totalMarks, setTotalMarks] = useState(50);
+
     const [subjects, setSubjects] = useState<string[]>([]);
     const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
     const [input, setInput] = useState("");
@@ -44,7 +50,6 @@ export default function CreateAITest() {
                 const data = (await res.json()) as SyllabusResponse;
                 const subs = data.syllabus?.[0]?.subjects?.map((subject) => subject.name) || [];
                 setSyllabusSubjects(subs);
-
             } catch (err) {
                 console.error("Failed to fetch syllabus", err);
             }
@@ -93,15 +98,24 @@ export default function CreateAITest() {
         }
         try {
             setLoading(true);
+
+            // ✅ UPDATED PAYLOAD
+            const payload =
+                testFormat === "mcq"
+                    ? { subjects, difficulty, questions, time, topicFocus, mixedSubjects, college, semester, testFormat }
+                    : { subjects, difficulty, totalMarks, time, topicFocus, college, semester, testFormat };
+
             const res = await fetch(BACKEND_URL + "/api/test/generate", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 credentials: "include",
-                body: JSON.stringify({ subjects, difficulty, questions, time, topicFocus, mixedSubjects, college, semester })
+                body: JSON.stringify(payload)
             });
+
             const data = await res.json();
+
             if (!res.ok) {
                 toast.warn(data.message);
                 if (data.aiTokenStatus) {
@@ -127,12 +141,13 @@ export default function CreateAITest() {
         }
     };
 
-    if(loading) {
-        return <Loader2/>
+    if (loading) {
+        return <Loader2 />
     }
 
     return (
         <div className="mx-auto max-w-5xl">
+
             <div className="mb-5">
                 <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
                     <Sparkles size={18} />
@@ -142,6 +157,22 @@ export default function CreateAITest() {
             </div>
 
             <AiTokenStatus status={tokenStatus} showManualAction />
+
+            {/* ✅ NEW TEST FORMAT UI */}
+            <div className="mb-6 border-2 border-black px-5 py-4 flex gap-3">
+                <button
+                    onClick={() => setTestFormat("mcq")}
+                    className={testFormat === "mcq" ? "" : "button-secondary"}
+                >
+                    MCQ
+                </button>
+                <button
+                    onClick={() => setTestFormat("subjective")}
+                    className={testFormat === "subjective" ? "" : "button-secondary"}
+                >
+                    Subjective
+                </button>
+            </div>
 
             <div className="mb-7 border-2 border-black px-5 py-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-6 text-sm">
@@ -155,10 +186,22 @@ export default function CreateAITest() {
                         <p className="text-xs text-gray-500">Difficulty</p>
                         <p className="font-bold">{difficulty}</p>
                     </div>
-                    <div>
-                        <p className="text-xs text-gray-500">Questions</p>
-                        <p className="font-bold">{questions}</p>
-                    </div>
+
+                    {/* ✅ CONDITIONAL */}
+                    {testFormat === "mcq" && (
+                        <div>
+                            <p className="text-xs text-gray-500">Questions</p>
+                            <p className="font-bold">{questions}</p>
+                        </div>
+                    )}
+
+                    {testFormat === "subjective" && (
+                        <div>
+                            <p className="text-xs text-gray-500">Total Marks</p>
+                            <p className="font-bold">{totalMarks}</p>
+                        </div>
+                    )}
+
                     <div>
                         <p className="text-xs text-gray-500">Time</p>
                         <p className="font-bold">{time} min</p>
@@ -167,10 +210,10 @@ export default function CreateAITest() {
                         <p className="text-xs text-gray-500">AI Token</p>
                         <p className="font-bold">{tokenStatusUnavailable ? "Checked on submit" : hasTokens ? "Ready" : "Resets tomorrow"}</p>
                     </div>
-
                 </div>
             </div>
 
+            {/* SUBJECTS BLOCK (UNCHANGED) */}
             <div className="mb-7">
                 <p className="font-bold">Subjects</p>
                 {!subjects.length && (
@@ -208,9 +251,9 @@ export default function CreateAITest() {
                         </div>
                     </div>
                 )}
-
             </div>
 
+            {/* SETTINGS */}
             <div className="grid md:grid-cols-3 gap-10 mb-3">
 
                 <div>
@@ -222,11 +265,23 @@ export default function CreateAITest() {
                     </select>
                 </div>
 
-                <div>
-                    <p className="font-bold mb-3">Questions</p>
-                    <input type="range" min={5} max={50} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
-                    <p className="text-sm mt-2">{questions}</p>
-                </div>
+                {/* MCQ */}
+                {testFormat === "mcq" && (
+                    <div>
+                        <p className="font-bold mb-3">Questions</p>
+                        <input type="range" min={5} max={50} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
+                        <p className="text-sm mt-2">{questions}</p>
+                    </div>
+                )}
+
+                {/* SUBJECTIVE */}
+                {testFormat === "subjective" && (
+                    <div>
+                        <p className="font-bold mb-3">Total Marks</p>
+                        <input type="range" min={20} max={100} value={totalMarks} onChange={(e) => setTotalMarks(Number(e.target.value))} className="w-full" />
+                        <p className="text-sm mt-2">{totalMarks}</p>
+                    </div>
+                )}
 
                 <div>
                     <p className="font-bold mb-3">Time</p>
@@ -243,7 +298,7 @@ export default function CreateAITest() {
 
             <button onClick={generateTest} disabled={!canGenerate || loading} className={`w-full gap-2 text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
                 <Sparkles size={20} />
-                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? "Generate AI Test" : "No tokens left"}
+                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? `Generate ${testFormat === "mcq" ? "MCQ" : "Subjective"} Test` : "No tokens left"}
             </button>
 
             {tokenStatus && !hasTokens && (
@@ -252,6 +307,7 @@ export default function CreateAITest() {
                     Create Manual Test Instead
                 </button>
             )}
+
         </div>
     );
 }

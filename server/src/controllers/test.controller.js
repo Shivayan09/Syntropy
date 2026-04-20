@@ -1,60 +1,51 @@
 import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
-import { generateTest } from "../services/test.service.js";
+import { generateTest } from "../services/aiTest.service.js";
+import { generateSubjectiveTest } from "../services/subjectiveTest.service.js";
 import { buildAiTokenStatus, syncDailyAiTokens } from "../utils/aiToken.utils.js";
 
 export const createTest = async (req, res) => {
     try {
         const userId = req.user._id;
-        const { title, description, difficulty, duration, subjects, questions, type } = req.body;
-        if (!title) {
-            return res.status(400).json({
-                success: false,
-                message: "Title is required"
-            });
+        const { title, description, difficulty, duration, subjects, questions, type, testFormat } = req.body;
+        if (!["mcq", "subjective"].includes(testFormat)) {
+            return res.status(400).json({ success: false, message: "Invalid test format" });
         }
-        if (subjects.length < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Enter atleast 1 subject"
-            })
+        if (!title) {
+            return res.status(400).json({ success: false, message: "Title is required" });
+        }
+        if (!subjects || subjects.length < 1) {
+            return res.status(400).json({ success: false, message: "Enter atleast 1 subject" });
         }
         if (!questions || questions.length < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "At least 1 question is required"
-            });
+            return res.status(400).json({ success: false, message: "At least 1 question is required" });
         }
         for (let i = 0; i < questions.length; i++) {
             const q = questions[i];
             if (!q.question || !q.question.trim()) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Question ${i + 1} cannot be empty`
-                });
+                return res.status(400).json({ success: false, message: `Question ${i + 1} cannot be empty` });
             }
-            if (!q.options || q.options.length < 2) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Question ${i + 1} must have options`
-                });
-            }
-            for (let j = 0; j < q.options.length; j++) {
-                if (!q.options[j] || !q.options[j].trim()) {
-                    return res.status(400).json({
-                        success: false,
-                        message: `Option ${j + 1} in Question ${i + 1} cannot be empty`
-                    });
+            if (testFormat === "mcq") {
+                if (!q.options || q.options.length !== 4) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have exactly 4 options` });
+                }
+                for (let j = 0; j < 4; j++) {
+                    if (!q.options[j] || !q.options[j].trim()) {
+                        return res.status(400).json({ success: false, message: `Option ${j + 1} in Question ${i + 1} cannot be empty` });
+                    }
+                }
+                if (q.correctAnswer === undefined || q.correctAnswer < 0 || q.correctAnswer >= 4) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have a valid correct answer` });
                 }
             }
-            if (q.correctAnswer === undefined || q.correctAnswer === null || q.correctAnswer < 0 || q.correctAnswer >= q.options.length) {
-                return res.status(400).json({
-                    success: false,
-                    message: `Question ${i + 1} must have a valid correct answer`
-                });
+            if (testFormat === "subjective") {
+                if (q.marks === undefined || q.marks <= 0) {
+                    return res.status(400).json({ success: false, message: `Question ${i + 1} must have valid marks` });
+                }
             }
         }
-        const test = await Test.create({ title, description, difficulty, duration, subjects, questions, totalQuestions: questions.length, createdBy: userId, type });
+        const formattedQuestions = questions.map(q => ({ ...q }));
+        const test = await Test.create({ title, description, difficulty, duration, subjects, questions: formattedQuestions, totalQuestions: formattedQuestions.length, createdBy: userId, type, testFormat, totalMarks: testFormat === "subjective" ? formattedQuestions.reduce((sum, q) => sum + q.marks, 0) : undefined });
         res.status(201).json({
             success: true,
             test
@@ -137,7 +128,12 @@ export const aiTest = async (req, res) => {
                 aiTokenStatus: buildAiTokenStatus(await User.findById(userId))
             });
         }
-        const test = await generateTest(req.body, userId);
+        let test;
+        if (req.body.testFormat === "subjective") {
+            test = await generateSubjectiveTest(req.body, userId);
+        } else {
+            test = await generateTest(req.body, userId);
+        }
         return res.status(200).json({
             success: true,
             testId: test._id,

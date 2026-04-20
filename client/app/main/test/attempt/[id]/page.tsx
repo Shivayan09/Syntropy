@@ -21,13 +21,14 @@ import Loader2 from "@/components/utils/Loader2";
 
 type Question = {
   question: string;
-  options: string[];
+  options?: string[];
 };
 
 type Test = {
   _id: string;
   title?: string;
   questions: Question[];
+  testFormat: "mcq" | "subjective"; // ✅ add this
 };
 
 type Attempt = {
@@ -57,7 +58,7 @@ export default function AttemptPage() {
   const [test, setTest] = useState<Test | null>(null);
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState<Array<number | undefined>>([]);
+  const [answers, setAnswers] = useState<Array<number | string | undefined>>([]);
   const [markedForReview, setMarkedForReview] = useState<boolean[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -66,12 +67,13 @@ export default function AttemptPage() {
 
   const questions = useMemo(() => test?.questions || [], [test]);
   const currentQuestion = questions[current];
-  const answeredCount = answers.filter((answer) => answer !== undefined).length;
+  const answeredCount = answers.filter((answer) => answer !== undefined && answer !== "").length;
   const unansweredCount = Math.max(0, questions.length - answeredCount);
   const reviewCount = markedForReview.filter(Boolean).length;
   const progress = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0;
   const isLastQuestion = current === questions.length - 1;
   const timeWarning = timeLeft > 0 && timeLeft <= 300;
+  const isMCQ = test?.testFormat === "mcq";
 
   const submitTest = useCallback(async () => {
     if (submitting || !attemptId) return;
@@ -111,14 +113,21 @@ export default function AttemptPage() {
         });
 
         const data = await res.json();
-        if (!res.ok) return;
 
-        if (data.attempt.status !== "in_progress") {
-          router.replace(`/main/test/result/${data.attempt._id}`);
+        console.log("API RESPONSE:", data);
+
+        if (!data || !data.attempt) {
+          console.error("Invalid attempt response", data);
           return;
         }
 
         const fetchedAttempt = data.attempt as Attempt;
+
+        if (fetchedAttempt.status !== "in_progress") {
+          router.replace(`/main/test/result/${fetchedAttempt._id}`);
+          return;
+        }
+
         const fetchedQuestions = fetchedAttempt.test.questions || [];
 
         setAttempt(fetchedAttempt);
@@ -173,6 +182,14 @@ export default function AttemptPage() {
     setAnswers((prev) => {
       const updated = [...prev];
       updated[current] = index;
+      return updated;
+    });
+  };
+
+  const setSubjectiveAnswer = (value: string) => {
+    setAnswers((prev) => {
+      const updated = [...prev];
+      updated[current] = value;
       return updated;
     });
   };
@@ -256,30 +273,43 @@ export default function AttemptPage() {
             </div>
 
             <div className="space-y-3 pb-4">
-              {currentQuestion.options.map((option, index) => {
-                const selected = answers[current] === index;
+              {isMCQ ? (
+                currentQuestion.options?.map((option, index) => {
+                  const selected = answers[current] === index;
 
-                return (
-                  <div
-                    key={`${option}-${index}`}
-                    onClick={() => selectOption(index)}
-                    className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected
+                  return (
+                    <div
+                      key={`${option}-${index}`}
+                      onClick={() => selectOption(index)}
+                      className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected
                         ? "bg-primary text-white"
                         : "button-secondary bg-(--surface) text-(--text)"
-                      }`}
-                  >
-                    <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
-                      <span
-                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
-                          }`}
-                      >
-                        {optionLabels[index] || index + 1}
+                        }`}
+                    >
+                      <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
+                        <span
+                          className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected
+                            ? "border-white bg-white text-black"
+                            : "border-(--border) bg-(--bg-secondary)"
+                            }`}
+                        >
+                          {optionLabels[index] || index + 1}
+                        </span>
+                        <span className="pt-1 text-base font-semibold leading-relaxed">
+                          {option}
+                        </span>
                       </span>
-                      <span className="pt-1 text-base font-semibold leading-relaxed">{option}</span>
-                    </span>
-                  </div>
-                );
-              })}
+                    </div>
+                  );
+                })
+              ) : (
+                <textarea
+                  value={(answers[current] as string) || ""}
+                  onChange={(e) => setSubjectiveAnswer(e.target.value)}
+                  placeholder="Write your answer..."
+                  className="w-full min-h-40"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -383,7 +413,9 @@ export default function AttemptPage() {
 
         <div className="grid grid-cols-5 gap-2 xl:grid-cols-4">
           {questions.map((_, index) => {
-            const answered = answers[index] !== undefined;
+            const answered =
+              answers[index] !== undefined &&
+              answers[index] !== "";
             const active = current === index;
             const marked = markedForReview[index];
 
@@ -393,12 +425,12 @@ export default function AttemptPage() {
                 type="button"
                 onClick={() => goToQuestion(index)}
                 className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${active
-                    ? "bg-black text-white"
-                    : answered
-                      ? "bg-primary text-white"
-                      : marked
-                        ? "button-secondary border-primary bg-(--surface) text-primary"
-                        : "button-secondary bg-(--surface) text-(--text)"
+                  ? "bg-black text-white"
+                  : answered
+                    ? "bg-primary text-white"
+                    : marked
+                      ? "button-secondary border-primary bg-(--surface) text-primary"
+                      : "button-secondary bg-(--surface) text-(--text)"
                   }`}
                 aria-label={`Go to question ${index + 1}`}
               >
@@ -496,9 +528,8 @@ function SubmitConfirmModal({
         <div
           role="button"
           tabIndex={loading ? -1 : 0}
-          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full ${
-            loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-70"
-          }`}
+          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full ${loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-70"
+            }`}
           onClick={safeClose}
           onKeyDown={(event) => {
             if ((event.key === "Enter" || event.key === " ") && !loading) {
