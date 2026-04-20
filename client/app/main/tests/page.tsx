@@ -54,7 +54,7 @@ export default function TestsPage() {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/test/all", {credentials: "include"});
+        const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include" });
         const data = await res.json();
         if (!res.ok) return;
         setTests(data.tests || []);
@@ -91,8 +91,8 @@ export default function TestsPage() {
     mode === "all"
       ? "No tests match this view yet. Create a manual paper or generate one with AI to get started."
       : mode === "manual"
-      ? "No manual tests match this view. Create a structured paper when you need full control."
-      : "No AI generated tests match this view. Generate a new set for fast topic practice.";
+        ? "No manual tests match this view. Create a structured paper when you need full control."
+        : "No AI generated tests match this view. Generate a new set for fast topic practice.";
 
   return (
     <div className="space-y-7">
@@ -107,18 +107,24 @@ export default function TestsPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-        <div className="flex gap-3">
+        <div className="flex justify-between md:gap-3">
           {(["all", "manual", "generated"] as TestMode[]).map((testMode) => (
             <button
               key={testMode}
               onClick={() => setMode(testMode)}
-              className={`h-10 rounded-none px-4 shadow-none hover:transform-none hover:shadow-none ${
-                mode === testMode
+              className={`h-10 rounded-none px-4 shadow-none hover:transform-none hover:shadow-none ${mode === testMode
                   ? "bg-primary text-white"
                   : "button-secondary border-transparent bg-transparent text-(--text)"
-              }`}
+                }`}
             >
-              {typeLabel[testMode]}
+              {testMode === "generated" ? (
+                <>
+                  <span className="sm:hidden">AI tests</span>
+                  <span className="hidden sm:inline">AI Generated</span>
+                </>
+              ) : (
+                typeLabel[testMode]
+              )}
               <span className="ml-2 text-xs opacity-80">
                 {testMode === "all" ? tests.length : testMode === "manual" ? manualTests.length : generatedTests.length}
               </span>
@@ -218,7 +224,7 @@ export default function TestsPage() {
                         {isGenerated ? "AI" : "Manual"}
                       </span>
                     </div>
-                    <p   className="truncate text-xl font-bold">{test.title || "Untitled test"}</p  >
+                    <p className="truncate text-xl font-bold">{test.title || "Untitled test"}</p  >
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
