@@ -22,6 +22,7 @@ type TestPreviewData = {
   _id: string;
   title: string;
   type?: "manual" | "generated";
+  testFormat?: "mcq" | "subjective";
   difficulty?: string;
   totalQuestions?: number;
   duration?: number;
@@ -96,6 +97,7 @@ export default function TestPreview() {
   const subjectCount = test?.subjects?.length || 0;
   const isGenerated = test?.type === "generated";
   const TestTypeIcon = isGenerated ? Sparkles : ClipboardPen;
+  const formatLabel = test?.testFormat === "subjective" ? "Subjective" : "MCQ";
 
   const briefingItems = useMemo(
     () => [
@@ -149,10 +151,15 @@ export default function TestPreview() {
           <div className="card p-6 md:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div>
-                <span className="inline-flex items-center text-white gap-2 border border-black bg-(--primary) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black]">
-                  <TestTypeIcon size={14} />
-                  {isGenerated ? "AI Generated" : "Manual"}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center text-white gap-2 border border-black bg-(--primary) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black]">
+                    <TestTypeIcon size={14} />
+                    {isGenerated ? "AI Generated" : "Manual"}
+                  </span>
+                  <span className="inline-flex items-center gap-2 border text-white border-black bg-(--primary) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_var(--shadow)]">
+                    {formatLabel}
+                  </span>
+                </div>
                 <h2 className="mt-5 text-3xl font-extrabold">Pre-attempt overview</h2>
                 <p className="mt-2 max-w-2xl text-sm opacity-70">
                   A quick operational check before you enter the timed attempt environment.
