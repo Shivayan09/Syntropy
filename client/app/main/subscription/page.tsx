@@ -432,7 +432,7 @@ function StatTile({
     note: string;
 }) {
     return (
-        <div className="card2">
+        <div className="p-5 border border-(--border)">
             <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-bold opacity-60">{label}</p>
                 <Icon size={18} className="text-primary" />
