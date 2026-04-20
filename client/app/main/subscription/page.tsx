@@ -246,11 +246,11 @@ export default function PlansPage() {
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
 
-                                <StatTile icon={Gauge} label="Daily tests" value={currentPlan.tokens} note="AI generation limit" />
+                                <StatTile label="Daily tests" value={currentPlan.tokens} note="AI generation limit" />
 
-                                <StatTile icon={LineChart} label="Progress loop" value="Active" note="test → review → improve" />
+                                <StatTile label="Progress loop" value="Active user" note="test → review → improve" />
 
-                                <StatTile icon={CalendarClock} label={isPaidPlan ? "Valid till" : "Reset cycle"} value={isPaidPlan ? formatExpiry(user?.planExpiry) : "Daily"} note={isPaidPlan ? "billing cycle" : "resets every midnight"} />
+                                <StatTile label={isPaidPlan ? "Valid till" : "Reset cycle"} value={isPaidPlan ? formatExpiry(user?.planExpiry) : "Daily"} note={isPaidPlan ? "billing cycle" : "resets every midnight"} />
 
                             </div>
                             <div className="border border-dashed border-black p-4 bg-(--bg-secondary)">
@@ -421,12 +421,10 @@ export default function PlansPage() {
 }
 
 function StatTile({
-    icon: Icon,
     label,
     value,
     note,
 }: {
-    icon: typeof Gauge;
     label: string;
     value: string;
     note: string;
@@ -435,7 +433,6 @@ function StatTile({
         <div className="p-5 border border-(--border)">
             <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-bold opacity-60">{label}</p>
-                <Icon size={18} className="text-primary" />
             </div>
             <p className="mt-3 text-2xl font-extrabold">{value}</p>
             <p className="mt-1 text-xs opacity-60">{note}</p>
