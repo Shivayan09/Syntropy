@@ -8,6 +8,7 @@ import {
   ArrowRight,
   BookOpenCheck,
   Camera,
+  Crown,
   GraduationCap,
   Mail,
   Phone,
@@ -56,6 +57,21 @@ const semesterLabel = (value: string) => {
   if (value === "3") return "3rd semester";
   return `${value}th semester`;
 };
+
+const planMeta = {
+  free: {
+    label: "Free",
+    note: "Core practice access",
+  },
+  pro: {
+    label: "Pro",
+    note: "Sharper daily prep",
+  },
+  elite: {
+    label: "Elite",
+    note: "Full power unlocked",
+  },
+} as const;
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -206,6 +222,8 @@ export default function Profile() {
     return null;
   }
 
+  const activePlan = planMeta[user?.plan || "free"];
+
   return (
     <div className="mx-auto space-y-7">
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
@@ -229,7 +247,7 @@ export default function Profile() {
       <section className="space-y-6">
         <div className="flex flex-col md:flex-row gap-5">
           <div className="card2 p-6 md:p-7 w-full md:w-1/2">
-            <div className="flex items-start gap-5">
+            <div className="flex items-center gap-5">
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-black bg-(--surface) shadow-[4px_4px_0px_black]">
                 {!imgLoaded && (
                   <div className="absolute inset-0 grid place-items-center bg-(--bg-secondary) text-xs font-bold opacity-70">
@@ -247,9 +265,16 @@ export default function Profile() {
                 />
               </div>
 
-              <div className="min-w-0">
+              <div className="min-w-0 w-full">
+                <div className="flex items-center justify-end">
+                  <div className="mb-3 inline-flex items-center gap-2 border border-black bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white shadow-[3px_3px_0px_black]">
+                    <Crown size={14} />
+                    {activePlan.label} Plan
+                  </div>
+                </div>
                 <p className="truncate text-2xl font-extrabold">{form.name || "Unnamed user"}</p>
-                <p className="truncate text-sm opacity-65">{form.email || "No email"}</p>
+                <p className="truncate text-sm opacity-65 mt-2">{form.email || "No email"}</p>
+
                 <button className="button-secondary mt-4 gap-2" onClick={() => fileInputRef.current?.click()}>
                   <Camera size={18} />
                   Photo
@@ -259,7 +284,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="card2 p-5 w-1/2">
+          <div className="card2 p-5 w-full md:w-1/2">
             <p className="text-sm font-bold opacity-60">Profile status</p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-3">
@@ -431,6 +456,75 @@ export default function Profile() {
                     </button>
                   ))
                 )}
+              </div>
+            </div>
+          </section>
+          <section className="card p-6 md:p-7">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-bold opacity-60">Membership</p>
+                <h2 className="text-2xl font-extrabold">Subscription</h2>
+                <p className="mt-1 text-sm opacity-70">
+                  Your current access level, renewal state, and upgrade controls in one place.
+                </p>
+              </div>
+
+              <button onClick={() => router.push("/main/subscription")} className="button-secondary gap-2">
+                Manage
+                <ArrowRight size={18} />
+              </button>
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="card p-5 md:p-6">
+                <div className="flex flex-col sm:items-start md:items-center gap-5 sm:flex-row sm:justify-between">
+                  <div>
+                    <div className="inline-flex items-center gap-2 border border-black bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white shadow-[3px_3px_0px_black]">
+                      <Crown size={14} />
+                      {activePlan.label} Membership
+                    </div>
+                    <p className="mt-4 text-3xl font-extrabold">{activePlan.label}</p>
+                    <p className="mt-2 text-sm font-semibold opacity-80">{activePlan.note}</p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
+                      <p className="text-xs font-bold uppercase opacity-60">Access status</p>
+                      <p className="mt-2 text-lg font-extrabold">
+                        {user?.plan === "free" ? "Starter" : "Premium"}
+                      </p>
+                    </div>
+                    <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
+                      <p className="text-xs font-bold uppercase opacity-60">Billing state</p>
+                      <p className="mt-2 text-lg font-extrabold">
+                        {user?.plan === "free" ? "No billing" : "Active"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card p-5 md:p-6">
+                <p className="text-sm font-bold opacity-60">Plan details</p>
+                <div className="mt-4 inline-flex items-center gap-2 border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_var(--shadow)]">
+                  <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                  {user?.plan === "free" ? "Starter access" : "Active subscription"}
+                </div>
+
+                <div className="mt-5 space-y-4 text-sm">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="opacity-70">Valid till</span>
+                    <span className="text-right font-extrabold">
+                      {user?.planExpiry
+                        ? new Date(user.planExpiry).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                        : "Not applicable"}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
