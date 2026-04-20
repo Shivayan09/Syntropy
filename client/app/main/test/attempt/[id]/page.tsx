@@ -22,6 +22,7 @@ import Loader2 from "@/components/utils/Loader2";
 type Question = {
   question: string;
   options?: string[];
+  marks?: number;
 };
 
 type Test = {
@@ -255,8 +256,13 @@ export default function AttemptPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-2 border border-(--border) bg-(--bg-secondary) px-3 py-1 text-xs font-extrabold uppercase">
                     <ListChecks size={14} />
-                    Single correct option
+                    {isMCQ ? "Single correct option" : "Written response"}
                   </span>
+                  {!isMCQ && (
+                    <span className="inline-flex items-center gap-2 border border-(--border) bg-(--bg-secondary) px-3 py-1 text-xs font-extrabold uppercase">
+                      {currentQuestion.marks || 0} marks
+                    </span>
+                  )}
                   {markedForReview[current] && (
                     <span className="inline-flex items-center gap-2 border border-primary bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white">
                       <BookmarkCheck size={14} />
