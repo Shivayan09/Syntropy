@@ -142,7 +142,7 @@ export default function LoginPage() {
                             </div>
 
                             <div className="flex justify-between text-sm">
-                                <span className="text-primary cursor-pointer font-semibold" onClick={() => router.push("/forgot-password")}>
+                                <span className="text-primary cursor-pointer font-semibold" onClick={() => router.push("/auth/forgot-password")}>
                                     Forgot password?
                                 </span>
                             </div>

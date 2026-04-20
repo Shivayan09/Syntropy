@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
     avatarPublicId: { type: String },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: function () { return !this.googleId }, minlength: 6, select: false },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
     googleId: { type: String, unique: true, sparse: true },
     provider: { type: String, enum: ["local", "google"], default: "local" },
     college: { type: String, trim: true, minLength: 2 },

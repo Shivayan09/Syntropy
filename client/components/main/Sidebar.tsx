@@ -173,7 +173,7 @@ export default function Sidebar({
             <div className={itemClass("/main/tests")} onClick={() => router.push("/main/tests")}>
               <BookOpen size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                All Tests
+                Test Bank
               </span>
             </div>
 
@@ -187,14 +187,14 @@ export default function Sidebar({
             <div className={itemClass("/main/history")} onClick={() => router.push("/main/history")}>
               <History size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                History
+                My attempts
               </span>
             </div>
 
             <div className={itemClass("/main/analytics")} onClick={() => router.push("/main/analytics")}>
               <BarChart3 size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                Analytics
+                Test Analytics
               </span>
             </div>
 
@@ -215,7 +215,7 @@ export default function Sidebar({
             <div className={itemClass("/main/profile")} onClick={() => navigate("/main/profile")}>
               <Settings size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                Settings
+                My Account
               </span>
             </div>
 
