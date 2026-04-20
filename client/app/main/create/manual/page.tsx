@@ -105,9 +105,9 @@ export default function Create() {
       prev.map((question, i) =>
         i === questionIndex
           ? {
-              ...question,
-              options: question.options.map((option, j) => (j === optionIndex ? value : option)),
-            }
+            ...question,
+            options: question.options.map((option, j) => (j === optionIndex ? value : option)),
+          }
           : question,
       ),
     );
@@ -145,19 +145,19 @@ export default function Create() {
       const questions =
         testFormat === "mcq"
           ? mcqQuestions.map((question) => ({
-              question: question.question,
-              options: question.options,
-              correctAnswer: question.correctIndex,
-            }))
+            question: question.question,
+            options: question.options,
+            correctAnswer: question.correctIndex,
+          }))
           : subjectiveQuestions.map((question) => ({
-              question: question.question,
-              marks: Number(question.marks) || 0,
-              expectedAnswer: question.expectedAnswer.trim(),
-              keyPoints: question.keyPoints
-                .split("\n")
-                .map((point) => point.trim())
-                .filter(Boolean),
-            }));
+            question: question.question,
+            marks: Number(question.marks) || 0,
+            expectedAnswer: question.expectedAnswer.trim(),
+            keyPoints: question.keyPoints
+              .split("\n")
+              .map((point) => point.trim())
+              .filter(Boolean),
+          }));
 
       const res = await fetch(`${BACKEND_URL}/api/test/create`, {
         method: "POST",
@@ -199,8 +199,10 @@ export default function Create() {
         </p>
       </div>
 
-      <section className="mb-6 grid gap-3 md:grid-cols-2">
-        <div
+      <section className="mb-6">
+        <p className="font-bold text-lg mb-5">Choose test format :</p>
+        <div className="flex gap-5">
+          <div
           role="button"
           tabIndex={0}
           onClick={() => setTestFormat("mcq")}
@@ -210,9 +212,16 @@ export default function Create() {
               setTestFormat("mcq");
             }
           }}
-          className={`cursor-pointer border p-5 text-left ${
-            testFormat === "mcq" ? "border-primary bg-primary text-white" : "border-(--border) bg-(--bg-secondary)"
-          }`}
+          className="card cursor-pointer p-5 text-left"
+          style={
+            testFormat === "mcq"
+              ? {
+                backgroundColor: "var(--primary)",
+                color: "white",
+                borderColor: "var(--primary)",
+              }
+              : undefined
+          }
         >
           <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
           <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
@@ -231,9 +240,16 @@ export default function Create() {
               setTestFormat("subjective");
             }
           }}
-          className={`cursor-pointer border p-5 text-left ${
-            testFormat === "subjective" ? "border-primary bg-primary text-white" : "border-(--border) bg-(--bg-secondary)"
-          }`}
+          className="card cursor-pointer p-5 text-left"
+          style={
+            testFormat === "subjective"
+              ? {
+                backgroundColor: "var(--primary)",
+                color: "white",
+                borderColor: "var(--primary)",
+              }
+              : undefined
+          }
         >
           <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>
             Subjective Test
@@ -242,6 +258,7 @@ export default function Create() {
           <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
             Set marks per question and optionally add model answers plus key points to guide evaluation.
           </p>
+        </div>
         </div>
       </section>
 
@@ -412,7 +429,7 @@ export default function Create() {
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="text-xs font-extrabold uppercase text-primary">Question {index + 1}</p>
-                    <h4 className="text-xl font-extrabold">Written response</h4>
+                    <h4 className="text-xl font-extrabold mt-2">Written response</h4>
                   </div>
 
                   <div className="flex items-center gap-3">
@@ -435,7 +452,7 @@ export default function Create() {
 
                 <div className="space-y-4">
                   <div>
-                    <p className="mb-2 font-bold">Question prompt</p>
+                    <p className="mb-2 font-bold">Question</p>
                     <textarea
                       placeholder="Enter the written question"
                       value={question.question}

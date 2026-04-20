@@ -158,21 +158,65 @@ export default function CreateAITest() {
 
             <AiTokenStatus status={tokenStatus} showManualAction />
 
-            {/* ✅ NEW TEST FORMAT UI */}
-            <div className="mb-6 border-2 border-black px-5 py-4 flex gap-3">
-                <button
+            <section className="mb-6">
+                <p className="font-bold text-lg mb-5">Choose test format :</p>
+                <div className="flex gap-5">
+                    <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setTestFormat("mcq")}
-                    className={testFormat === "mcq" ? "" : "button-secondary"}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setTestFormat("mcq");
+                        }
+                    }}
+                    className="card cursor-pointer p-5 text-left"
+                    style={
+                        testFormat === "mcq"
+                            ? {
+                                backgroundColor: "var(--primary)",
+                                color: "white",
+                                borderColor: "var(--primary)",
+                            }
+                            : undefined
+                    }
                 >
-                    MCQ
-                </button>
-                <button
+                    <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
+                    <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
+                    <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
+                        Generate a focused multiple-choice paper with one correct option per question.
+                    </p>
+                </div>
+                <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => setTestFormat("subjective")}
-                    className={testFormat === "subjective" ? "" : "button-secondary"}
+                    onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setTestFormat("subjective");
+                        }
+                    }}
+                    className="card cursor-pointer p-5 text-left"
+                    style={
+                        testFormat === "subjective"
+                            ? {
+                                backgroundColor: "var(--primary)",
+                                color: "white",
+                                borderColor: "var(--primary)",
+                            }
+                            : undefined
+                    }
                 >
-                    Subjective
-                </button>
-            </div>
+                    <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>Subjective Test</p>
+                    <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
+                    <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
+                        Generate descriptive questions with marks-based evaluation for written answers.
+                    </p>
+                </div>
+                </div>
+            </section>
 
             <div className="mb-7 border-2 border-black px-5 py-4 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-6 text-sm">
