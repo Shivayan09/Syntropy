@@ -25,7 +25,7 @@ type Test = {
   createdAt: string;
 };
 
-type TestMode = "manual" | "generated";
+type TestMode = "all" | "manual" | "generated";
 type SortMode = "newest" | "oldest" | "duration" | "questions";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
@@ -38,13 +38,14 @@ const formatDate = (value: string) =>
   });
 
 const typeLabel = {
+  all: "All",
   manual: "Manual",
   generated: "AI Generated",
 };
 
 export default function TestsPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<TestMode>("manual");
+  const [mode, setMode] = useState<TestMode>("all");
   const [tests, setTests] = useState<Test[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -69,7 +70,7 @@ export default function TestsPage() {
 
   const manualTests = tests.filter((test) => test.type === "manual");
   const generatedTests = tests.filter((test) => test.type === "generated");
-  const activeTests = mode === "manual" ? manualTests : generatedTests;
+  const activeTests = mode === "manual" ? manualTests : mode === "generated" ? generatedTests : tests;
 
   const filteredTests = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -87,7 +88,9 @@ export default function TestsPage() {
   }, [activeTests, search, sort]);
 
   const emptyCopy =
-    mode === "manual"
+    mode === "all"
+      ? "No tests match this view yet. Create a manual paper or generate one with AI to get started."
+      : mode === "manual"
       ? "No manual tests match this view. Create a structured paper when you need full control."
       : "No AI generated tests match this view. Generate a new set for fast topic practice.";
 
@@ -105,7 +108,7 @@ export default function TestsPage() {
 
       <section className="grid gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center">
         <div className="flex gap-3">
-          {(["manual", "generated"] as TestMode[]).map((testMode) => (
+          {(["all", "manual", "generated"] as TestMode[]).map((testMode) => (
             <button
               key={testMode}
               onClick={() => setMode(testMode)}
@@ -117,7 +120,7 @@ export default function TestsPage() {
             >
               {typeLabel[testMode]}
               <span className="ml-2 text-xs opacity-80">
-                {testMode === "manual" ? manualTests.length : generatedTests.length}
+                {testMode === "all" ? tests.length : testMode === "manual" ? manualTests.length : generatedTests.length}
               </span>
             </button>
           ))}
@@ -189,12 +192,12 @@ export default function TestsPage() {
               </p>
               <button
                 onClick={() =>
-                  router.push(mode === "manual" ? "/main/create/manual" : "/main/create/generate")
+                  router.push(mode === "generated" ? "/main/create/generate" : "/main/create/manual")
                 }
                 className="mt-6 gap-2"
               >
                 <Plus size={18} />
-                {mode === "manual" ? "Create manual test" : "Generate AI test"}
+                {mode === "generated" ? "Generate AI test" : "Create manual test"}
               </button>
             </div>
           </div>
