@@ -2,7 +2,7 @@ import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
 import { generateTest } from "../services/aiTest.service.js";
 import { generateSubjectiveTest } from "../services/subjectiveTest.service.js";
-import { buildAiTokenStatus, syncDailyAiTokens } from "../utils/aiToken.utils.js";
+import { buildAiTokenStatus, consumeAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
 
 export const createTest = async (req, res) => {
     try {
@@ -119,13 +119,13 @@ export const aiTest = async (req, res) => {
                 message: "User not found"
             });
         }
-        await syncDailyAiTokens(user);
-        user = await User.findOneAndUpdate({ _id: userId, aiTokens: { $gt: 0 } }, { $inc: { aiTokens: -1 } }, { new: true });
-        if (!user) {
+        await syncAiTokens(user);
+        const hasCredit = await consumeAiCredit(user);
+        if (!hasCredit) {
             return res.status(403).json({
                 success: false,
-                message: "No AI tokens left today. You can still create unlimited manual tests.",
-                aiTokenStatus: buildAiTokenStatus(await User.findById(userId))
+                message: "No AI test credits left right now. You can still create unlimited manual tests.",
+                aiTokenStatus: buildAiTokenStatus(user)
             });
         }
         let test;

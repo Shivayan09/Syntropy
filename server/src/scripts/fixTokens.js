@@ -8,7 +8,16 @@ const run = async () => {
     try {
         await connectDB();
         console.log("MongoDB connected");
-        const result = await User.updateMany({ aiTokens: { $exists: false } }, { $set: { aiTokens: 1 } });
+        const result = await User.updateMany(
+            {},
+            {
+                $set: {
+                    aiTokens: 0,
+                    bonusAiTokens: 0,
+                    freeAiTestsUsed: 0,
+                }
+            }
+        );
         console.log("Updated users:", result.modifiedCount);
         process.exit(0);
     } catch (err) {

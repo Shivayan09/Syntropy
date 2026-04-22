@@ -1,7 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
 import validator from 'validator'
-import { buildAiTokenStatus, syncDailyAiTokens } from "../utils/aiToken.utils.js";
+import { buildAiTokenStatus, syncAiTokens } from "../utils/aiToken.utils.js";
 
 export const getAiTokenStatus = async (req, res) => {
     try {
@@ -13,7 +13,7 @@ export const getAiTokenStatus = async (req, res) => {
             });
         }
 
-        await syncDailyAiTokens(user);
+        await syncAiTokens(user);
 
         return res.status(200).json({
             success: true,

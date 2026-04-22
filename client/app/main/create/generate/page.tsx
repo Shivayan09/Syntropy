@@ -93,7 +93,7 @@ export default function CreateAITest() {
             return;
         }
         if (tokenStatus && !hasTokens) {
-            toast.warn("No AI tokens left today. Manual tests are still unlimited.");
+            toast.warn("No AI test credits left right now. Manual tests are still unlimited.");
             return;
         }
         try {
@@ -252,7 +252,15 @@ export default function CreateAITest() {
                     </div>
                     <div>
                         <p className="text-xs text-gray-500">AI Token</p>
-                        <p className="font-bold">{tokenStatusUnavailable ? "Checked on submit" : hasTokens ? "Ready" : "Resets tomorrow"}</p>
+                        <p className="font-bold">
+                            {tokenStatusUnavailable
+                                ? "Checked on submit"
+                                : hasTokens
+                                    ? "Ready"
+                                    : tokenStatus?.billingCycle === "lifetime"
+                                        ? "Trial exhausted"
+                                        : "Refill pending"}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -342,7 +350,7 @@ export default function CreateAITest() {
 
             <button onClick={generateTest} disabled={!canGenerate || loading} className={`w-full gap-2 text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
                 <Sparkles size={20} />
-                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? `Generate ${testFormat === "mcq" ? "MCQ" : "Subjective"} Test` : "No tokens left"}
+                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? `Generate ${testFormat === "mcq" ? "MCQ" : "Subjective"} Test` : "No credits left"}
             </button>
 
             {tokenStatus && !hasTokens && (

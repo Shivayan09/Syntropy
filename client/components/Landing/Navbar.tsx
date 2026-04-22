@@ -67,7 +67,7 @@ export default function Navbar() {
       {/* DESKTOP NAVBAR */}
       <div className="hidden md:flex border-b fixed z-50 w-full bg-(--surface)/80 backdrop-blur-lg border-black/10 px-10 py-3 items-center justify-between">
 
-        <div onClick={() => nav("/")} className="font-extrabold cursor-pointer text-primary flex items-center gap-1">
+        <div onClick={() => nav("/")} className="font-extrabold cursor-pointer text-xl text-primary flex items-center gap-1">
           <img src="/logo.png" className="h-7" />
           vector
         </div>

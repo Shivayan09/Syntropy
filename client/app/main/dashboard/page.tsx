@@ -141,6 +141,8 @@ export default function Dashboard() {
       }))
       .sort((a, b) => b.average - a.average);
   }, [attempts]);
+  const topSubject = subjectStats[0];
+  const displayedSubjectStats = subjectStats.slice(0, 4);
 
   const scoreTone =
     readiness >= 80
@@ -240,7 +242,7 @@ export default function Dashboard() {
           </button>
         </div>
 
-        <div className="card p-6 md:p-7">
+        <div className="card flex flex-col p-6 md:p-7">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-bold opacity-60">Subject map</p>
@@ -260,22 +262,61 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              {subjectStats.slice(0, 4).map((subject) => (
-                <div key={subject.name} className="py-1">
-                  <div className="mb-2 flex items-center justify-between gap-4 text-sm">
-                    <p className="font-bold">{subject.name}</p>
-                    <p className="font-extrabold">{subject.average}%</p>
+            <div className="flex flex-1 flex-col">
+              <div className="space-y-1">
+                {displayedSubjectStats.map((subject) => (
+                  <div key={subject.name} className="py-1">
+                    <div className="mb-2 flex items-center justify-between gap-4 text-sm">
+                      <p className="font-bold">{subject.name}</p>
+                      <p className="font-extrabold">{subject.average}%</p>
+                    </div>
+                    <div className="h-4 overflow-clip rounded-full border border-black bg-secondary">
+                      <div
+                        className="h-full border-r border-black bg-primary"
+                        style={{ width: `${subject.average}%` }}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs opacity-60">{subject.attempts} attempts</p>
                   </div>
-                  <div className="h-4 border border-black bg-secondary rounded-full overflow-clip">
-                    <div
-                      className="h-full border-r border-black bg-primary"
-                      style={{ width: `${subject.average}%` }}
-                    />
+                ))}
+              </div>
+
+              {displayedSubjectStats.length <= 2 && topSubject && (
+                <div className="mt-6 grid gap-3 border-t border-(--border) pt-5 sm:grid-cols-3">
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Primary zone</p>
+                    <p className="mt-2 text-lg font-extrabold">{topSubject.name}</p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1 ? "Current mapped subject" : "Strongest mapped subject"}
+                    </p>
                   </div>
-                  <p className="mt-1 text-xs opacity-60">{subject.attempts} attempts</p>
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Tracked attempts</p>
+                    <p className="mt-2 text-lg font-extrabold">
+                      {displayedSubjectStats.reduce((total, subject) => total + subject.attempts, 0)}
+                    </p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1 ? "Attempts in this zone" : "Attempts across mapped zones"}
+                    </p>
+                  </div>
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Current accuracy</p>
+                    <p className="mt-2 text-lg font-extrabold">
+                      {displayedSubjectStats.length === 1
+                        ? `${topSubject.average}%`
+                        : `${Math.round(
+                            displayedSubjectStats.reduce((total, subject) => total + subject.average, 0) /
+                              displayedSubjectStats.length
+                          )}%`}
+                    </p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1
+                        ? "Baseline before more subjects appear"
+                        : "Average across the mapped subjects"}
+                    </p>
+                  </div>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>

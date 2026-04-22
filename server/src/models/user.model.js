@@ -15,9 +15,12 @@ const userSchema = new mongoose.Schema({
     college: { type: String, trim: true, minLength: 2 },
     semester: { type: Number, min: 1, max: 8 },
     onboardingCompleted: { type: Boolean, default: false },
-    aiTokens: { type: Number, default: 1 },
+    aiTokens: { type: Number, default: 0 },
+    bonusAiTokens: { type: Number, default: 0 },
+    freeAiTestsUsed: { type: Number, default: 0 },
     lastTokenReset: { type: Date, default: Date.now },
-    plan: { type: String, enum: ["free", "pro", "elite"], default: "free" },
+    plan: { type: String, enum: ["free", "starter", "pro", "power", "elite"], default: "free" },
+    planBillingCycle: { type: String, enum: ["monthly", "annual", null], default: null },
     planExpiry: { type: Date },
     preferences: {
         type: {

@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { normalizePlan } from "../config/plan.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
@@ -72,11 +73,7 @@ export const sendRegistrationOtp = async (req, res) => {
         await RegistrationOtp.findOneAndUpdate(
             { email: normalizedEmail },
             {
-                $set: {
-                    otpHash,
-                    attempts: 0,
-                    expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
-                },
+                $set: { otpHash, attempts: 0, expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000) },
                 $setOnInsert: { email: normalizedEmail },
                 $unset: { verifiedAt: "" },
             },
@@ -265,6 +262,11 @@ export const getMe = async (req, res) => {
         const user = await User.findById(req.user._id).select('-password -aiTokens -lastTokenReset');
         if (!user) {
             return res.status(404).json({ message: "User not found" });
+        }
+        const normalizedPlan = normalizePlan(user.plan);
+        if (normalizedPlan !== user.plan) {
+            user.plan = normalizedPlan;
+            await user.save();
         }
         return res.status(200).json(user);
     } catch (error) {

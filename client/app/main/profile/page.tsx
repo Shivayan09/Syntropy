@@ -61,15 +61,19 @@ const semesterLabel = (value: string) => {
 const planMeta = {
   free: {
     label: "Free",
-    note: "Core practice access",
+    note: "3 total AI trial tests",
+  },
+  starter: {
+    label: "Starter",
+    note: "15 AI tests each month",
   },
   pro: {
     label: "Pro",
-    note: "Sharper daily prep",
+    note: "50 AI tests each month",
   },
-  elite: {
-    label: "Elite",
-    note: "Full power unlocked",
+  power: {
+    label: "Power",
+    note: "150 AI tests each month",
   },
 } as const;
 
@@ -223,6 +227,12 @@ export default function Profile() {
   }
 
   const activePlan = planMeta[user?.plan || "free"];
+  const billingState =
+    user?.plan === "free"
+      ? "No billing"
+      : user?.planBillingCycle === "annual"
+        ? "Annual"
+        : "Monthly";
 
   return (
     <div className="mx-auto space-y-7">
@@ -491,14 +501,12 @@ export default function Profile() {
                     <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
                       <p className="text-xs font-bold uppercase opacity-60">Access status</p>
                       <p className="mt-2 text-lg font-extrabold">
-                        {user?.plan === "free" ? "Starter" : "Premium"}
+                        {user?.plan === "free" ? "Trial" : "Paid"}
                       </p>
                     </div>
                     <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
                       <p className="text-xs font-bold uppercase opacity-60">Billing state</p>
-                      <p className="mt-2 text-lg font-extrabold">
-                        {user?.plan === "free" ? "No billing" : "Active"}
-                      </p>
+                      <p className="mt-2 text-lg font-extrabold">{billingState}</p>
                     </div>
                   </div>
                 </div>
@@ -508,7 +516,11 @@ export default function Profile() {
                 <p className="text-sm font-bold opacity-60">Plan details</p>
                 <div className="mt-4 inline-flex items-center gap-2 border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_var(--shadow)]">
                   <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-                  {user?.plan === "free" ? "Starter access" : "Active subscription"}
+                  {user?.plan === "free"
+                    ? "Free trial access"
+                    : user?.planBillingCycle === "annual"
+                      ? "Annual subscription"
+                      : "Monthly subscription"}
                 </div>
 
                 <div className="mt-5 space-y-4 text-sm">

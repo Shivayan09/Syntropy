@@ -5,11 +5,16 @@ import { useAuth } from "@/context/AuthContext";
 
 export type AiTokenStatus = {
   remaining: number;
-  dailyLimit: number;
+  includedRemaining: number;
+  bonusRemaining: number;
+  cycleLimit: number;
   hasTokens: boolean;
   lastResetAt?: string;
-  nextResetAt: string;
+  nextResetAt?: string | null;
   manualTestsUnlimited: boolean;
+  plan: "free" | "starter" | "pro" | "power";
+  planLabel: string;
+  billingCycle: "lifetime" | "monthly" | "annual";
 };
 
 type AiTokenContextType = {

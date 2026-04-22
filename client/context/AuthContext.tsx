@@ -13,7 +13,8 @@ type User = {
   college?: string;
   semester?: number;
   onboardingCompleted?: boolean;
-  plan?: "free" | "pro" | "elite";
+  plan?: "free" | "starter" | "pro" | "power";
+  planBillingCycle?: "monthly" | "annual" | null;
   planExpiry?: string;
   preferences?: {
     subjects?: string[];
