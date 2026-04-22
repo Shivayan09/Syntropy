@@ -53,24 +53,22 @@ export const sendRegistrationOtp = async (req, res) => {
     try {
         const { name, email, phoneNumber } = req.body;
         const validationError = validateRegistrationInput({ name, email, phoneNumber }, false);
-
         if (validationError) {
-            return res.status(400).json({ success: false, message: validationError });
+            return res.status(400).json({
+                success: false,
+                message: validationError
+            });
         }
-
         const normalizedEmail = normalizeEmail(email);
         const existingUser = await User.findOne({ email: normalizedEmail });
-
         if (existingUser) {
             return res.status(400).json({
                 success: false,
                 message: "User already exists!"
             });
         }
-
         const otp = crypto.randomInt(100000, 1000000).toString();
         const otpHash = await bcrypt.hash(otp, 10);
-
         await RegistrationOtp.findOneAndUpdate(
             { email: normalizedEmail },
             {
@@ -84,9 +82,7 @@ export const sendRegistrationOtp = async (req, res) => {
             },
             { upsert: true, runValidators: true }
         );
-
         await sendRegistrationOtpEmail(normalizedEmail, otp);
-
         return res.status(200).json({
             success: true,
             message: "OTP sent successfully",
@@ -102,54 +98,57 @@ export const sendRegistrationOtp = async (req, res) => {
 export const verifyRegistrationOtp = async (req, res) => {
     try {
         const { email, otp } = req.body;
-
         if (!email || !validator.isEmail(email)) {
             return res.status(400).json({ success: false, message: "Please enter a valid email!" });
         }
         if (!otp) {
-            return res.status(400).json({ success: false, message: "OTP is required" });
+            return res.status(400).json({
+                success: false,
+                message: "OTP is required"
+            });
         }
-
         const normalizedEmail = normalizeEmail(email);
         const otpDoc = await RegistrationOtp.findOne({ email: normalizedEmail });
-
         if (!otpDoc || otpDoc.expiresAt <= new Date()) {
             if (otpDoc) {
                 await RegistrationOtp.deleteOne({ _id: otpDoc._id });
             }
-            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+            return res.status(400).json({
+                success: false,
+                message: "Invalid or expired OTP"
+            });
         }
-
         if (otpDoc.attempts >= MAX_OTP_ATTEMPTS) {
             await RegistrationOtp.deleteOne({ _id: otpDoc._id });
             return res.status(429).json({ success: false, message: "Too many OTP attempts. Please request a new OTP." });
         }
-
         const matched = await bcrypt.compare(otp.toString(), otpDoc.otpHash || "");
-
         if (!matched) {
             otpDoc.attempts += 1;
             await otpDoc.save({ validateBeforeSave: false });
-            return res.status(400).json({ success: false, message: "Invalid OTP" });
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP"
+            });
         }
-
         otpDoc.verifiedAt = new Date();
         otpDoc.otpHash = undefined;
         await otpDoc.save({ validateBeforeSave: false });
-
         return res.status(200).json({
             success: true,
             message: "OTP verified successfully",
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 
 export const register = async (req, res) => {
     const { name, email, phoneNumber, password } = req.body
     const validationError = validateRegistrationInput({ name, email, phoneNumber, password });
-
     if (validationError) {
         return res.status(400).json({
             success: false,
@@ -177,7 +176,6 @@ export const register = async (req, res) => {
                 message: "Please verify your email OTP before registering"
             });
         }
-
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({ name, phoneNumber, email: normalizedEmail, password: hashedPassword });
         await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
@@ -188,9 +186,7 @@ export const register = async (req, res) => {
             sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
-
         const savedUser = await User.findById(user._id);
-
         return res.status(200).json({
             success: true,
             user: savedUser
