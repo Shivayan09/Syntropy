@@ -44,15 +44,15 @@ export default function Hero() {
 
                 <div className="hidden md:flex justify-center md:justify-start gap-6 mt-10">
                     <div>
-                        <p className="text-lg md:text-2xl font-bold">Manual + AI</p>
+                        <p className="text-lg opacity-70 font-bold">Manual and AI</p>
                         <p className="text-sm text-gray-600">Two ways to build tests</p>
                     </div>
                     <div>
-                        <p className="text-lg md:text-2xl font-bold">Timed</p>
+                        <p className="text-lg opacity-70 font-bold">Timed tests</p>
                         <p className="text-sm text-gray-600">Real attempt experience</p>
                     </div>
                     <div>
-                        <p className="text-lg md:text-2xl font-bold">Tracked</p>
+                        <p className="text-lg opacity-70 font-bold">Tracked performance</p>
                         <p className="text-sm text-gray-600">Review, analytics, leaderboard</p>
                     </div>
                 </div>
