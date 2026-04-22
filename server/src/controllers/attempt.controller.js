@@ -11,7 +11,6 @@ const normalizeAttemptAnswers = (answers = []) =>
                 feedback: ""
             };
         }
-
         return {
             answer: entry?.answer ?? null,
             marksAwarded: entry?.marksAwarded ?? 0,
@@ -29,7 +28,6 @@ const buildMcqAnswers = (questions = [], submittedAnswers = []) =>
     questions.map((question, index) => {
         const rawAnswer = submittedAnswers[index];
         const selectedAnswer = typeof rawAnswer === "number" ? rawAnswer : null;
-
         return {
             answer: selectedAnswer,
             marksAwarded: selectedAnswer !== null && selectedAnswer === question.correctAnswer ? 1 : 0,
@@ -50,10 +48,16 @@ export const submitAttempt = async (req, res) => {
         const { attemptId, answers } = req.body;
         const attempt = await Attempt.findOne({ _id: attemptId, user: userId }).populate("test");
         if (!attempt) {
-            return res.status(404).json({ success: false, message: "Attempt not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Attempt not found"
+            });
         }
         if (attempt.status !== "in_progress") {
-            return res.status(400).json({ success: false, message: "Attempt already submitted" });
+            return res.status(400).json({
+                success: false,
+                message: "Attempt already submitted"
+            });
         }
         const now = new Date();
         const endTime = new Date(attempt.startedAt.getTime() + attempt.duration * 60000);
@@ -126,7 +130,10 @@ export const getAttemptById = async (req, res) => {
         const attemptId = req.params.id;
         const attempt = await Attempt.findOne({ _id: attemptId, user: userId }).populate({ path: "test", select: "title subjects duration questions testFormat totalMarks" });
         if (!attempt) {
-            return res.status(404).json({ success: false, message: "Attempt not found" });
+            return res.status(404).json({
+                success: false,
+                message: "Attempt not found"
+            });
         }
         if (attempt.status === "in_progress") {
             const now = new Date();
@@ -154,9 +161,7 @@ export const getAttemptById = async (req, res) => {
 
 export const getMyAttempts = async (req, res) => {
     try {
-        const attempts = await Attempt.find({ user: req.user._id, status: "completed" })
-            .populate("test", "title subjects duration difficulty totalQuestions type questions")
-            .sort({ createdAt: -1 })
+        const attempts = await Attempt.find({ user: req.user._id, status: "completed" }).populate("test", "title subjects duration difficulty totalQuestions type questions").sort({ createdAt: -1 })
         res.json({
             success: true,
             attempts
@@ -176,18 +181,12 @@ export const startAttempt = async (req, res) => {
         const test = await Test.findById(testId);
         if (!test) {
             return res.status(404).json({
+                success: false,
                 message: "Test not found"
             });
         }
         const existing = await Attempt.findOne({ user: userId, test: testId, isFirstAttempt: true });
-        const attempt = await Attempt.create({
-            user: userId,
-            test: testId,
-            duration: test.duration,
-            startedAt: new Date(),
-            status: "in_progress",
-            isFirstAttempt: !existing
-        });
+        const attempt = await Attempt.create({ user: userId, test: testId, duration: test.duration, startedAt: new Date(), status: "in_progress", isFirstAttempt: !existing });
         res.json({
             attemptId: attempt._id
         });
@@ -211,7 +210,9 @@ export const heartbeatAttempt = async (req, res) => {
             });
         }
         if (attempt.status !== "in_progress") {
-            return res.json({ success: true });
+            return res.json({
+                success: true
+            });
         }
         attempt.lastActiveAt = new Date();
         await attempt.save();

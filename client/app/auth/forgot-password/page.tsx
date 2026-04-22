@@ -46,7 +46,7 @@ export default function ForgotPassword() {
                 <div className="flex gap-1 mb-5">
                     <img src="/logo.png" alt="" className="h-7" />
                     <p className="text-sm font-bold text-primary">
-                        TESTIFY
+                        vector
                     </p>
                 </div>
 
@@ -55,7 +55,7 @@ export default function ForgotPassword() {
                 </h1>
 
                 <p className="text-gray-700 mb-10">
-                    Most students practice blindly. Testify shows you exactly where you stand and what to fix.
+                    Most students practice blindly. vector shows you exactly where you stand and what to fix.
                 </p>
 
                 <div className="space-y-6">

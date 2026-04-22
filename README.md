@@ -1,12 +1,12 @@
-# Testify
+# vector
 
 A brutal, no-nonsense mock test platform designed to eliminate guesswork and provide **clear, actionable performance insights**.
 
 ---
 
-## What is Testify?
+## What is vector?
 
-Testify is a test-driven learning platform where users:
+vector is a test-driven learning platform where users:
 
 * Take structured subject-based tests
 * Get honest performance analysis
@@ -75,8 +75,8 @@ till now
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/yourusername/testify.git
-cd testify
+git clone https://github.com/yourusername/vector.git
+cd vector
 ```
 
 ### 2. Install dependencies
@@ -128,4 +128,4 @@ MIT License
 
 > Most people don’t improve because they don’t know what they’re doing wrong.
 
-Testify exists to fix that.
+vector exists to fix that.

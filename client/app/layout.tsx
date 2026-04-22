@@ -17,23 +17,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Testify",
+  title: "vector",
   description: "Test your exam preparation",
   icons: {
     icon: "/logo.png"
   },
 
   openGraph: {
-    title: "Testify",
+    title: "vector",
     description: "Test your exam preparation",
-    url: "https://testify-jet.vercel.app",
-    siteName: "Testify",
+    url: "https://vector-jet.vercel.app",
+    siteName: "vector",
     images: [
       {
-        url: "https://testify-jet.vercel.app/logo.png",
+        url: "https://vector-jet.vercel.app/logo.png",
         width: 512,
         height: 512,
-        alt: "Testify logo",
+        alt: "vector logo",
       },
     ],
     type: "website",
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "Testify",
+    title: "vector",
     description: "Test your exam preparation",
-    images: ["https://testify-jet.vercel.app/logo.png"],
+    images: ["https://vector-jet.vercel.app/logo.png"],
   },
 };
 

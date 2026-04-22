@@ -215,7 +215,7 @@ export default function Onboarding() {
 
                 <div className="flex gap-1 mb-3">
                     <img src="/logo.png" className="h-7" />
-                    <p className="text-sm font-bold text-primary">TESTIFY</p>
+                    <p className="text-sm font-bold text-primary">vector</p>
                 </div>
 
                 <h1 className="text-5xl font-extrabold leading-tight mb-7">

@@ -11,6 +11,8 @@ export default function RegisterPage() {
     const [step, setStep] = useState(1);
     const { getMe } = useAuth();
     const [loading, setLoading] = useState(false);
+    const [otp, setOtp] = useState("");
+    const [otpVerified, setOtpVerified] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -21,11 +23,91 @@ export default function RegisterPage() {
     });
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+    const getErrorMessage = (err: unknown) => err instanceof Error ? err.message : "Something went wrong";
 
     const next = () => setStep((s) => Math.min(s + 1, 3));
     const back = () => setStep((s) => Math.max(s - 1, 1));
 
+    const handleFormChange = (field: keyof typeof form, value: string) => {
+        setForm({ ...form, [field]: value });
+        if (field === "email") {
+            setOtp("");
+            setOtpVerified(false);
+        }
+    };
+
+    const sendOtp = async () => {
+        try {
+            setLoading(true);
+
+            const res = await fetch(BACKEND_URL + "/api/auth/register/send-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    name: form.name,
+                    email: form.email,
+                    phoneNumber: form.phoneNumber
+                })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.warn(data.message);
+                return;
+            }
+
+            toast.success(data.message || "OTP sent");
+            next();
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error("Failed to send OTP");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const verifyOtp = async () => {
+        try {
+            setLoading(true);
+
+            const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    email: form.email,
+                    otp
+                })
+            });
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.warn(data.message);
+                return;
+            }
+
+            setOtpVerified(true);
+            toast.success(data.message || "OTP verified");
+            next();
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error("Failed to verify OTP");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleRegister = async () => {
+        if (!otpVerified) {
+            toast.warn("Please verify your email OTP first");
+            return;
+        }
+
         if (form.password !== form.confirmPassword) {
             alert("Passwords do not match");
             return;
@@ -56,9 +138,9 @@ export default function RegisterPage() {
                 toast.success("Account created");
                 router.push("/onboarding");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error(err);
-            toast.error(err)
+            toast.error(getErrorMessage(err))
         } finally {
             setLoading(false);
         }
@@ -73,7 +155,7 @@ export default function RegisterPage() {
                 <div className="flex gap-1 mb-5">
                     <img src="/logo.png" alt="" className="h-7" />
                     <p className="text-sm font-bold text-primary">
-                        TESTIFY
+                        vector
                     </p>
                 </div>
 
@@ -83,7 +165,7 @@ export default function RegisterPage() {
                 </h1>
 
                 <p className="text-gray-700 mb-10">
-                    Most students practice blindly. Testify shows you exactly where you stand and what to fix.
+                    Most students practice blindly. vector shows you exactly where you stand and what to fix.
                 </p>
 
                 <div className="space-y-6">
@@ -94,7 +176,7 @@ export default function RegisterPage() {
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>
@@ -116,7 +198,7 @@ export default function RegisterPage() {
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>
@@ -174,7 +256,7 @@ export default function RegisterPage() {
                                     placeholder="Full Name"
                                     className="w-full"
                                     value={form.name}
-                                    onChange={(e)=>setForm({...form, name: e.target.value})}
+                                    onChange={(e) => handleFormChange("name", e.target.value)}
                                 />
 
                                 <input
@@ -182,7 +264,7 @@ export default function RegisterPage() {
                                     placeholder="Email"
                                     className="w-full"
                                     value={form.email}
-                                    onChange={(e)=>setForm({...form, email: e.target.value})}
+                                    onChange={(e) => handleFormChange("email", e.target.value)}
                                 />
 
                                 <input
@@ -190,11 +272,15 @@ export default function RegisterPage() {
                                     placeholder="Phone Number"
                                     className="w-full"
                                     value={form.phoneNumber}
-                                    onChange={(e)=>setForm({...form, phoneNumber: e.target.value})}
+                                    onChange={(e) => handleFormChange("phoneNumber", e.target.value)}
                                 />
 
-                                <button className="w-full" onClick={next}>
-                                    Continue
+                                <button
+                                    className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    onClick={sendOtp}
+                                    disabled={loading}
+                                >
+                                    {loading ? "Sending..." : "Continue"}
                                 </button>
                             </div>
                         )}
@@ -211,14 +297,20 @@ export default function RegisterPage() {
                                     type="text"
                                     placeholder="Enter OTP"
                                     className="w-full text-center tracking-widest"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
                                 />
 
                                 <div className="flex gap-3">
                                     <button className="button-secondary w-1/2" onClick={back}>
                                         Back
                                     </button>
-                                    <button className="w-1/2" onClick={next}>
-                                        Verify
+                                    <button
+                                        className={`w-1/2 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                                        onClick={verifyOtp}
+                                        disabled={loading}
+                                    >
+                                        {loading ? "Verifying..." : "Verify"}
                                     </button>
                                 </div>
                             </div>
@@ -233,7 +325,7 @@ export default function RegisterPage() {
                                     placeholder="Password"
                                     className="w-full"
                                     value={form.password}
-                                    onChange={(e)=>setForm({...form, password: e.target.value})}
+                                    onChange={(e) => handleFormChange("password", e.target.value)}
                                 />
 
                                 <input
@@ -241,7 +333,7 @@ export default function RegisterPage() {
                                     placeholder="Confirm Password"
                                     className="w-full"
                                     value={form.confirmPassword}
-                                    onChange={(e)=>setForm({...form, confirmPassword: e.target.value})}
+                                    onChange={(e) => handleFormChange("confirmPassword", e.target.value)}
                                 />
 
                                 <div className="flex gap-3">

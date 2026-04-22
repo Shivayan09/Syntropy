@@ -24,7 +24,7 @@ export default function Navbar() {
 
         <div onClick={() => nav("/")} className="font-extrabold text-lg text-primary flex items-center gap-1">
           <img src="/logo.png" className="h-6" />
-          TESTIFY
+          vector
         </div>
 
         <button onClick={() => setOpen(true)}>
@@ -69,7 +69,7 @@ export default function Navbar() {
 
         <div onClick={() => nav("/")} className="font-extrabold cursor-pointer text-primary flex items-center gap-1">
           <img src="/logo.png" className="h-7" />
-          TESTIFY
+          vector
         </div>
 
         <div className="flex font-semibold text-gray-600 items-center gap-10">

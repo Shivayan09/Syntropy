@@ -85,7 +85,6 @@ subject:""
 
     let aiText = completion.choices[0].message.content;
 
-    // clean AI garbage
     aiText = aiText.replace(/```json|```/g, "").trim();
 
     const parsed = JSON.parse(aiText);

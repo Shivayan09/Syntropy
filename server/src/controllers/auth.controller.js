@@ -1,52 +1,186 @@
 import User from "../models/user.model.js"
+import RegistrationOtp from "../models/registrationOtp.model.js";
 import validator from 'validator'
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
-export const register = async (req, res) => {
-    const { name, email, phoneNumber, password } = req.body
+const OTP_EXPIRY_MINUTES = 10;
+const MAX_OTP_ATTEMPTS = 5;
+
+const normalizeEmail = (email) => email?.trim().toLowerCase();
+
+const validateRegistrationInput = ({ name, email, phoneNumber, password }, requirePassword = true) => {
     if (!name) {
-        return res.status(400).json({
-            success: false,
-            message: "Name is required"
-        })
+        return "Name is required";
     }
     if (!email) {
-        return res.status(400).json({
-            success: false,
-            message: "Email is required"
-        })
+        return "Email is required";
     }
     if (!validator.isEmail(email)) {
-        return res.status(400).json({
-            success: false,
-            message: "Please enter a valid email!"
-        })
+        return "Please enter a valid email!";
     }
-    if (!password) {
-        return res.status(400).json({
-            success: false,
-            message: "Password is required"
-        })
+    if (requirePassword && !password) {
+        return "Password is required";
     }
-    if (!validator.isMobilePhone(phoneNumber, "any")) {
+    if (!validator.isMobilePhone(phoneNumber || "", "any")) {
+        return "Please enter a valid phone number!";
+    }
+    return null;
+};
+
+const createEmailTransporter = () => nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
+const sendRegistrationOtpEmail = async (email, otp) => {
+    const transporter = createEmailTransporter();
+
+    await transporter.sendMail({
+        from: process.env.EMAIL,
+        to: email,
+        subject: 'Verify your email',
+        html: `<p>Your registration OTP is <strong>${otp}</strong>.</p><p>This code expires in ${OTP_EXPIRY_MINUTES} minutes.</p>`,
+    });
+};
+
+export const sendRegistrationOtp = async (req, res) => {
+    try {
+        const { name, email, phoneNumber } = req.body;
+        const validationError = validateRegistrationInput({ name, email, phoneNumber }, false);
+
+        if (validationError) {
+            return res.status(400).json({ success: false, message: validationError });
+        }
+
+        const normalizedEmail = normalizeEmail(email);
+        const existingUser = await User.findOne({ email: normalizedEmail });
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: "User already exists!"
+            });
+        }
+
+        const otp = crypto.randomInt(100000, 1000000).toString();
+        const otpHash = await bcrypt.hash(otp, 10);
+
+        await RegistrationOtp.findOneAndUpdate(
+            { email: normalizedEmail },
+            {
+                $set: {
+                    otpHash,
+                    attempts: 0,
+                    expiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000),
+                },
+                $setOnInsert: { email: normalizedEmail },
+                $unset: { verifiedAt: "" },
+            },
+            { upsert: true, runValidators: true }
+        );
+
+        await sendRegistrationOtpEmail(normalizedEmail, otp);
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP sent successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+export const verifyRegistrationOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        if (!email || !validator.isEmail(email)) {
+            return res.status(400).json({ success: false, message: "Please enter a valid email!" });
+        }
+        if (!otp) {
+            return res.status(400).json({ success: false, message: "OTP is required" });
+        }
+
+        const normalizedEmail = normalizeEmail(email);
+        const otpDoc = await RegistrationOtp.findOne({ email: normalizedEmail });
+
+        if (!otpDoc || otpDoc.expiresAt <= new Date()) {
+            if (otpDoc) {
+                await RegistrationOtp.deleteOne({ _id: otpDoc._id });
+            }
+            return res.status(400).json({ success: false, message: "Invalid or expired OTP" });
+        }
+
+        if (otpDoc.attempts >= MAX_OTP_ATTEMPTS) {
+            await RegistrationOtp.deleteOne({ _id: otpDoc._id });
+            return res.status(429).json({ success: false, message: "Too many OTP attempts. Please request a new OTP." });
+        }
+
+        const matched = await bcrypt.compare(otp.toString(), otpDoc.otpHash || "");
+
+        if (!matched) {
+            otpDoc.attempts += 1;
+            await otpDoc.save({ validateBeforeSave: false });
+            return res.status(400).json({ success: false, message: "Invalid OTP" });
+        }
+
+        otpDoc.verifiedAt = new Date();
+        otpDoc.otpHash = undefined;
+        await otpDoc.save({ validateBeforeSave: false });
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP verified successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const register = async (req, res) => {
+    const { name, email, phoneNumber, password } = req.body
+    const validationError = validateRegistrationInput({ name, email, phoneNumber, password });
+
+    if (validationError) {
         return res.status(400).json({
             success: false,
-            message: "Please enter a valid phone number!"
+            message: validationError
         })
     }
     try {
-        const existingUser = await User.findOne({ email });
+        const normalizedEmail = normalizeEmail(email);
+        const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
             return res.status(400).json({
                 success: false,
                 message: "User already exists!"
             })
         }
+        const verifiedOtp = await RegistrationOtp.findOne({
+            email: normalizedEmail,
+            verifiedAt: { $exists: true },
+            expiresAt: { $gt: new Date() },
+        });
+
+        if (!verifiedOtp) {
+            return res.status(400).json({
+                success: false,
+                message: "Please verify your email OTP before registering"
+            });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, phoneNumber, email, password: hashedPassword });
+        const user = await User.create({ name, phoneNumber, email: normalizedEmail, password: hashedPassword });
+        await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
         res.cookie("token", token, {
             httpOnly: true,
@@ -173,13 +307,7 @@ export const forgotPassword = async (req, res) => {
 };
 
 const sendResetEmail = async (email, token) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
+    const transporter = createEmailTransporter();
 
     const resetLink = `${process.env.FRONTEND_URL}/auth/reset-password/${token}`;
 
