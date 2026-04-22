@@ -7,11 +7,8 @@ import Hero from "@/components/Landing/Hero";
 import Navbar from "@/components/Landing/Navbar";
 import Preview from "@/components/Landing/Preview";
 import Steps from "@/components/Landing/Steps";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-
   return (
     <div className="min-h-screen bg-(--bg) text-(--text)">
       <Navbar/>

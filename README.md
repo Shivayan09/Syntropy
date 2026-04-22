@@ -1,131 +1,200 @@
-# vector
+# syntropy
 
-A brutal, no-nonsense mock test platform designed to eliminate guesswork and provide **clear, actionable performance insights**.
+syntropy is a full-stack mock test platform for students preparing for semester exams, placements, and other timed assessments. It lets users create manual tests, generate AI-powered tests, attempt them in a timed interface, review results, track performance trends, upload syllabi, and manage AI test credits through paid plans.
 
----
+## What The Product Does
 
-## What is vector?
+- Register with email OTP verification and sign in with cookie-based auth
+- Complete onboarding with academic details, preferences, and syllabus upload
+- Create tests manually in both `mcq` and `subjective` formats
+- Generate AI tests from selected subjects, difficulty, duration, marks, and student context
+- Attempt tests inside a timed interface with navigation, review flags, and auto-submit on expiry
+- View result pages, answer review screens, attempt history, analytics, and leaderboard rankings
+- Upload a syllabus PDF, parse it into structured subjects/units/topics, and reuse subjects while creating tests
+- Buy monthly/annual AI-test plans or top-up credits through Razorpay
 
-vector is a test-driven learning platform where users:
+## Monorepo Structure
 
-* Take structured subject-based tests
-* Get honest performance analysis
-* Identify weak areas
-* Track real improvement over time
-
-No fake progress. No fluff. Just clarity.
-
----
-
-## Features
-
-* **Performance Analytics**
-  Understand where you stand with clear breakdowns
-
-* **Weak Area Detection**
-  Instantly identify topics that need attention
-
-* **Mock Tests**
-  Practice under real test conditions
-
-* **Progress Tracking**
-  Measure improvement over time
-
-* **Step-Based Authentication**
-  Smooth onboarding with multi-step registration
-
----
+```text
+.
+├── client/   # Next.js frontend
+└── server/   # Express + MongoDB API
+```
 
 ## Tech Stack
 
-**Frontend**
+### Frontend
 
-* Next.js (App Router)
-* React
-* Tailwind CSS
-* Lucide Icons
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Framer Motion
+- Lucide React
+- React Toastify
 
-**Backend (Planned / In Progress)**
+### Backend
 
-* Node.js / Express or FastAPI
-* MongoDB / PostgreSQL
-* JWT Authentication
+- Node.js
+- Express 5
+- MongoDB + Mongoose
+- JWT in `httpOnly` cookies
+- Multer for uploads
+- Cloudinary for file/avatar storage
+- Nodemailer for OTP and password reset emails
+- Razorpay for subscriptions and top-ups
 
----
+### AI / Parsing
 
-## Project Structure
-till now
-```
-/app
-  /login
-  /signup
-  /dashboard
-/components
-  Hero.jsx
-  Preview.jsx
-  Navbar.jsx
-/utils
-  api.js
-```
+- Groq SDK
+  - MCQ test generation
+  - Subjective test generation
+  - Subjective answer evaluation
+- Google Gemini
+  - Syllabus parsing into subjects and units
+- `pdf-parse`
+  - Extracting syllabus text from uploaded PDF files
 
----
+## Key Functional Areas
 
-## Getting Started
+### Authentication And Onboarding
 
-### 1. Clone the repo
+- 3-step registration flow with email OTP verification
+- Login, logout, `getMe`, forgot-password, and reset-password flows
+- Protected routes plus onboarding gating before main app access
+- Profile editing for name, username, phone, email, college, semester, role, and preferences
+
+### Test Creation
+
+- Manual test builder supports:
+  - MCQs with 4 options and one correct answer
+  - Subjective questions with marks, expected answer, and key points
+- AI generation supports:
+  - Multiple subjects
+  - Difficulty selection
+  - MCQ question count or subjective total marks
+  - Duration
+  - College and semester context
+
+### Attempts, Results, And Review
+
+- Timed attempt session with:
+  - palette navigation
+  - mark-for-review
+  - clear answer
+  - countdown timer
+  - auto-submit when time ends
+- MCQ attempts are scored instantly
+- Subjective attempts are evaluated by AI and return marks plus feedback per answer
+- Review pages show submitted answers and the correct/graded outcome
+
+### Analytics And Leaderboard
+
+- Dashboard with recent attempts, readiness score, best score, and subject map
+- Analytics page with:
+  - average accuracy
+  - trend visualization
+  - subject breakdown
+  - weak subject/topic detection
+  - retake lift
+- Leaderboard ranks users by first-attempt performance only
+
+### Plans And AI Credit System
+
+- Free plan includes `3` total AI test generations
+- Paid plans and top-ups are handled through a plan catalog on the server
+- Manual test creation remains unlimited
+- AI token status tracks:
+  - included credits
+  - bonus/top-up credits
+  - refill cycle
+  - next reset date
+
+## Data Model Overview
+
+Core MongoDB models:
+
+- `User`
+  - auth/profile fields
+  - onboarding state
+  - AI token / plan metadata
+  - preferences and stats
+- `Test`
+  - `manual` or `generated`
+  - `mcq` or `subjective`
+  - subjects, duration, questions, marks
+- `Attempt`
+  - answers, score, accuracy, timing, first-attempt flag, status
+- `Syllabus`
+  - uploaded file URL, raw text, parsed subjects/units/topics
+- `RegistrationOtp`
+  - hashed OTP, expiry, attempt counter, verification state
+
+## API Surface
+
+Main route groups in `server/src/routes`:
+
+- `/api/auth`
+- `/api/user`
+- `/api/test`
+- `/api/attempt`
+- `/api/syllabus`
+- `/api/leaderboard`
+- `/api/payment`
+
+
+## Running Locally
+
+Install and run the frontend and backend separately.
+
+### 1. Install dependencies
 
 ```bash
-git clone https://github.com/yourusername/vector.git
-cd vector
-```
+cd client
+npm install
 
-### 2. Install dependencies
-
-```bash
+cd ../server
 npm install
 ```
 
-### 3. Run the development server
+### 2. Start the backend
 
 ```bash
+cd server
 npm run dev
 ```
 
-### 4. Open in browser
+### 3. Start the frontend
 
+```bash
+cd client
+npm run dev
 ```
-not hosted yet
-```
 
----
+### 4. Open the app
 
-## Authentication Flow
+Frontend: `http://localhost:3000`  
+Backend: `http://localhost:5000`
 
-1. User enters basic details (name, email, phone)
-2. Email verification (OTP)
-3. Password setup
+## Important Notes About The Current Codebase
 
----
+- The current README previously described the backend as "planned", but the backend is already implemented and wired into the frontend.
+- Syllabus upload UI accepts PDFs or images, but the current extraction flow is PDF-centric and uses `pdf-parse`; `tesseract.js` is installed but not currently driving the upload pipeline.
+- The support/contact page is still frontend-only and does not submit to a backend service yet.
+- There is no root-level workspace script; `client` and `server` are run independently.
 
-## Roadmap
+## Current Product Positioning
 
-* [ ] Backend integration
-* [ ] Real test engine
-* [ ] Detailed analytics dashboard
-* [ ] User profiles
-* [ ] Leaderboards
-* [ ] AI-based recommendations
+This is not just a landing page or mock UI. It is an implemented full-stack exam practice system centered around:
 
----
+- personalized onboarding
+- manual and AI-generated mock tests
+- timed attempts
+- AI-assisted evaluation for subjective answers
+- performance review and analytics
+- syllabus-aware subject selection
+- monetized AI credit plans
 
 ## License
 
-MIT License
-
----
-
-## Philosophy
-
-> Most people don’t improve because they don’t know what they’re doing wrong.
-
-vector exists to fix that.
+No license file is currently present in the repository.

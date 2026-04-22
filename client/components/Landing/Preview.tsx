@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import {
+    BrainCircuit,
     Check,
     Clock,
-    TrendingUp,
     Target,
-    AlertTriangle,
-    X
+    TrendingUp,
+    X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -18,10 +18,10 @@ export default function Preview() {
     const [active, setActive] = useState(-1);
 
     const options = [
-        { text: "O(n)", correct: false },
-        { text: "O(log n)", correct: true },
-        { text: "O(n log n)", correct: false },
-        { text: "O(1)", correct: false },
+        { text: "When n is always small", correct: false },
+        { text: "When the data is sorted and the search space halves each step", correct: true },
+        { text: "When every element must still be checked once", correct: false },
+        { text: "When the algorithm never compares middle elements", correct: false },
     ];
 
     useEffect(() => {
@@ -33,7 +33,7 @@ export default function Preview() {
         }, 900);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [options.length]);
 
     return (
         <section className="py-10 px-5 md:px-10">
@@ -42,22 +42,20 @@ export default function Preview() {
                     LIVE EXPERIENCE
                 </p>
                 <h2 className="text-3xl md:text-5xl font-extrabold leading-tight">
-                    Test. Analyze. Improve.
+                    Attempt. Review. Adjust.
                 </h2>
                 <p className="text-gray-600 mt-4">
-                    Not just practice. A system that shows you exactly where you stand.
+                    This section now mirrors the actual product flow: a timed question on one side, and the study signals you get back on the other.
                 </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-10 items-start">
-                {/* LEFT */}
                 <div className="relative">
                     <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
 
                     <div className="card bg-surface">
-                        {/* Top bar */}
                         <div className="flex justify-between items-center mb-6">
-                            <p className="font-bold">DSA Mock Test</p>
+                            <p className="font-bold">Generated DSA Mock Test</p>
 
                             <div className="flex items-center gap-2 text-sm border-2 border-black px-3 py-1 bg-secondary">
                                 <Clock size={14} />
@@ -65,12 +63,10 @@ export default function Preview() {
                             </div>
                         </div>
 
-                        {/* Question */}
                         <h3 className="font-semibold mb-5">
-                            What is the time complexity of binary search?
+                            Binary search works in O(log n). Which explanation best justifies that result?
                         </h3>
 
-                        {/* OPTIONS */}
                         <div className="space-y-3">
                             {options.map((opt, i) => {
                                 const isActive = i === active;
@@ -84,8 +80,8 @@ export default function Preview() {
                                             backgroundColor: isCorrect
                                                 ? "var(--primary)"
                                                 : isWrong
-                                                ? "#ef4444"
-                                                : "",
+                                                    ? "#ef4444"
+                                                    : "",
                                             color:
                                                 isCorrect || isWrong
                                                     ? "#ffffff"
@@ -127,38 +123,36 @@ export default function Preview() {
                             })}
                         </div>
 
-                        {/* Feedback */}
                         <div className="mt-6 border-2 border-black p-4 bg-secondary">
                             <p className="font-bold text-sm mb-1">
-                                Correct Answer
+                                Review insight
                             </p>
                             <p className="text-sm text-gray-700">
-                                Binary search halves the search space each step.
+                                The strongest explanations connect the answer to halving the search space each step, not just memorizing a complexity label.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* RIGHT */}
                 <div className="flex flex-col justify-center gap-5 h-full">
                     <div className="card bg-surface flex gap-4 items-start">
                         <Target className="mt-1" />
                         <div>
-                            <p className="font-bold">Pinpoint Weak Areas</p>
+                            <p className="font-bold">Subject-aware practice</p>
                             <p className="text-sm text-gray-600">
-                                Instantly see which topics are holding you back.
+                                Build tests from selected subjects and reuse parsed syllabus data instead of starting from scratch every time.
                             </p>
                         </div>
                     </div>
 
                     <div className="card bg-surface flex gap-4 items-start">
-                        <AlertTriangle className="mt-1" />
+                        <BrainCircuit className="mt-1" />
                         <div>
                             <p className="font-bold">
-                                Brutally Honest Feedback
+                                AI where it matters
                             </p>
                             <p className="text-sm text-gray-600">
-                                No fake confidence. Just real performance insights.
+                                Generate full tests faster and evaluate subjective answers with feedback when manual checking would slow you down.
                             </p>
                         </div>
                     </div>
@@ -166,18 +160,18 @@ export default function Preview() {
                     <div className="card bg-surface flex gap-4 items-start">
                         <TrendingUp className="mt-1" />
                         <div>
-                            <p className="font-bold">Track Real Growth</p>
+                            <p className="font-bold">Track real growth</p>
                             <p className="text-sm text-gray-600">
-                                Measure improvement over time, not guesses.
+                                Dashboard, analytics, history, and retakes make progress visible across attempts instead of leaving it to memory.
                             </p>
                         </div>
                     </div>
 
                     <button
                         className="w-full mt-4"
-                        onClick={() => router.push("/main/test")}
+                        onClick={() => router.push("/main/tests")}
                     >
-                        Start Your First Test
+                        Browse available tests
                     </button>
                 </div>
             </div>

@@ -161,7 +161,7 @@ export const updateAvatar = async (req, res) => {
         }
         const uploadResult = await cloudinary.uploader.upload(`data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
             {
-                folder: "vector/avatars",
+                folder: "syntropy/avatars",
                 transformation: [{ width: 300, height: 300, crop: "fill" }, { quality: "auto" }],
             }
         );

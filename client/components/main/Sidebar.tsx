@@ -70,7 +70,7 @@ export default function Sidebar({
         </button>
 
         <p className="ml-5 font-bold text-primary">
-          vector
+          syntropy
         </p>
       </div>
 
@@ -86,7 +86,7 @@ export default function Sidebar({
 
           <div className="flex justify-between items-center mb-6">
             <p onClick={() => navigate("/")} className="cursor-pointer font-extrabold text-lg text-primary">
-              vector
+              syntropy
             </p>
 
             <button onClick={() => setOpen(false)}>
@@ -185,7 +185,7 @@ export default function Sidebar({
             <img src="/logo.png" className="h-7" />
 
             <span onClick={() => router.push('/')} className={`cursor-pointer font-extrabold text-primary text-xl whitespace-nowrap transition-all duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-              vector
+              syntropy
             </span>
           </div>}
 

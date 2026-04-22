@@ -17,23 +17,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "vector",
+  title: "syntropy",
   description: "Test your exam preparation",
   icons: {
     icon: "/logo.png"
   },
 
   openGraph: {
-    title: "vector",
+    title: "syntropy",
     description: "Test your exam preparation",
-    url: "https://vector-jet.vercel.app",
-    siteName: "vector",
+    url: "https://syntropy-jet.vercel.app",
+    siteName: "syntropy",
     images: [
       {
-        url: "https://vector-jet.vercel.app/logo.png",
+        url: "https://syntropy-jet.vercel.app/logo.png",
         width: 512,
         height: 512,
-        alt: "vector logo",
+        alt: "syntropy logo",
       },
     ],
     type: "website",
@@ -41,9 +41,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "vector",
+    title: "syntropy",
     description: "Test your exam preparation",
-    images: ["https://vector-jet.vercel.app/logo.png"],
+    images: ["https://syntropy-jet.vercel.app/logo.png"],
   },
 };
 
