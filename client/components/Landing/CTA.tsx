@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function CTA() {
+    
     const router = useRouter();
 
     return (
