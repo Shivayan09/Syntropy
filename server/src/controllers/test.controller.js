@@ -2,7 +2,8 @@ import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
 import { generateTest } from "../services/aiTest.service.js";
 import { generateSubjectiveTest } from "../services/subjectiveTest.service.js";
-import { buildAiTokenStatus, consumeAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
+import { buildAiTokenStatus, consumeAiCredit, refundAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
+import { getTestNumber } from "../utils/testTitle.utils.js";
 
 export const createTest = async (req, res) => {
     try {
@@ -67,9 +68,17 @@ export const getTest = async (req, res) => {
                 message: "Test not found"
             });
         }
+
+        const responseTest = test.toObject();
+
+        if (responseTest.type === "generated") {
+            const testNumber = await getTestNumber(req.user._id, test);
+            responseTest.title = `Test ${testNumber}`;
+        }
+
         res.json({
             success: true,
-            test
+            test: responseTest
         });
     } catch (error) {
         res.status(500).json({
@@ -110,9 +119,12 @@ export const getTestForAttempt = async (req, res) => {
 };
 
 export const aiTest = async (req, res) => {
+    let user;
+    let creditSource = null;
+
     try {
         const userId = req.user._id;
-        let user = await User.findById(userId);
+        user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -120,8 +132,8 @@ export const aiTest = async (req, res) => {
             });
         }
         await syncAiTokens(user);
-        const hasCredit = await consumeAiCredit(user);
-        if (!hasCredit) {
+        creditSource = await consumeAiCredit(user);
+        if (!creditSource) {
             return res.status(403).json({
                 success: false,
                 message: "No AI test credits left right now. You can still create unlimited manual tests.",
@@ -141,9 +153,14 @@ export const aiTest = async (req, res) => {
             aiTokenStatus: buildAiTokenStatus(user)
         });
     } catch (err) {
+        if (user && creditSource) {
+            await refundAiCredit(user, creditSource);
+        }
+
         return res.status(500).json({
             success: false,
-            message: err.message
+            message: err.message,
+            aiTokenStatus: user ? buildAiTokenStatus(user) : undefined
         });
     }
 };

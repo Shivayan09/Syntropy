@@ -117,31 +117,52 @@ export const consumeAiCredit = async (user) => {
     if (remainingFreeCredits > 0) {
       user.freeAiTestsUsed = (user.freeAiTestsUsed || 0) + 1;
       await user.save();
-      return true;
+      return "free";
     }
 
     if ((user.bonusAiTokens || 0) > 0) {
       user.bonusAiTokens -= 1;
       await user.save();
-      return true;
+      return "bonus";
     }
 
-    return false;
+    return null;
   }
 
   if ((user.aiTokens || 0) > 0) {
     user.aiTokens -= 1;
     await user.save();
-    return true;
+    return "plan";
   }
 
   if ((user.bonusAiTokens || 0) > 0) {
     user.bonusAiTokens -= 1;
     await user.save();
-    return true;
+    return "bonus";
   }
 
-  return false;
+  return null;
+};
+
+export const refundAiCredit = async (user, creditSource) => {
+  if (!creditSource) {
+    return user;
+  }
+
+  if (creditSource === "free") {
+    user.freeAiTestsUsed = Math.max((user.freeAiTestsUsed || 0) - 1, 0);
+  }
+
+  if (creditSource === "plan") {
+    user.aiTokens = (user.aiTokens || 0) + 1;
+  }
+
+  if (creditSource === "bonus") {
+    user.bonusAiTokens = (user.bonusAiTokens || 0) + 1;
+  }
+
+  await user.save();
+  return user;
 };
 
 export const buildAiTokenStatus = (user) => {

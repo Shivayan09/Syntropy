@@ -21,13 +21,15 @@ type SyllabusResponse = {
 };
 
 export default function CreateAITest() {
+    const MAX_GENERATED_QUESTIONS = 30;
+    const MAX_SUBJECTIVE_MARKS = 100;
     const router = useRouter();
     const { user, getMe } = useAuth();
     const { tokenStatus, refreshTokenStatus, setTokenStatus } = useAiTokens();
 
     // ✅ NEW
     const [testFormat, setTestFormat] = useState<TestFormat>("mcq");
-    const [totalMarks, setTotalMarks] = useState(50);
+    const [totalMarks, setTotalMarks] = useState(MAX_SUBJECTIVE_MARKS);
 
     const [subjects, setSubjects] = useState<string[]>([]);
     const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
@@ -60,7 +62,7 @@ export default function CreateAITest() {
     useEffect(() => {
         if (user?.preferences) {
             setDifficulty(user.preferences.difficulty || "Medium");
-            setQuestions(user.preferences.questionsPerTest || 20);
+            setQuestions(Math.min(user.preferences.questionsPerTest || 20, MAX_GENERATED_QUESTIONS));
         }
     }, [user]);
 
@@ -321,7 +323,7 @@ export default function CreateAITest() {
                 {testFormat === "mcq" && (
                     <div>
                         <p className="font-bold mb-3">Questions</p>
-                        <input type="range" min={5} max={50} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
+                        <input type="range" min={5} max={MAX_GENERATED_QUESTIONS} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
                         <p className="text-sm mt-2">{questions}</p>
                     </div>
                 )}
@@ -330,7 +332,7 @@ export default function CreateAITest() {
                 {testFormat === "subjective" && (
                     <div>
                         <p className="font-bold mb-3">Total Marks</p>
-                        <input type="range" min={20} max={100} value={totalMarks} onChange={(e) => setTotalMarks(Number(e.target.value))} className="w-full" />
+                        <input type="range" min={20} max={MAX_SUBJECTIVE_MARKS} value={totalMarks} onChange={(e) => setTotalMarks(Number(e.target.value))} className="w-full" />
                         <p className="text-sm mt-2">{totalMarks}</p>
                     </div>
                 )}
