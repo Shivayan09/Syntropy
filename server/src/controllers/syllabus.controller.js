@@ -5,9 +5,10 @@ import { parseSyllabus } from "../services/syllabusParser.service.js";
 import fs from "fs";
 
 export const uploadSyllabus = async (req, res) => {
+    const file = req.file;
+
     try {
         const userId = req.user._id;
-        const file = req.file;
         if (!file) {
             return res.status(400).json({
                 success: false,
@@ -22,7 +23,6 @@ export const uploadSyllabus = async (req, res) => {
             user: userId, title: file.originalname, fileUrl: upload.secure_url, parsed: false
         });
         const rawText = await extractTextFromFile(upload.secure_url);
-        console.log("📄 RAW OCR TEXT:\n", rawText.slice(0, 1000));
         let subjects = [];
         try {
             subjects = await parseSyllabus(rawText);
@@ -47,6 +47,10 @@ export const uploadSyllabus = async (req, res) => {
             success: false,
             message: error.message
         });
+    } finally {
+        if (file?.path) {
+            await fs.promises.unlink(file.path).catch(() => null);
+        }
     }
 };
 
