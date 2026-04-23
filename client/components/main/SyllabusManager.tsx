@@ -1,64 +1,96 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { toast } from "react-toastify";
 import DeleteModal from "../modals/DeleteModal";
 
+type Topic = {
+    name: string;
+};
+
+type Unit = {
+    title: string;
+    topics: Topic[];
+};
+
+type Subject = {
+    name: string;
+    units: Unit[];
+};
+
+type SyllabusRecord = {
+    _id: string;
+    title: string;
+    subjects: Subject[];
+    parsed?: boolean;
+};
 
 export default function SyllabusManager() {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
-    const [syllabus, setSyllabus] = useState<any>(null);
-    const [original, setOriginal] = useState<any>(null);
+    const [syllabus, setSyllabus] = useState<SyllabusRecord | null>(null);
+    const [original, setOriginal] = useState<SyllabusRecord | null>(null);
     const [editingSubject, setEditingSubject] = useState<number | null>(null);
     const [fetching, setFetching] = useState(true);
     const [deleteSubjectIndex, setDeleteSubjectIndex] = useState<number | null>(null);
 
-    useEffect(() => {
-        fetchSyllabus();
-    }, []);
-
-    const fetchSyllabus = async () => {
+    const fetchSyllabus = useCallback(async () => {
         try {
             setFetching(true);
-            const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include", });
+            const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include" });
             const data = await res.json();
-            const s = data.syllabus?.[0] || null;
-            setSyllabus(s);
-            setOriginal(structuredClone(s));
+            const currentSyllabus = data.syllabus?.[0] || null;
+            setSyllabus(currentSyllabus);
+            setOriginal(structuredClone(currentSyllabus));
         } catch (err) {
             console.error(err);
         } finally {
             setFetching(false);
         }
-    };
+    }, [BACKEND_URL]);
+
+    useEffect(() => {
+        fetchSyllabus();
+    }, [fetchSyllabus]);
 
     const upload = async () => {
         if (!file) {
             return;
         }
+
         const form = new FormData();
         form.append("file", file);
         setLoading(true);
+
         try {
-            await fetch(BACKEND_URL + "/api/syllabus/upload", {
+            const res = await fetch(BACKEND_URL + "/api/syllabus/upload", {
                 method: "POST",
                 body: form,
                 credentials: "include",
             });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.warn(data.message || "Syllabus upload failed");
+                return;
+            }
+
+            toast.success(data.overwritten ? "Syllabus replaced successfully" : "Syllabus uploaded successfully");
             setFile(null);
-            fetchSyllabus();
+            await fetchSyllabus();
         } catch (err) {
             console.error(err);
+            toast.error("Syllabus upload failed");
         } finally {
             setLoading(false);
         }
     };
 
-    const update = (updated: any) => {
+    const update = (updated: SyllabusRecord) => {
         setSyllabus(structuredClone(updated));
     };
 
@@ -66,50 +98,66 @@ export default function SyllabusManager() {
         JSON.stringify(syllabus?.subjects) !==
         JSON.stringify(original?.subjects);
 
-    const topicsToString = (topics: any[]) =>
-        topics?.map((t) => t.name).join(", ") || "";
+    const topicsToString = (topics: Topic[]) =>
+        topics?.map((topic) => topic.name).join(", ") || "";
 
     const stringToTopics = (value: string) =>
-        value.split(",").map((t) => t.trim()).filter(Boolean).map((t) => ({ name: t }));
+        value
+            .split(",")
+            .map((topic) => topic.trim())
+            .filter(Boolean)
+            .map((topic) => ({ name: topic }));
 
-    const updateSubject = (si: number, val: string) => {
-        const s = structuredClone(syllabus);
-        s.subjects[si].name = val;
-        update(s);
+    const updateSubject = (subjectIndex: number, value: string) => {
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects[subjectIndex].name = value;
+        update(nextSyllabus);
     };
 
-    const removeSubject = (si: number) => {
-        const s = structuredClone(syllabus);
-        s.subjects.splice(si, 1);
-        update(s);
+    const removeSubject = (subjectIndex: number) => {
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects.splice(subjectIndex, 1);
+        update(nextSyllabus);
     };
 
-    const updateUnit = (si: number, ui: number, val: string) => {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units[ui].title = val;
-        update(s);
+    const updateUnit = (subjectIndex: number, unitIndex: number, value: string) => {
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects[subjectIndex].units[unitIndex].title = value;
+        update(nextSyllabus);
     };
 
-    const removeUnit = (si: number, ui: number) => {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units.splice(ui, 1);
-        update(s);
+    const removeUnit = (subjectIndex: number, unitIndex: number) => {
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects[subjectIndex].units.splice(unitIndex, 1);
+        update(nextSyllabus);
     };
 
-    const addUnit = (si: number) => {
-        const s = structuredClone(syllabus);
-        s.subjects[si].units.push({ title: "", topics: [] });
-        update(s);
+    const addUnit = (subjectIndex: number) => {
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects[subjectIndex].units.push({ title: "", topics: [] });
+        update(nextSyllabus);
     };
 
     const addSubject = () => {
-        const s = structuredClone(syllabus);
-        s.subjects.push({ name: "", units: [] });
-        update(s);
+        if (!syllabus) return;
+
+        const nextSyllabus = structuredClone(syllabus);
+        nextSyllabus.subjects.push({ name: "", units: [] });
+        update(nextSyllabus);
     };
 
     const save = async () => {
-        if (!hasChanges) return;
+        if (!syllabus || !hasChanges) return;
 
         const res = await fetch(BACKEND_URL + "/api/syllabus/update", {
             method: "PUT",
@@ -125,10 +173,10 @@ export default function SyllabusManager() {
 
         if (!res.ok) {
             toast.warn(data.message);
-        } else {
-            toast.success("Syllabus update saved");
+            return;
         }
 
+        toast.success("Syllabus update saved");
         setOriginal(structuredClone(syllabus));
     };
 
@@ -142,28 +190,31 @@ export default function SyllabusManager() {
 
     if (!syllabus) {
         return (
-            <div>
-                <p className="text-gray-500 mb-3">
-                    No syllabus! Add it here:
-                </p>
-
-                <div className="flex items-center gap-5">
-                    <input type="file" accept=".pdf,image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-
-                    <div className="flex items-center gap-3">
-                        <button onClick={upload} disabled={!file || loading} >
-                            Upload Syllabus
-                        </button>
-
-                        {file && (
-                            <span className="text-sm opacity-70">
-                                {file.name}
-                            </span>
-                        )}
-                    </div>
+            <div className="card space-y-4">
+                <div>
+                    <p className="font-bold">No syllabus uploaded yet</p>
+                    <p className="mt-1 text-sm opacity-70">
+                        Upload a syllabus PDF or image to generate your editable subject structure.
+                    </p>
                 </div>
 
-                {loading && <Loader2 />}
+                <input type="file" accept=".pdf,image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+
+                <p className="text-sm text-amber-700">
+                    Uploading a new syllabus later will overwrite your current syllabus data.
+                </p>
+
+                <div className="flex items-center gap-3">
+                    <button onClick={upload} disabled={!file || loading} className={!file || loading ? "opacity-70 cursor-not-allowed" : ""}>
+                        {loading ? "Uploading..." : "Upload Syllabus"}
+                    </button>
+
+                    {file && (
+                        <span className="text-sm opacity-70">
+                            {file.name}
+                        </span>
+                    )}
+                </div>
             </div>
         );
     }
@@ -171,9 +222,10 @@ export default function SyllabusManager() {
     return (
         <div>
             <div className="flex items-center justify-between mb-5">
-                <p className="font-bold">
-                    Current uploaded syllabus
-                </p>
+                <div>
+                    <p className="font-bold">Current uploaded syllabus</p>
+                    <p className="mt-1 text-sm opacity-70">{syllabus.title}</p>
+                </div>
 
                 <div className="hidden md:flex justify-end">
                     <button onClick={save} disabled={!hasChanges} className={!hasChanges ? "opacity-70 cursor-not-allowed" : ""}>
@@ -182,72 +234,99 @@ export default function SyllabusManager() {
                 </div>
             </div>
 
-            {syllabus.subjects.map((sub: any, si: number) => (
-                <div key={si} className="mb-5 card">
+            <div className="card mb-6 space-y-4">
+                <div>
+                    <p className="font-bold">Replace syllabus</p>
+                    <p className="mt-1 text-sm opacity-70">
+                        Uploading a new syllabus will overwrite the current one and remove the previous upload.
+                    </p>
+                </div>
 
+                <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                    <input type="file" accept=".pdf,image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+                    <button onClick={upload} disabled={!file || loading} className={!file || loading ? "opacity-70 cursor-not-allowed" : ""}>
+                        {loading ? "Uploading..." : "Upload New Syllabus"}
+                    </button>
+                </div>
+
+                {file && (
+                    <p className="text-sm opacity-70">
+                        Selected file: {file.name}
+                    </p>
+                )}
+            </div>
+
+            {syllabus.subjects.map((subject, subjectIndex) => (
+                <div key={subjectIndex} className="mb-5 card">
                     <div className="flex items-center justify-between">
-
-                        {editingSubject === si ? (
-                            <input value={sub.name} onChange={(e) => updateSubject(si, e.target.value)} className="text-lg font-semibold border-b bg-transparent p-0 shadow-none outline-none" />
+                        {editingSubject === subjectIndex ? (
+                            <input
+                                value={subject.name}
+                                onChange={(e) => updateSubject(subjectIndex, e.target.value)}
+                                className="text-lg font-semibold border-b bg-transparent p-0 shadow-none outline-none"
+                            />
                         ) : (
                             <h2 className="text-lg font-semibold">
-                                {sub.name}
+                                {subject.name}
                             </h2>
                         )}
 
                         <div className="flex items-center gap-3">
-
-                            <button className="button-secondary" onClick={() => setEditingSubject(editingSubject === si ? null : si)} >
-                                {editingSubject === si ? "Done" : "Edit Subject"}
+                            <button className="button-secondary" onClick={() => setEditingSubject(editingSubject === subjectIndex ? null : subjectIndex)}>
+                                {editingSubject === subjectIndex ? "Done" : "Edit Subject"}
                             </button>
 
-                            <Trash2 size={16} className="text-red-500 cursor-pointer" onClick={() => setDeleteSubjectIndex(si)} />
+                            <Trash2 size={16} className="text-red-500 cursor-pointer" onClick={() => setDeleteSubjectIndex(subjectIndex)} />
                         </div>
                     </div>
 
                     <div className="space-y-2 mt-5 flex flex-wrap gap-5">
-                        {sub.units.map((unit: any, ui: number) => (
-                            <div key={ui}>
+                        {subject.units.map((unit, unitIndex) => (
+                            <div key={unitIndex}>
                                 <div className="flex items-center gap-2">
-                                    <span>{ui + 1}.</span>
+                                    <span>{unitIndex + 1}.</span>
 
-                                    {editingSubject === si ? (
-                                        <input value={unit.title} onChange={(e) => updateUnit(si, ui, e.target.value)} className="border-b mt-3 bg-transparent p-0 shadow-none outline-none" />
+                                    {editingSubject === subjectIndex ? (
+                                        <input
+                                            value={unit.title}
+                                            onChange={(e) => updateUnit(subjectIndex, unitIndex, e.target.value)}
+                                            className="border-b mt-3 bg-transparent p-0 shadow-none outline-none"
+                                        />
                                     ) : (
                                         <span className="font-semibold">
                                             {unit.title}
                                         </span>
                                     )}
 
-                                    {editingSubject === si && (
-                                        <Trash2 size={14} className="text-red-500 cursor-pointer" onClick={() => removeUnit(si, ui)} />
+                                    {editingSubject === subjectIndex && (
+                                        <Trash2 size={14} className="text-red-500 cursor-pointer" onClick={() => removeUnit(subjectIndex, unitIndex)} />
                                     )}
                                 </div>
 
                                 <div className="ml-5 mt-1">
-                                    {editingSubject === si ? (
+                                    {editingSubject === subjectIndex ? (
                                         <input
                                             placeholder="Enter topics"
                                             value={topicsToString(unit.topics)}
                                             onChange={(e) => {
-                                                const s = structuredClone(syllabus);
-                                                s.subjects[si].units[ui].topics = stringToTopics(e.target.value);
-                                                setSyllabus(s);
+                                                if (!syllabus) return;
+                                                const nextSyllabus = structuredClone(syllabus);
+                                                nextSyllabus.subjects[subjectIndex].units[unitIndex].topics = stringToTopics(e.target.value);
+                                                setSyllabus(nextSyllabus);
                                             }}
                                             className="border-b mt-2 bg-transparent p-0 shadow-none outline-none text-sm w-full"
                                         />
                                     ) : (
                                         <span className="text-sm text-gray-500">
-                                            {topicsToString(unit.topics) ||
-                                                "No topics added yet"}
+                                            {topicsToString(unit.topics) || "No topics added yet"}
                                         </span>
                                     )}
                                 </div>
                             </div>
                         ))}
 
-                        {editingSubject === si && (
-                            <button className="mt-3" onClick={() => addUnit(si)} >
+                        {editingSubject === subjectIndex && (
+                            <button className="mt-3" onClick={() => addUnit(subjectIndex)}>
                                 + Add Unit
                             </button>
                         )}
@@ -260,7 +339,7 @@ export default function SyllabusManager() {
             </button>
 
             <div className="flex md:hidden w-full mt-5">
-                <button onClick={save} disabled={!hasChanges} className={!hasChanges ? "opacity-70 cursor-not-allowed w-full" : "w-full"} >
+                <button onClick={save} disabled={!hasChanges} className={!hasChanges ? "opacity-70 cursor-not-allowed w-full" : "w-full"}>
                     Save syllabus
                 </button>
             </div>

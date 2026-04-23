@@ -1,52 +1,66 @@
+import fs from "fs";
 import Syllabus from "../models/syllabus.model.js";
-import cloudinary from "../config/cloudinary.js";
 import { extractTextFromFile } from "../services/ocr.service.js";
 import { parseSyllabus } from "../services/syllabusParser.service.js";
-import fs from "fs";
 
 export const uploadSyllabus = async (req, res) => {
+    const file = req.file;
+
     try {
         const userId = req.user._id;
-        const file = req.file;
+
         if (!file) {
             return res.status(400).json({
                 success: false,
                 message: "No file uploaded"
             });
         }
-        const upload = await cloudinary.uploader.upload(file.path, {
-            resource_type: "raw",
-        });
-        await fs.promises.unlink(file.path);
-        const syllabus = await Syllabus.create({
-            user: userId, title: file.originalname, fileUrl: upload.secure_url, parsed: false
-        });
-        const rawText = await extractTextFromFile(upload.secure_url);
-        console.log("📄 RAW OCR TEXT:\n", rawText.slice(0, 1000));
+
+        const rawText = await extractTextFromFile(file.path, file.mimetype);
+        console.log("RAW OCR TEXT:\n", rawText.slice(0, 1000));
+
         let subjects = [];
         try {
             subjects = await parseSyllabus(rawText);
         } catch (err) {
             console.error("PARSER FAILED:", err.message);
         }
+
+        const existingSyllabus = await Syllabus.findOne({ user: userId }).sort({ createdAt: -1 });
+        if (existingSyllabus) {
+            await Syllabus.deleteMany({ user: userId, _id: { $ne: existingSyllabus._id } });
+        }
+
+        const syllabus = existingSyllabus || new Syllabus({ user: userId });
+        syllabus.title = file.originalname;
+        syllabus.fileType = file.mimetype === "application/pdf" ? "pdf" : "image";
+        syllabus.fileUrl = undefined;
         syllabus.rawText = rawText;
-        if (subjects && subjects.length > 0) {
-            syllabus.subjects = subjects;
-            syllabus.parsed = true;
-        } else {
+        syllabus.subjects = subjects && subjects.length > 0 ? subjects : [];
+        syllabus.source = "upload";
+        syllabus.parsed = syllabus.subjects.length > 0;
+
+        if (!syllabus.parsed) {
             console.log("No subjects parsed, saving raw only");
         }
+
         await syllabus.save();
-        res.status(200).json({
+
+        return res.status(200).json({
             success: true,
-            syllabus
+            syllabus,
+            overwritten: Boolean(existingSyllabus)
         });
     } catch (error) {
         console.error("UPLOAD ERROR:", error.message);
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
             message: error.message
         });
+    } finally {
+        if (file?.path) {
+            await fs.promises.unlink(file.path).catch(() => null);
+        }
     }
 };
 
@@ -90,7 +104,7 @@ export const updateSyllabus = async (req, res) => {
     try {
         const userId = req.user._id;
         const { _id, subjects } = req.body;
-        const syllabus = await Syllabus.findOne({ _id, user: userId, });
+        const syllabus = await Syllabus.findOne({ _id, user: userId });
         if (!syllabus) {
             return res.status(404).json({
                 success: false,

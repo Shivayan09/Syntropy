@@ -1,32 +1,43 @@
-import axios from "axios";
+import fs from "fs";
 import { createRequire } from "module";
+import Tesseract from "tesseract.js";
 
 const require = createRequire(import.meta.url);
 const pdfParse = require("pdf-parse");
 
-export const extractTextFromFile = async (fileUrl) => {
+const extractTextFromPdf = async (filePath) => {
+    const buffer = await fs.promises.readFile(filePath);
+
+    const pdf = typeof pdfParse === "function"
+        ? pdfParse
+        : pdfParse.default;
+
+    if (typeof pdf !== "function") {
+        throw new Error("pdf-parse not loaded correctly");
+    }
+
+    const data = await pdf(buffer);
+    return data.text || "";
+};
+
+const extractTextFromImage = async (filePath) => {
+    const { data } = await Tesseract.recognize(filePath, "eng");
+    return data?.text || "";
+};
+
+export const extractTextFromFile = async (filePath, mimeType) => {
     try {
-        const response = await axios.get(fileUrl, {
-            responseType: "arraybuffer"
-        });
-
-        const buffer = Buffer.from(response.data);
-
-        // 🔥 ensure correct function reference
-        const pdf = typeof pdfParse === "function"
-            ? pdfParse
-            : pdfParse.default;
-
-        if (typeof pdf !== "function") {
-            throw new Error("pdf-parse not loaded correctly");
+        if (mimeType === "application/pdf") {
+            return await extractTextFromPdf(filePath);
         }
 
-        const data = await pdf(buffer);
+        if (mimeType?.startsWith("image/")) {
+            return await extractTextFromImage(filePath);
+        }
 
-        return data.text || "";
-
+        throw new Error("Unsupported syllabus file type");
     } catch (error) {
-        console.error("❌ PDF PARSE ERROR:", error.message);
+        console.error("OCR EXTRACT ERROR:", error.message);
         return "";
     }
 };

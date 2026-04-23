@@ -46,7 +46,7 @@ export default function Education() {
           Educational Info
         </h1>
         <p className="text-sm opacity-70 mt-2">
-          Manage your academic details
+          Manage your academic details and keep your syllabus up to date
         </p>
       </div>
 
