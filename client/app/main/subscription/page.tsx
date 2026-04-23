@@ -3,20 +3,7 @@
 import { useMemo, useState } from "react";
 import Script from "next/script";
 import { toast } from "react-toastify";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Check,
-  Crown,
-  Layers2,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Target,
-  Wallet,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, BadgeCheck, Check, Crown, Layers2, Shield, ShieldCheck, Sparkles, Star, Target, Wallet, Zap, } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type PlanKey = "free" | "starter" | "pro" | "power";
@@ -93,7 +80,7 @@ const plans = [
     key: "starter",
     name: "Starter",
     priceLabel: "₹99/month",
-    quota: "15 AI tests / month",
+    quota: "15 AI tests per month",
     description: "For casual but paying students who want a low-friction study rhythm.",
     features: [
       "15 AI test generations per month",
@@ -109,7 +96,7 @@ const plans = [
     key: "pro",
     name: "Pro",
     priceLabel: "₹249/month",
-    quota: "50 AI tests / month",
+    quota: "50 AI tests per month",
     description: "For serious learners who revise, retest, and improve every week.",
     features: [
       "50 AI test generations per month",
@@ -126,8 +113,8 @@ const plans = [
 const annualOffer = {
   itemKey: "pro_annual" as const,
   name: "Pro Annual",
-  priceLabel: "₹1,999",
-  quota: "50 AI tests per month",
+  priceLabel: "₹1,999 per year",
+  quota: "100 AI tests per month",
   description: "Serious exam-prep students can stay on Pro for a full year with 2 months free.",
 };
 
@@ -252,8 +239,7 @@ export default function PlansPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
   const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const currentPlanKey = (user?.plan || "free") as PlanKey;
-  const currentPlan =
-    useMemo(() => plans.find((plan) => plan.key === currentPlanKey) || plans[0], [currentPlanKey]);
+  const currentPlan = useMemo(() => plans.find((plan) => plan.key === currentPlanKey) || plans[0], [currentPlanKey]);
   const nextPlan = useMemo(() => {
     if (currentPlanKey === "free") return plans.find((plan) => plan.key === "starter");
     if (currentPlanKey === "starter") return plans.find((plan) => plan.key === "pro");
@@ -386,39 +372,49 @@ export default function PlansPage() {
         </section>
 
         <section className="mt-7">
-          <div className="grid gap-8 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
             <div className="card2 flex flex-col gap-6">
+              {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 border border-black bg-primary px-3 py-1 text-white">
                   <CurrentPlanIcon size={16} className="text-white" />
-                  <span className="text-sm font-extrabold uppercase">{currentPlan.name} Plan</span>
+                  <span className="text-sm font-extrabold uppercase">
+                    {currentPlan.name} Plan
+                  </span>
                 </div>
-                <div className="border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase">
+
+                <div className="border border-black bg-[var(--surface)] px-3 py-1 text-xs font-extrabold uppercase">
                   {planMeta[currentPlanKey].status}
                 </div>
               </div>
+
+              {/* Title */}
               <div>
                 <h1 className="text-3xl leading-tight font-extrabold md:text-4xl">
                   Your current setup is tuned for{" "}
-                  <span className="text-primary">consistent practice</span>.
+                  <span className="text-primary">consistent practice</span>
                 </h1>
-
-                <p className="mt-3 max-w-xl text-sm opacity-70">
-                  {planMeta[currentPlanKey].summary} Every test you generate, every review you do,
-                  feeds into a loop designed to improve accuracy and speed.
-                </p>
               </div>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                <StatTile label="AI tests" value={currentPlan.quota} note="included allowance" />
-                <StatTile label="Progress loop" value="Active user" note="test -> review -> improve" />
+
+              {/* Stats (FIXED) */}
+              <div className="grid grid-cols-2 gap-4">
+                <StatTile
+                  label="Progress loop"
+                  value="Active user"
+                  note="test → review → improve"
+                />
+
                 <StatTile
                   label={isPaidPlan ? "Valid till" : "Upgrade path"}
                   value={isPaidPlan ? formatExpiry(user?.planExpiry) : "Starter / Pro"}
                   note={isPaidPlan ? "billing cycle" : "monthly or top-up"}
                 />
               </div>
+
+              {/* Info Box */}
               <div className="border border-dashed border-black bg-(--bg-secondary) p-4">
                 <p className="text-sm font-extrabold">What this means for your prep</p>
+
                 <p className="mt-1 text-sm opacity-70">
                   {currentPlanKey === "free"
                     ? "You can try the product properly, but regular AI practice will need a paid plan or a top-up."
@@ -429,36 +425,70 @@ export default function PlansPage() {
               </div>
             </div>
 
-            <div className="card flex flex-col gap-5">
-              <div>
-                <p className="text-xs font-bold uppercase opacity-60">What you can do right now</p>
-              </div>
-
-              
-
-              {nextPlan && (
-                <div className="border border-dashed border-black bg-(--surface) p-4">
-                  <p className="text-xs font-bold uppercase opacity-60">Next step</p>
-
-                  <p className="mt-1 text-lg font-extrabold">Move to {nextPlan.name}</p>
-
-                  <p className="mt-2 text-sm opacity-70">
-                    Unlock {nextPlan.quota.toLowerCase()} and shorten the gap between practice and
-                    improvement.
+            <div className="flex flex-col gap-6">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-primary">
+                  <Wallet size={18} />
+                  <p className="text-lg font-extrabold uppercase tracking-wider">
+                    Top-up Packs
                   </p>
                 </div>
-              )}
 
-              <div className="grid gap-3">
-                {infoItems.map((item) => (
-                  <MiniPanel
-                    key={item.title}
-                    icon={item.icon}
-                    title={item.title}
-                    note={item.description}
-                  />
+                <span className="text-xs font-bold border border-black px-2 py-1 bg-primary text-white shadow-[2px_2px_0px_black]">
+                  Instant Credits ⚡
+                </span>
+              </div>
+
+              {/* Packs */}
+              <div className="space-y-5">
+                {topUps.map((pack, i) => (
+                  <div
+                    key={pack.itemKey}
+                    className={` group relative flex items-center justify-between gap-4  border-2 border-black bg-(--surface) p-5  shadow-[4px_4px_0px_black] transition-all duration-150`}
+                  >
+                    {/* Highlight Badge */}
+                    {i === 1 && (
+                      <span className="absolute -top-3 left-4 bg-primary text-white text-xs font-extrabold px-2 py-1 border border-black shadow-[2px_2px_0px_black]">
+                        BEST VALUE
+                      </span>
+                    )}
+
+                    {/* Left */}
+                    <div>
+                      <p className="text-xl font-extrabold">{pack.name}</p>
+                      <p className="mt-1 text-sm opacity-70 max-w-55">
+                        {pack.description}
+                      </p>
+
+                      {/* Value Hook */}
+                      <p className="mt-2 text-xs font-bold text-primary">
+                        {i === 1
+                          ? "Most popular choice 🔥"
+                          : "Upgrade your performance"}
+                      </p>
+                    </div>
+
+                    {/* Right */}
+                    <div className="flex flex-col items-end gap-3">
+                      {/* Price */}
+                      <span className="border-2 border-black bg-secondary text-primary px-4 py-1 text-sm font-extrabold shadow-[2px_2px_0px_black]">
+                        {pack.priceLabel}
+                      </span>
+
+                      {/* Button */}
+                      <button
+                        onClick={() => handlePurchase(pack.itemKey)}
+                        disabled={loading === pack.itemKey}
+                        className={` flex items-center justify-center gap-2  px-5 h-10 font-bold border-2 border-black  bg-(--bg-secondary) text-(--text) shadow-[4px_4px_0px_black] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_black] ${loading === pack.itemKey && "opacity-70 cursor-not-allowed"}`}
+                      >
+                        {loading === pack.itemKey ? "Processing..." : "Buy Now →"}
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
+
             </div>
           </div>
         </section>
@@ -480,10 +510,7 @@ export default function PlansPage() {
                 const isLoading = plan.itemKey ? loading === plan.itemKey : false;
 
                 return (
-                  <div
-                    key={plan.key}
-                    className={`${isCurrent ? "card2" : "card"} relative flex h-full flex-col justify-between p-0`}
-                  >
+                  <div key={plan.key} className={`${isCurrent ? "card2" : "card"} relative flex h-full flex-col justify-between p-0`}>
                     <div className="p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -543,9 +570,8 @@ export default function PlansPage() {
                         }
                       }}
                       disabled={isLoading || isCurrent || !plan.itemKey}
-                      className={`w-full gap-2 rounded-none border-x-0 border-b-0 shadow-none hover:translate-x-0 hover:translate-y-0 hover:shadow-none ${
-                        plan.highlighted && !isCurrent ? "" : "button-secondary"
-                      }`}
+                      className={`w-full gap-2 rounded-none border-x-0 border-b-0 shadow-none hover:translate-x-0 hover:translate-y-0 hover:shadow-none ${plan.highlighted && !isCurrent ? "" : "button-secondary"
+                        }`}
                     >
                       {isLoading ? "Processing..." : isCurrent ? "Current plan" : plan.cta}
                       {plan.itemKey && !isCurrent && <ArrowRight size={17} />}
@@ -557,7 +583,7 @@ export default function PlansPage() {
           </div>
         </section>
 
-        <section className="mt-10 grid gap-5 xl:grid-cols-[1fr_1fr]">
+        <section className="mt-10">
           <div className="card2 flex flex-col gap-5">
             <div className="flex items-center gap-2 text-primary">
               <Star size={18} />
@@ -594,39 +620,7 @@ export default function PlansPage() {
             </button>
           </div>
 
-          <div className="card flex flex-col gap-5">
-            <div className="flex items-center gap-2 text-primary">
-              <Wallet size={18} />
-              <p className="text-sm font-bold uppercase">Top-up packs</p>
-            </div>
 
-            <div className="space-y-3">
-              {topUps.map((pack) => (
-                <div
-                  key={pack.itemKey}
-                  className="flex items-start justify-between gap-4 border border-(--border) bg-(--bg-secondary) p-4"
-                >
-                  <div>
-                    <p className="text-lg font-extrabold">{pack.name}</p>
-                    <p className="mt-1 text-sm opacity-70">{pack.description}</p>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-3">
-                    <span className="border border-black bg-(--surface) px-3 py-1 text-sm font-extrabold">
-                      {pack.priceLabel}
-                    </span>
-                    <button
-                      onClick={() => handlePurchase(pack.itemKey)}
-                      disabled={loading === pack.itemKey}
-                      className="button-secondary gap-2"
-                    >
-                      {loading === pack.itemKey ? "Processing..." : "Buy now"}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
 
         <div className="mt-10 text-center text-sm opacity-60">
@@ -649,7 +643,7 @@ function StatTile({
   note: string;
 }) {
   return (
-    <div className="border border-(--border) p-5">
+    <div className="card">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-bold opacity-60">{label}</p>
       </div>

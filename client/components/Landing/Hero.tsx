@@ -5,8 +5,11 @@ import {
     ArrowRight,
     BookOpenCheck,
     BrainCircuit,
+    ClipboardList,
+    Pen,
     TimerReset,
     Trophy,
+    Wand,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -77,7 +80,7 @@ export default function Hero() {
                             desc: "Parse subjects and units once, then reuse them while creating tests.",
                         },
                         {
-                            icon: BrainCircuit,
+                            icon: ClipboardList,
                             title: "Generate tests",
                             desc: "Set difficulty, duration, marks, and student context for AI papers.",
                         },
