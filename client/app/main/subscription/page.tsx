@@ -383,7 +383,7 @@ export default function PlansPage() {
                   </span>
                 </div>
 
-                <div className="border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase">
+                <div className="border border-black bg-[var(--surface)] px-3 py-1 text-xs font-extrabold uppercase">
                   {planMeta[currentPlanKey].status}
                 </div>
               </div>
