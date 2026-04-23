@@ -11,7 +11,6 @@ const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
-const hashResetToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 
 const validateRegistrationInput = ({ name, email, phoneNumber, password }, requirePassword = true) => {
     if (!name) {
@@ -281,31 +280,25 @@ export const forgotPassword = async (req, res) => {
         if (!email) {
             return res.json({ success: false, message: "Please enter your email!" });
         }
-        if (!validator.isEmail(email)) {
-            return res.status(400).json({ success: false, message: "Please enter a valid email!" });
-        }
 
-        const normalizedEmail = normalizeEmail(email);
-        const resetResponse = {
-            success: true,
-            message: "If an account exists for that email, a password reset link has been sent."
-        };
-
-        const user = await User.findOne({ email: normalizedEmail });
+        const user = await User.findOne({ email });
         if (!user) {
-            return res.status(200).json(resetResponse);
+            return res.status(404).json({ success: false, message: "User not found!" });
         }
 
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
 
-        user.resetToken = hashResetToken(resetToken);
+        user.resetToken = resetToken;
         user.resetTokenExpiry = resetTokenExpiry;
         await user.save({ validateBeforeSave: false });
 
         await sendResetEmail(user.email, resetToken);
 
-        return res.status(200).json(resetResponse);
+        return res.status(200).json({
+            success: true,
+            message: "Password reset email sent successfully",
+        });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
@@ -333,10 +326,8 @@ export const resetPassword = async (req, res) => {
             return res.json({ success: false, message: "Please provide token and new password!" });
         }
 
-        const hashedResetToken = hashResetToken(resetToken);
-
         const user = await User.findOne({
-            resetToken: hashedResetToken,
+            resetToken,
             resetTokenExpiry: { $gt: Date.now() }
         });
 
