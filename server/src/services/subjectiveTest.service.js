@@ -21,7 +21,7 @@ function generateDistribution(totalMarks) {
     }
 
     return Object.entries(result)
-        .filter(([_, count]) => count > 0)
+        .filter(([, count]) => count > 0)
         .map(([marks, count]) => ({ marks: Number(marks), count }));
 }
 

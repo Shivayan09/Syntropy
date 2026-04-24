@@ -112,11 +112,11 @@ Return JSON:
         }
 
     } catch (err) {
-        throw new Error("AI returned invalid JSON");
+        throw new Error("AI returned invalid JSON", { cause: err });
     }
 
     const formattedQuestions = parsed
-        .map((q, idx) => {
+        .map((q) => {
             if (!q?.question || !Array.isArray(q?.options) || q.options.length !== 4) {
                 return null;
             }

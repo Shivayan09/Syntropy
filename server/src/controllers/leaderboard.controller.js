@@ -1,5 +1,4 @@
 import Attempt from "../models/attempt.model.js";
-import User from "../models/user.model.js";
 
 export const getLeaderboard = async (req, res) => {
   try {
