@@ -1,21 +1,18 @@
 "use client";
 
+import Image from "next/image";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import {
   ArrowRight,
-  BookOpenCheck,
   Camera,
   Crown,
-  GraduationCap,
   Mail,
   Phone,
   Save,
   Settings,
-  Target,
-  UserRound,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
@@ -264,12 +261,14 @@ export default function Profile() {
                     photo
                   </div>
                 )}
-                <img
+                <Image
                   alt={`${form.name || "User"} avatar`}
                   src={
                     form.avatar ||
                     `https://picsum.photos/seed/${encodeURIComponent(form.email || form.name || "user")}/200`
                   }
+                  fill
+                  unoptimized
                   onLoad={() => setImgLoaded(true)}
                   className={`h-full w-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
                 />

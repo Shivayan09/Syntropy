@@ -2,14 +2,10 @@
 
 import {
     ArrowDown,
-    ArrowRight,
     BookOpenCheck,
-    BrainCircuit,
     ClipboardList,
-    Pen,
     TimerReset,
     Trophy,
-    Wand,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 

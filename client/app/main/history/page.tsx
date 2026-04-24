@@ -3,9 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
-  CalendarDays,
   CheckCircle2,
-  Clock3,
   FileQuestion,
   History,
   ListFilter,
@@ -42,15 +40,6 @@ const formatDate = (value?: string) => {
     day: "numeric",
     month: "short",
     year: "numeric",
-  });
-};
-
-const formatTime = (value?: string) => {
-  if (!value) return "";
-
-  return new Date(value).toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
   });
 };
 

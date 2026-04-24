@@ -26,6 +26,8 @@ export default function CreateAITest() {
     const router = useRouter();
     const { user, getMe } = useAuth();
     const { tokenStatus, refreshTokenStatus, setTokenStatus } = useAiTokens();
+    const preferredDifficulty = user?.preferences?.difficulty || "Medium";
+    const preferredQuestions = Math.min(user?.preferences?.questionsPerTest || 20, MAX_GENERATED_QUESTIONS);
 
     // ✅ NEW
     const [testFormat, setTestFormat] = useState<TestFormat>("mcq");
@@ -34,8 +36,8 @@ export default function CreateAITest() {
     const [subjects, setSubjects] = useState<string[]>([]);
     const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
     const [input, setInput] = useState("");
-    const [difficulty, setDifficulty] = useState<Difficulty>("Medium");
-    const [questions, setQuestions] = useState(20);
+    const [difficulty, setDifficulty] = useState<Difficulty>(preferredDifficulty);
+    const [questions, setQuestions] = useState(preferredQuestions);
     const [time, setTime] = useState(30);
     const [loading, setLoading] = useState(false);
     const [topicFocus, setTopicFocus] = useState("");
@@ -58,13 +60,6 @@ export default function CreateAITest() {
         };
         fetchSyllabus();
     }, [BACKEND_URL]);
-
-    useEffect(() => {
-        if (user?.preferences) {
-            setDifficulty(user.preferences.difficulty || "Medium");
-            setQuestions(Math.min(user.preferences.questionsPerTest || 20, MAX_GENERATED_QUESTIONS));
-        }
-    }, [user]);
 
     const addSubject = () => {
         const val = input.trim();

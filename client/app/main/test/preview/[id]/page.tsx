@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpenCheck,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -13,7 +12,6 @@ import {
   FileQuestion,
   Gauge,
   Layers3,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";

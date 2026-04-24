@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MessageSquare, HelpCircle, ChevronDown } from "lucide-react";
 
@@ -37,11 +37,11 @@ export default function SupportPage() {
         message: "",
     });
 
-    const handleChange = (e: any) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         // TODO: connect backend

@@ -17,7 +17,7 @@ export default function OnboardingRoute({ children }: { children: React.ReactNod
                 router.replace("/main/dashboard");
             }
         }
-    }, [user, loading]);
+    }, [user, loading, router]);
     if (loading) {
         return <Loader />;
     }

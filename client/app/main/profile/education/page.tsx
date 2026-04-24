@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Loader2 from "@/components/utils/Loader2";
 import SyllabusManager from "@/components/main/SyllabusManager";
@@ -14,21 +14,11 @@ type EducationForm = {
 export default function Education() {
   const { user, loading } = useAuth();
 
-  const [form, setForm] = useState<EducationForm>({
-    college: "",
-    semester: "",
-    targetRole: "",
-  });
-
-  useEffect(() => {
-    if (!user) return;
-
-    setForm({
-      college: user.college || "",
-      semester: user.semester?.toString() || "",
-      targetRole: user.preferences?.targetRole || "",
-    });
-  }, [user]);
+  const [form, setForm] = useState<EducationForm>(() => ({
+    college: user?.college || "",
+    semester: user?.semester?.toString() || "",
+    targetRole: user?.preferences?.targetRole || "",
+  }));
 
   const getSemesterLabel = (num: number) => {
     if (num === 1) return "1st semester";

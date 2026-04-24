@@ -35,8 +35,6 @@ export default function Steps() {
                             icon: LineChart,
                         },
                     ].map((step, i) => {
-                        const Icon = step.icon;
-
                         return (
                             <div
                                 key={step.title}

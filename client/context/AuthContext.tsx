@@ -1,7 +1,7 @@
 "use client";
 
 import Loader from "@/components/utils/Loader";
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 
 type User = {
   _id: string;
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const getMe = async () => {
+  const getMe = useCallback(async () => {
     try {
       const res = await fetch(process.env.NEXT_PUBLIC_BACKEND_URL + "/api/auth/getMe", { credentials: "include" });
       if (!res.ok) {
@@ -49,11 +49,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     }
     setLoading(false);
-  };
+  }, []);
 
   useEffect(() => {
-    getMe();
-  }, []);
+    void Promise.resolve().then(getMe);
+  }, [getMe]);
 
   if (loading) {
     return <Loader />;

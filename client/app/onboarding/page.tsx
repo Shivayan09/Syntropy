@@ -2,6 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { FileImage, FileText, Sparkles, UploadCloud } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, ChangeEvent, DragEvent } from "react";
 import { toast } from "react-toastify";
@@ -258,7 +259,7 @@ export default function Onboarding() {
             <div className="hidden md:flex w-[60%] py-5 flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-3">
-                    <img src="/logo.png" className="h-7" />
+                    <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
                     <p className="text-sm font-bold text-primary">syntropy</p>
                 </div>
 

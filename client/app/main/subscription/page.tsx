@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Script from "next/script";
 import { toast } from "react-toastify";
-import { ArrowRight, BadgeCheck, Check, Crown, Layers2, Shield, ShieldCheck, Sparkles, Star, Target, Wallet, Zap, } from "lucide-react";
+import { ArrowRight, Check, Crown, Shield, ShieldCheck, Sparkles, Star, Wallet, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type PlanKey = "free" | "starter" | "pro" | "power";
@@ -162,24 +162,6 @@ const planMeta = {
   },
 } as const;
 
-const infoItems = [
-  {
-    title: "Retention-first access",
-    description: "Usage value, exam rhythm, and plan clarity are visible at a glance.",
-    icon: BadgeCheck,
-  },
-  {
-    title: "Upgrade with context",
-    description: "The current tier stays anchored while stronger plans show the practical jump.",
-    icon: Layers2,
-  },
-  {
-    title: "Mock-test relevant",
-    description: "Everything is framed around tests, review depth, pace, and consistency.",
-    icon: Target,
-  },
-] as const;
-
 const offerMeta = {
   starter_monthly: {
     name: "Starter",
@@ -240,11 +222,6 @@ export default function PlansPage() {
   const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const currentPlanKey = (user?.plan || "free") as PlanKey;
   const currentPlan = useMemo(() => plans.find((plan) => plan.key === currentPlanKey) || plans[0], [currentPlanKey]);
-  const nextPlan = useMemo(() => {
-    if (currentPlanKey === "free") return plans.find((plan) => plan.key === "starter");
-    if (currentPlanKey === "starter") return plans.find((plan) => plan.key === "pro");
-    return null;
-  }, [currentPlanKey]);
   const CurrentPlanIcon = planMeta[currentPlanKey].icon;
   const isPaidPlan = currentPlanKey !== "free";
   const currentRank = getPlanRank(currentPlanKey);
@@ -653,22 +630,3 @@ function StatTile({
   );
 }
 
-function MiniPanel({
-  icon: Icon,
-  title,
-  note,
-}: {
-  icon: typeof Star;
-  title: string;
-  note: string;
-}) {
-  return (
-    <div className="card border border-(--border) bg-(--surface) p-4">
-      <div className="mb-3 flex items-center gap-2 text-primary">
-        <Icon size={18} />
-        <p className="text-sm font-extrabold">{title}</p>
-      </div>
-      <p className="text-sm opacity-70">{note}</p>
-    </div>
-  );
-}

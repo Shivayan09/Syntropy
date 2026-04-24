@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
 import { useState } from "react";
@@ -11,6 +12,7 @@ export default function ForgotPassword() {
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+    const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : "Something went wrong";
 
     const handleForgotPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,9 +33,9 @@ export default function ForgotPassword() {
             }
 
             toast.success("Password reset link sent to your email");
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            toast.error("Something went wrong");
+            toast.error(getErrorMessage(error));
         } finally {
             setLoading(false);
         }
@@ -44,7 +46,7 @@ export default function ForgotPassword() {
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
-                    <img src="/logo.png" alt="" className="h-7" />
+                    <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
                     <p className="text-sm font-bold text-primary">
                         syntropy
                     </p>
@@ -65,7 +67,7 @@ export default function ForgotPassword() {
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>
@@ -87,7 +89,7 @@ export default function ForgotPassword() {
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>

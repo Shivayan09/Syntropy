@@ -4,13 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowRight,
-  BarChart3,
-  CheckCircle2,
-  CircleX,
-  Clock3,
   FileQuestion,
-  ListChecks,
-  RotateCcw,
   Target,
   Trophy,
 } from "lucide-react";

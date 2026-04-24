@@ -16,7 +16,7 @@ export default function AuthRoute({ children, }: { children: React.ReactNode }) 
                 router.replace("/main/dashboard");
             }
         }
-    }, [user, loading]);
+    }, [user, loading, router]);
     if (loading) {
         return <Loader />;
     }

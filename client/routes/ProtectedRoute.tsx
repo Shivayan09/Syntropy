@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
         } else if (!loading && user && !user.onboardingCompleted) {
             router.replace("/onboarding");
         }
-    }, [user, loading]);
+    }, [user, loading, router]);
     if (loading) {
         return <Loader />;
     }

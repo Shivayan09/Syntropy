@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   BarChart3,
-  BookOpenCheck,
   BrainCircuit,
   CalendarDays,
-  ClipboardPen,
   Clock3,
   Flame,
   Target,

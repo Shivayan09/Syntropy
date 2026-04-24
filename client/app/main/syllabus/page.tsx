@@ -1,18 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Loader2 from "@/components/utils/Loader2";
+
+type SyllabusTopic = {
+  name: string;
+};
+
+type SyllabusUnit = {
+  title: string;
+  topics: SyllabusTopic[];
+};
+
+type SyllabusSubject = {
+  name: string;
+  units?: SyllabusUnit[];
+};
+
+type SyllabusItem = {
+  _id: string;
+  title: string;
+  units?: SyllabusUnit[];
+  subjects?: SyllabusSubject[];
+};
+
+type SyllabusResponse = {
+  syllabus?: SyllabusItem[];
+};
 
 export default function SyllabusPage() {
   const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [syllabus, setSyllabus] = useState<any[]>([]);
-  const [active, setActive] = useState<any>(null);
+  const [syllabus, setSyllabus] = useState<SyllabusItem[]>([]);
+  const [active, setActive] = useState<SyllabusItem | null>(null);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const fetchSyllabus = async () => {
+  const fetchSyllabus = useCallback(async () => {
     try {
       const res = await fetch(
         BACKEND_URL + "/api/syllabus/my",
@@ -21,9 +46,9 @@ export default function SyllabusPage() {
 
       const text = await res.text();
 
-      let data;
+      let data: SyllabusResponse;
       try {
-        data = JSON.parse(text);
+        data = JSON.parse(text) as SyllabusResponse;
       } catch {
         console.error("Invalid JSON:", text);
         data = { syllabus: [] };
@@ -36,11 +61,11 @@ export default function SyllabusPage() {
     } finally {
       setInitialLoading(false);
     }
-  };
+  }, [BACKEND_URL]);
 
   useEffect(() => {
-    fetchSyllabus();
-  }, []);
+    void fetchSyllabus();
+  }, [fetchSyllabus]);
 
   const upload = async () => {
     if (!file) return;
@@ -69,7 +94,7 @@ export default function SyllabusPage() {
       }
 
       setFile(null);
-      fetchSyllabus();
+      void fetchSyllabus();
 
     } catch (err) {
       console.error(err);
@@ -169,14 +194,14 @@ export default function SyllabusPage() {
           </div>
 
           <div className="space-y-5">
-            {active.subjects?.map((subject: any, si: number) => (
+            {active.subjects?.map((subject: SyllabusSubject, si: number) => (
   <div key={si} className="space-y-4">
 
     <p className="font-extrabold text-lg">
       {subject.name}
     </p>
 
-    {subject.units?.map((unit: any, i: number) => (
+    {subject.units?.map((unit: SyllabusUnit, i: number) => (
       <div key={i} className="card">
 
         <p className="font-extrabold mb-3">
@@ -184,7 +209,7 @@ export default function SyllabusPage() {
         </p>
 
         <div className="grid md:grid-cols-2 gap-2">
-          {unit.topics.map((t: any, j: number) => (
+          {unit.topics.map((t: SyllabusTopic, j: number) => (
             <div key={j} className="border p-2 text-sm">
               {t.name}
             </div>

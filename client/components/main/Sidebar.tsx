@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 import {
   BarChart3,
   BookOpen,
@@ -14,7 +15,6 @@ import {
   PanelLeft,
   Trophy,
   Crown,
-  Contact,
   Headphones
 } from "lucide-react";
 
@@ -182,7 +182,7 @@ export default function Sidebar({
           )}
 
           {!collapsed && <div className="flex items-center gap-1 mb-7 ml-2">
-            <img src="/logo.png" className="h-7" />
+            <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
 
             <span onClick={() => router.push('/')} className={`cursor-pointer font-extrabold text-primary text-xl whitespace-nowrap transition-all duration-200 ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
               syntropy

@@ -31,7 +31,7 @@ export default function DeleteModal({
             window.addEventListener("keydown", handleEsc);
         }
         return () => window.removeEventListener("keydown", handleEsc);
-    }, [open]);
+    }, [open, onClose]);
 
     if (!open) {
         return null;

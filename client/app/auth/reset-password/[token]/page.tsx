@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3, Eye, EyeOff } from "lucide-react";
@@ -67,7 +68,7 @@ export default function ResetPasswordPage({
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
-                    <img src="/logo.png" alt="" className="h-7" />
+                    <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
                     <p className="text-sm font-bold text-primary">
                         syntropy
                     </p>
@@ -88,7 +89,7 @@ export default function ResetPasswordPage({
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>
@@ -110,7 +111,7 @@ export default function ResetPasswordPage({
                             <div>
                                 <p className="font-bold">Target Weak Areas</p>
                                 <p className="text-sm text-gray-600">
-                                    Identify exactly where you're losing marks.
+                                    Identify exactly where you&apos;re losing marks.
                                 </p>
                             </div>
                         </div>
