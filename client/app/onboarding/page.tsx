@@ -1,8 +1,9 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { FileImage, FileText, Sparkles, UploadCloud } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, ChangeEvent } from "react";
+import { useEffect, useState, ChangeEvent, DragEvent } from "react";
 import { toast } from "react-toastify";
 
 type Preferences = {
@@ -27,6 +28,12 @@ const steps = [
     "Finish",
 ];
 
+const syllabusProcessingSteps = [
+    "Your file is being processed",
+    "Syllabus is being extracted",
+    "Syllabus is being saved in your profile",
+];
+
 export default function Onboarding() {
     const [step, setStep] = useState(1);
     const totalSteps = steps.length;
@@ -48,9 +55,30 @@ export default function Onboarding() {
 
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const [processingStep, setProcessingStep] = useState(0);
+
+    useEffect(() => {
+        if (!loading || step !== 4) return;
+
+        setProcessingStep(0);
+        const interval = window.setInterval(() => {
+            setProcessingStep((current) =>
+                current < syllabusProcessingSteps.length - 1 ? current + 1 : current
+            );
+        }, 1400);
+
+        return () => window.clearInterval(interval);
+    }, [loading, step]);
 
     const next = () => setStep((s) => Math.min(s + 1, totalSteps));
     const back = () => setStep((s) => Math.max(s - 1, 1));
+
+    const acceptFile = (nextFile: File | null) => {
+        if (!nextFile) return;
+        setFile(nextFile);
+        setDragActive(false);
+    };
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -59,6 +87,22 @@ export default function Onboarding() {
             ...prev,
             [name]: name === "semester" ? Number(value) : value,
         }));
+    };
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        acceptFile(e.target.files?.[0] || null);
+    };
+
+    const handleDragState = (event: DragEvent<HTMLLabelElement>, active: boolean) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setDragActive(active);
+    };
+
+    const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        acceptFile(event.dataTransfer.files?.[0] || null);
     };
 
     const handlePref = (key: keyof Preferences, value: string | number) => {
@@ -344,8 +388,109 @@ export default function Onboarding() {
 
                             {step === 4 && (
                                 <div className="flex flex-col gap-5">
-                                    <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-                                    {file && <p className="text-sm">{file.name}</p>}
+                                    {loading ? (
+                                        <div className="card2 space-y-4">
+                                            <div className="flex items-start gap-4">
+                                                <div className="grid h-12 w-12 shrink-0 place-items-center border border-black bg-primary text-white">
+                                                    <Sparkles size={22} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-sm font-bold uppercase text-primary">Preparing your syllabus</p>
+                                                    <h3 className="mt-1 text-xl font-extrabold">
+                                                        {syllabusProcessingSteps[processingStep]}
+                                                    </h3>
+                                                    <p className="mt-2 text-sm opacity-70">
+                                                        Sit tight while we turn your upload into a clean, editable syllabus structure.
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                <div className="h-3 border border-(--border) bg-(--surface)">
+                                                    <div
+                                                        className="h-full bg-primary transition-all duration-700"
+                                                        style={{ width: `${((processingStep + 1) / syllabusProcessingSteps.length) * 100}%` }}
+                                                    />
+                                                </div>
+
+                                                <div className="grid gap-2">
+                                                    {syllabusProcessingSteps.map((message, index) => {
+                                                        const completed = index < processingStep;
+                                                        const active = index === processingStep;
+
+                                                        return (
+                                                            <div
+                                                                key={message}
+                                                                className={`flex items-center gap-3 border px-3 py-2 text-sm transition ${active
+                                                                    ? "border-black bg-primary text-white shadow-[3px_3px_0px_black]"
+                                                                    : completed
+                                                                        ? "border-(--border) bg-(--bg-secondary)"
+                                                                        : "border-(--border) bg-(--surface) opacity-60"
+                                                                    }`}
+                                                            >
+                                                                <span className={`h-2.5 w-2.5 rounded-full ${active ? "bg-white animate-pulse" : completed ? "bg-primary" : "bg-(--border)"}`} />
+                                                                <span className="font-semibold">{message}</span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <label
+                                                htmlFor="onboarding-syllabus-upload"
+                                                onDragEnter={(event) => handleDragState(event, true)}
+                                                onDragOver={(event) => handleDragState(event, true)}
+                                                onDragLeave={(event) => handleDragState(event, false)}
+                                                onDrop={handleDrop}
+                                                className={`block cursor-pointer border p-5 transition ${dragActive
+                                                    ? "bg-primary text-white shadow-[6px_6px_0px_black]"
+                                                    : "bg-(--bg-secondary) shadow-[4px_4px_0px_black]"
+                                                    }`}
+                                            >
+                                                <input
+                                                    id="onboarding-syllabus-upload"
+                                                    type="file"
+                                                    accept=".pdf,image/*"
+                                                    onChange={handleFileChange}
+                                                    className="hidden"
+                                                />
+
+                                                <div className="flex items-start gap-4">
+                                                    <div className={`grid h-12 w-12 shrink-0 place-items-center border ${dragActive ? "border-white bg-white text-black" : "border-(--border) bg-(--surface) text-primary"}`}>
+                                                        <UploadCloud size={22} />
+                                                    </div>
+
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-bold uppercase opacity-70">Syllabus Upload</p>
+                                                        <h3 className="mt-1 text-xl font-extrabold">Drop your PDF or image here</h3>
+                                                        <p className="mt-2 text-sm opacity-75">
+                                                            Drag and drop your syllabus, or tap to browse files from your device.
+                                                        </p>
+
+                                                        <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase">
+                                                            <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--surface)"}`}>
+                                                                <FileText size={14} />
+                                                                PDF
+                                                            </span>
+                                                            <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--surface)"}`}>
+                                                                <FileImage size={14} />
+                                                                Image
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            {file && (
+                                                <div className="border border-(--border) bg-(--bg-secondary) p-4 shadow-[4px_4px_0px_black]">
+                                                    <p className="text-xs font-bold uppercase text-primary">Selected file</p>
+                                                    <p className="mt-1 truncate text-sm font-semibold">{file.name}</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
