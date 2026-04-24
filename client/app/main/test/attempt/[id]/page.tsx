@@ -65,6 +65,7 @@ export default function AttemptPage() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [paletteOpen, setPaletteOpen] = useState(false);
 
   const questions = useMemo(() => test?.questions || [], [test]);
   const currentQuestion = questions[current];
@@ -179,6 +180,17 @@ export default function AttemptPage() {
     return () => window.removeEventListener("beforeunload", handleLeave);
   }, []);
 
+  useEffect(() => {
+    if (!paletteOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [paletteOpen]);
+
   const selectOption = (index: number) => {
     setAnswers((prev) => {
       const updated = [...prev];
@@ -213,6 +225,7 @@ export default function AttemptPage() {
 
   const goToQuestion = (index: number) => {
     setCurrent(Math.max(0, Math.min(index, questions.length - 1)));
+    setPaletteOpen(false);
   };
 
   const openSubmitModal = () => {
@@ -240,9 +253,50 @@ export default function AttemptPage() {
   }
 
   return (
-    <div className="grid h-screen overflow-hidden bg-(--bg-secondary) text-(--text) xl:grid-cols-[minmax(0,1fr)_22rem]">
+    <div className="min-h-screen bg-(--bg-secondary) text-(--text) xl:grid xl:h-screen xl:overflow-hidden xl:grid-cols-[minmax(0,1fr)_22rem]">
       <section className="flex min-h-0 flex-col">
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 md:px-8">
+        <div className="sticky top-0 z-20 border-b border-(--border) bg-(--surface) px-4 py-3 shadow-[0_3px_0px_var(--shadow)] xl:hidden">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-xs font-extrabold uppercase text-primary">Mock test attempt</p>
+              <h1 className="truncate text-base font-extrabold">{test.title || "Mock Test"}</h1>
+              <p className="mt-1 text-xs font-bold opacity-65">
+                Question {current + 1} of {questions.length}
+              </p>
+            </div>
+
+            <div className={`shrink-0 border px-3 py-2 text-right ${timeWarning ? "border-primary bg-primary text-white" : "border-(--border) bg-(--bg-secondary)"}`}>
+              <p className="text-[10px] font-bold uppercase opacity-70">Time left</p>
+              <p className="mt-1 flex items-center justify-end gap-1 text-lg font-extrabold">
+                <Clock3 size={16} />
+                {formatTime(timeLeft)}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center justify-between text-[11px] font-bold uppercase opacity-65">
+                <span>Progress</span>
+                <span>{answeredCount}/{questions.length}</span>
+              </div>
+              <div className="h-2 bg-(--bg-secondary)">
+                <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="button-secondary h-10 gap-2 px-4 text-sm"
+              onClick={() => setPaletteOpen(true)}
+            >
+              <Flag size={16} />
+              Palette
+            </button>
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 pb-36 md:px-8 xl:pb-5">
           <div className="mx-auto max-w-5xl space-y-5">
             {timeWarning && (
               <div className="flex items-start gap-3 border border-primary bg-(--surface) p-4 text-sm font-semibold text-(--text)">
@@ -320,7 +374,7 @@ export default function AttemptPage() {
           </div>
         </div>
 
-        <div className="shrink-0 px-4 py-5 md:px-8">
+        <div className="sticky bottom-0 z-20 shrink-0 border-t border-(--border) bg-(--surface) px-4 py-4 shadow-[0_-3px_0px_var(--shadow)] md:px-8 xl:static xl:border-t-0 xl:bg-transparent xl:px-4 xl:py-5 xl:shadow-none">
           <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row">
               <button
@@ -370,7 +424,7 @@ export default function AttemptPage() {
         </div>
       </section>
 
-      <aside className="min-h-0 overflow-y-auto border-t border-(--border) bg-(--surface) p-4 xl:border-l xl:border-t-0 xl:p-5">
+      <aside className="hidden min-h-0 overflow-y-auto border-t border-(--border) bg-(--surface) p-4 xl:block xl:border-l xl:border-t-0 xl:p-5">
         <div className="mb-5 border-b border-(--border) pb-5">
           <p className="mb-1 text-xs font-extrabold uppercase text-primary">Mock test attempt</p>
           <h1 className="truncate text-xl font-extrabold leading-tight">{test.title || "Mock Test"}</h1>
@@ -460,6 +514,25 @@ export default function AttemptPage() {
         </div>
       </aside>
 
+      <MobilePaletteDrawer
+        open={paletteOpen}
+        submitting={submitting}
+        timeWarning={timeWarning}
+        title={test.title || "Mock Test"}
+        timeLeft={timeLeft}
+        answeredCount={answeredCount}
+        unansweredCount={unansweredCount}
+        reviewCount={reviewCount}
+        progress={progress}
+        totalQuestions={questions.length}
+        current={current}
+        answers={answers}
+        markedForReview={markedForReview}
+        onClose={() => setPaletteOpen(false)}
+        onSelectQuestion={goToQuestion}
+        onSubmit={openSubmitModal}
+      />
+
       <SubmitConfirmModal
         open={confirmOpen}
         loading={submitting}
@@ -470,6 +543,142 @@ export default function AttemptPage() {
         onClose={() => setConfirmOpen(false)}
         onConfirm={submitTest}
       />
+    </div>
+  );
+}
+
+function MobilePaletteDrawer({
+  answers,
+  answeredCount,
+  current,
+  markedForReview,
+  onClose,
+  onSelectQuestion,
+  onSubmit,
+  open,
+  progress,
+  reviewCount,
+  submitting,
+  timeLeft,
+  timeWarning,
+  title,
+  totalQuestions,
+  unansweredCount,
+}: {
+  answers: Array<number | string | undefined>;
+  answeredCount: number;
+  current: number;
+  markedForReview: boolean[];
+  onClose: () => void;
+  onSelectQuestion: (index: number) => void;
+  onSubmit: () => void;
+  open: boolean;
+  progress: number;
+  reviewCount: number;
+  submitting: boolean;
+  timeLeft: number;
+  timeWarning: boolean;
+  title: string;
+  totalQuestions: number;
+  unansweredCount: number;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-40 xl:hidden">
+      <div className="absolute inset-0 bg-black/45" onClick={onClose} />
+      <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-hidden rounded-t-[28px] border border-(--border) bg-(--surface) shadow-[0_-4px_0px_var(--shadow)]">
+        <div className="flex items-center justify-between border-b border-(--border) px-4 py-3">
+          <div className="min-w-0">
+            <p className="text-xs font-extrabold uppercase text-primary">Answer sheet</p>
+            <h2 className="truncate text-lg font-extrabold">{title}</h2>
+          </div>
+          <button type="button" className="button-secondary h-10 w-10 px-0" onClick={onClose} aria-label="Close palette">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="max-h-[calc(85vh-4.5rem)] overflow-y-auto px-4 py-4">
+          <div className={`border px-4 py-3 ${timeWarning ? "border-primary bg-primary text-white" : "border-(--border) bg-(--bg-secondary)"}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase opacity-70">Time left</p>
+                <p className="mt-1 flex items-center gap-2 text-2xl font-extrabold">
+                  <Clock3 size={18} />
+                  {formatTime(timeLeft)}
+                </p>
+              </div>
+              <div className="text-right text-xs font-bold uppercase opacity-70">
+                <p>Answered</p>
+                <p className="mt-1 text-base font-extrabold opacity-100">{answeredCount}/{totalQuestions}</p>
+              </div>
+            </div>
+
+            <div className="mt-3 h-2 bg-(--surface)/40">
+              <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+
+          <div className="my-4 grid grid-cols-3 gap-2 text-sm">
+            <div className="border border-(--border) bg-(--bg-secondary) p-3">
+              <p className="font-extrabold text-primary">{answeredCount}</p>
+              <p className="text-xs opacity-60">Done</p>
+            </div>
+            <div className="border border-(--border) bg-(--bg-secondary) p-3">
+              <p className="font-extrabold">{unansweredCount}</p>
+              <p className="text-xs opacity-60">Left</p>
+            </div>
+            <div className="border border-(--border) bg-(--bg-secondary) p-3">
+              <p className="font-extrabold">{reviewCount}</p>
+              <p className="text-xs opacity-60">Review</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+            {Array.from({ length: totalQuestions }).map((_, index) => {
+              const answered = answers[index] !== undefined && answers[index] !== "";
+              const active = current === index;
+              const marked = markedForReview[index];
+
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => onSelectQuestion(index)}
+                  className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${active
+                    ? "bg-black text-white"
+                    : answered
+                      ? "bg-primary text-white"
+                      : marked
+                        ? "button-secondary border-primary bg-(--surface) text-primary"
+                        : "button-secondary bg-(--surface) text-(--text)"
+                    }`}
+                  aria-label={`Go to question ${index + 1}`}
+                >
+                  <span className="flex items-center justify-center gap-1">
+                    {answered ? <CheckCircle2 size={14} /> : marked ? <Bookmark size={13} /> : <Circle size={12} />}
+                    {index + 1}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="sticky bottom-0 mt-4 border-t border-(--border) bg-(--surface) py-4">
+            <button
+              disabled={submitting}
+              className={`w-full gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
+              onClick={() => {
+                onClose();
+                onSubmit();
+              }}
+            >
+              {submitting ? "Submitting" : "Submit test"}
+              <Send size={18} />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
