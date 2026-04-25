@@ -18,20 +18,16 @@ export default function ForgotPassword() {
         e.preventDefault();
         try {
             setLoading(true);
-
             const res = await fetch(BACKEND_URL + "/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email }),
             });
-
             const data = await res.json();
-
             if (!res.ok) {
                 toast.warn(data.message);
                 return;
             }
-
             toast.success("Password reset link sent to your email");
         } catch (error: unknown) {
             console.error(error);
@@ -133,20 +129,10 @@ export default function ForgotPassword() {
                                 <label className="text-sm font-bold mb-1 block">
                                     Email
                                 </label>
-                                <input
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="w-full"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
+                                <input type="email" placeholder="you@example.com" className="w-full" value={email} onChange={(e) => setEmail(e.target.value)} />
                             </div>
 
-                            <button
-                                disabled={loading}
-                                className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-                                type="submit"
-                            >
+                            <button disabled={loading} className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`} type="submit">
                                 {loading ? "Sending..." : "Send Reset Link"}
                             </button>
                         </form>
@@ -155,10 +141,7 @@ export default function ForgotPassword() {
 
                         <p className="text-sm text-center">
                             Remembered your password?{" "}
-                            <span
-                                className="text-primary font-bold cursor-pointer"
-                                onClick={() => router.push("/auth/login")}
-                            >
+                            <span className="text-primary font-bold cursor-pointer" onClick={() => router.push("/auth/login")}>
                                 Back to login
                             </span>
                         </p>
