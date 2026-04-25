@@ -5,8 +5,19 @@ import { getNextTestTitle } from "../utils/testTitle.utils.js";
 
 export async function generateTest(data, userId) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-
     const { subjects, difficulty, questions, time, college, semester } = data;
+    const syllabus = await Syllabus.findOne({ user: userId });
+
+    const syllabusContext = syllabus?.subjects?.map(sub => ({ //syllabus object, has info of subjects and topics of the syllabus
+        subject: sub.name,
+        topics: sub.units.flatMap(unit =>
+            unit.topics.map(t => t.name)
+        )
+    }));
+
+    const filtered = syllabusContext?.filter(s =>
+        subjects.includes(s.subject) //this keeps only the subjects user selected from frontend
+    );
 
     if (!subjects || subjects.length === 0) {
         throw new Error("Subjects required");
@@ -19,7 +30,7 @@ export async function generateTest(data, userId) {
     const perSubject = Math.floor(questions / subjects.length);
     let remaining = questions % subjects.length;
 
-    const distribution = subjects.map((s) => {
+    const distribution = subjects.map((s) => { //converts the array of subjects, no. of ques into eng text
         const count = perSubject + (remaining > 0 ? 1 : 0);
         remaining--;
         return { subject: s, count };
@@ -54,15 +65,28 @@ Generate ${questions} MCQs.
 Student Context:
 - College: ${college || "Not specified"}
 - Semester: ${semester || "Not specified"}
-
-Instructions:
-- Lower semester → conceptual
-- Higher semester → analytical
+- Syllabus : ${JSON.stringify(filtered || syllabusContext)}
 
 Difficulty: ${difficulty}
 
-Distribution:
+Instructions:
+
+- You are given a syllabus containing subjects and their topics.
+- For each subject, generate questions ONLY from the topics listed for that subject.
+- DO NOT create questions outside the provided topics.
+- DO NOT mix topics between subjects.
+- If topics are missing for a subject, generate generic but relevant questions.
+
+- Strictly follow the distribution:
 ${distributionText}
+
+- Lower semester → conceptual questions
+- Higher semester → analytical/problem-solving questions
+
+- Ensure:
+  - Each question belongs to the correct subject
+  - Topic relevance is maintained
+  - No repeated questions
 
 Rules:
 - EXACTLY 4 options per question

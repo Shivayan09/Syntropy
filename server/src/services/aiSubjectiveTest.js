@@ -2,7 +2,6 @@ import Groq from "groq-sdk";
 import Test from "../models/test.model.js";
 import { getNextTestTitle } from "../utils/testTitle.utils.js";
 
-// ===== AUTO DISTRIBUTION =====
 function generateDistribution(totalMarks) {
     let remaining = totalMarks;
     const result = { 1: 0, 2: 0, 5: 0 };
@@ -25,7 +24,6 @@ function generateDistribution(totalMarks) {
         .map(([marks, count]) => ({ marks: Number(marks), count }));
 }
 
-// ===== MAIN GENERATOR =====
 export async function generateSubjectiveTest(data, userId) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
