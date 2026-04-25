@@ -29,10 +29,10 @@ export default function ResetPasswordPage({
             return;
         }
 
-        // if (newPassword.length < 6) {
-        //     toast.warn("Password must be at least 6 characters!");
-        //     return;
-        // }
+        if (newPassword.length < 6) {
+            toast.warn("Password must be at least 6 characters!");
+            return;
+        }
 
         try {
             setLoading(true);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -14,6 +15,9 @@ export default function RegisterPage() {
     const [loading, setLoading] = useState(false);
     const [otp, setOtp] = useState("");
     const [otpVerified, setOtpVerified] = useState(false);
+    const [passwordFeedback, setPasswordFeedback] = useState<string[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -25,9 +29,18 @@ export default function RegisterPage() {
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
     const getErrorMessage = (err: unknown) => err instanceof Error ? err.message : "Something went wrong";
-
     const next = () => setStep((s) => Math.min(s + 1, 3));
     const back = () => setStep((s) => Math.max(s - 1, 1));
+
+    const validatePassword = (value: string) => {
+        let messages: string[] = [];
+        if (value.length < 8) messages.push("Minimum 8 characters");
+        if (!/[A-Z]/.test(value)) messages.push("Add uppercase letter");
+        if (!/[a-z]/.test(value)) messages.push("Add lowercase letter");
+        if (!/[0-9]/.test(value)) messages.push("Add a number");
+        if (!/[!@#$%^&*]/.test(value)) messages.push("Add special character");
+        return messages;
+    };
 
     const handleFormChange = (field: keyof typeof form, value: string) => {
         setForm({ ...form, [field]: value });
@@ -35,12 +48,14 @@ export default function RegisterPage() {
             setOtp("");
             setOtpVerified(false);
         }
+        if (field === "password") {
+            setPasswordFeedback(validatePassword(value));
+        }
     };
 
     const sendOtp = async () => {
         try {
             setLoading(true);
-
             const res = await fetch(BACKEND_URL + "/api/auth/register/send-otp", {
                 method: "POST",
                 headers: {
@@ -54,12 +69,10 @@ export default function RegisterPage() {
                 })
             });
             const data = await res.json();
-
             if (!res.ok) {
                 toast.warn(data.message);
                 return;
             }
-
             toast.success(data.message || "OTP sent");
             next();
         } catch (err: unknown) {
@@ -71,36 +84,34 @@ export default function RegisterPage() {
     };
 
     const verifyOtp = async () => {
-        try {
-            setLoading(true);
-
-            const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    email: form.email,
-                    otp
-                })
-            });
-            const data = await res.json();
-
-            if (!res.ok) {
-                toast.warn(data.message);
-                return;
-            }
-
-            setOtpVerified(true);
-            toast.success(data.message || "OTP verified");
-            next();
-        } catch (err: unknown) {
-            console.error(err);
-            toast.error("Failed to verify OTP");
-        } finally {
-            setLoading(false);
-        }
+        // try {
+        //     setLoading(true);
+        //     const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         },
+        //         credentials: "include",
+        //         body: JSON.stringify({
+        //             email: form.email,
+        //             otp
+        //         })
+        //     });
+        //     const data = await res.json();
+        //     if (!res.ok) {
+        //         toast.warn(data.message);
+        //         return;
+        //     }
+        //     setOtpVerified(true);
+        //     toast.success(data.message || "OTP verified");
+        //     next();
+        // } catch (err: unknown) {
+        //     console.error(err);
+        //     toast.error("Failed to verify OTP");
+        // } finally {
+        //     setLoading(false);
+        // }
+        next();
     };
 
     const handleRegister = async () => {
@@ -110,7 +121,7 @@ export default function RegisterPage() {
         }
 
         if (form.password !== form.confirmPassword) {
-            alert("Passwords do not match");
+            toast.error("Passwords do not match");
             return;
         }
 
@@ -150,7 +161,6 @@ export default function RegisterPage() {
     return (
         <section className="h-screen flex">
 
-            {/* LEFT SIDE */}
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
@@ -223,7 +233,6 @@ export default function RegisterPage() {
                 </div>
             </div>
 
-            {/* RIGHT SIDE */}
             <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">
 
                 <div className="w-full max-w-md relative">
@@ -248,7 +257,6 @@ export default function RegisterPage() {
                             />
                         </div>
 
-                        {/* STEP 1 */}
                         {step === 1 && (
                             <div className="space-y-4">
 
@@ -286,7 +294,6 @@ export default function RegisterPage() {
                             </div>
                         )}
 
-                        {/* STEP 2 */}
                         {step === 2 && (
                             <div className="space-y-4">
 
@@ -317,25 +324,51 @@ export default function RegisterPage() {
                             </div>
                         )}
 
-                        {/* STEP 3 */}
                         {step === 3 && (
                             <div className="space-y-4">
 
-                                <input
-                                    type="password"
-                                    placeholder="Password"
-                                    className="w-full"
-                                    value={form.password}
-                                    onChange={(e) => handleFormChange("password", e.target.value)}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="Password"
+                                        className="w-full pr-10"
+                                        value={form.password}
+                                        onChange={(e) => handleFormChange("password", e.target.value)}
+                                    />
 
-                                <input
-                                    type="password"
-                                    placeholder="Confirm Password"
-                                    className="w-full"
-                                    value={form.confirmPassword}
-                                    onChange={(e) => handleFormChange("confirmPassword", e.target.value)}
-                                />
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                                    </div>
+                                </div>
+                                <div className="text-sm mt-2">
+                                    {form.password.length > 0 && (
+                                        passwordFeedback.length === 0 ? (
+                                            <p className="text-green-600 font-medium">
+                                                Strong password
+                                            </p>
+                                        ) : (
+                                            passwordFeedback.map((msg, i) => (
+                                                <p key={i} className="text-red-500">
+                                                    • {msg}
+                                                </p>
+                                            ))
+                                        )
+                                    )}
+                                </div>
+
+                                <div className="relative">
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        placeholder="Confirm Password"
+                                        className="w-full pr-10"
+                                        value={form.confirmPassword}
+                                        onChange={(e) => handleFormChange("confirmPassword", e.target.value)}
+                                    />
+
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                                        {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                                    </div>
+                                </div>
 
                                 <div className="flex gap-3">
                                     <button className="button-secondary w-1/2" onClick={back}>
