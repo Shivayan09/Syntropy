@@ -78,11 +78,11 @@ export default function AttemptPage() {
   const isMCQ = test?.testFormat === "mcq";
 
   const submitTest = useCallback(async () => {
-    if (submitting || !attemptId) return;
-
+    if (submitting || !attemptId) {
+      return;
+    }
     try {
       setSubmitting(true);
-
       const res = await fetch(BACKEND_URL + "/api/attempt/submit", {
         method: "POST",
         credentials: "include",
@@ -94,10 +94,10 @@ export default function AttemptPage() {
           answers,
         }),
       });
-
       const data = await res.json();
-      if (!res.ok) return;
-
+      if (!res.ok) {
+        return;
+      }
       setConfirmOpen(false);
       router.replace(`/main/test/result/${data.attemptId}`);
     } catch (err) {
@@ -113,25 +113,18 @@ export default function AttemptPage() {
         const res = await fetch(BACKEND_URL + `/api/attempt/${attemptId}`, {
           credentials: "include",
         });
-
         const data = await res.json();
-
         console.log("API RESPONSE:", data);
-
         if (!data || !data.attempt) {
           console.error("Invalid attempt response", data);
           return;
         }
-
         const fetchedAttempt = data.attempt as Attempt;
-
         if (fetchedAttempt.status !== "in_progress") {
           router.replace(`/main/test/result/${fetchedAttempt._id}`);
           return;
         }
-
         const fetchedQuestions = fetchedAttempt.test.questions || [];
-
         setAttempt(fetchedAttempt);
         setTest(fetchedAttempt.test);
         setAnswers(Array(fetchedQuestions.length).fill(undefined));
@@ -142,31 +135,26 @@ export default function AttemptPage() {
         setLoading(false);
       }
     };
-
     if (attemptId) fetchAttempt();
   }, [attemptId, router]);
 
   useEffect(() => {
-    if (!attempt) return;
-
+    if (!attempt) {
+      return;
+    }
     const start = new Date(attempt.startedAt).getTime();
     const duration = attempt.duration * 60 * 1000;
-
     const updateTimer = () => {
       const remaining = start + duration - Date.now();
-
       if (remaining <= 0) {
         setTimeLeft(0);
         submitTest();
         return;
       }
-
       setTimeLeft(Math.floor(remaining / 1000));
     };
-
     updateTimer();
     const interval = window.setInterval(updateTimer, 1000);
-
     return () => window.clearInterval(interval);
   }, [attempt, submitTest]);
 
@@ -175,17 +163,16 @@ export default function AttemptPage() {
       event.preventDefault();
       event.returnValue = "";
     };
-
     window.addEventListener("beforeunload", handleLeave);
     return () => window.removeEventListener("beforeunload", handleLeave);
   }, []);
 
   useEffect(() => {
-    if (!paletteOpen) return;
-
+    if (!paletteOpen) {
+      return;
+    }
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = originalOverflow;
     };
@@ -285,11 +272,7 @@ export default function AttemptPage() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="button-secondary h-10 gap-2 px-4 text-sm"
-              onClick={() => setPaletteOpen(true)}
-            >
+            <button type="button" className="button-secondary h-10 gap-2 px-4 text-sm" onClick={() => setPaletteOpen(true)}>
               <Flag size={16} />
               Palette
             </button>
@@ -338,21 +321,9 @@ export default function AttemptPage() {
                   const selected = answers[current] === index;
 
                   return (
-                    <div
-                      key={`${option}-${index}`}
-                      onClick={() => selectOption(index)}
-                      className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected
-                        ? "bg-primary text-white"
-                        : "button-secondary bg-(--surface) text-(--text)"
-                        }`}
-                    >
+                    <div key={`${option}-${index}`} onClick={() => selectOption(index)} className={`h-auto min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected ? "bg-primary text-white" : "button-secondary bg-(--surface) text-(--text)"}`} >
                       <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
-                        <span
-                          className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected
-                            ? "border-white bg-white text-black"
-                            : "border-(--border) bg-(--bg-secondary)"
-                            }`}
-                        >
+                        <span className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"}`} >
                           {optionLabels[index] || index + 1}
                         </span>
                         <span className="pt-1 text-base font-semibold leading-relaxed">
@@ -363,12 +334,7 @@ export default function AttemptPage() {
                   );
                 })
               ) : (
-                <textarea
-                  value={(answers[current] as string) || ""}
-                  onChange={(e) => setSubjectiveAnswer(e.target.value)}
-                  placeholder="Write your answer..."
-                  className="w-full min-h-40"
-                />
+                <textarea value={(answers[current] as string) || ""} onChange={(e) => setSubjectiveAnswer(e.target.value)} placeholder="Write your answer..." className="w-full min-h-40" />
               )}
             </div>
           </div>
@@ -377,39 +343,24 @@ export default function AttemptPage() {
         <div className="sticky bottom-0 z-20 shrink-0 border-t border-(--border) bg-(--surface) px-4 py-4 shadow-[0_-3px_0px_var(--shadow)] md:px-8 xl:static xl:border-t-0 xl:bg-transparent xl:px-4 xl:py-5 xl:shadow-none">
           <div className="mx-auto flex max-w-5xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row">
-              <button
-                className="button-secondary gap-2"
-                onClick={toggleReview}
-              >
+              <button className="button-secondary gap-2" onClick={toggleReview}>
                 {markedForReview[current] ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
                 {markedForReview[current] ? "Reviewed" : "Mark review"}
               </button>
-              <button
-                className="button-secondary gap-2"
-                onClick={clearAnswer}
-                disabled={answers[current] === undefined}
-              >
+              <button className="button-secondary gap-2" onClick={clearAnswer} disabled={answers[current] === undefined}>
                 <Eraser size={18} />
                 Clear response
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:justify-end">
-              <button
-                className="button-secondary gap-2"
-                onClick={() => goToQuestion(current - 1)}
-                disabled={current === 0}
-              >
+              <button className="button-secondary gap-2" onClick={() => goToQuestion(current - 1)} disabled={current === 0}>
                 <ArrowLeft size={18} />
                 Previous
               </button>
 
               {isLastQuestion ? (
-                <button
-                  disabled={submitting}
-                  className={`gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-                  onClick={openSubmitModal}
-                >
+                <button disabled={submitting} className={`gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`} onClick={openSubmitModal}>
                   {submitting ? "Submitting" : "Submit test"}
                   <Send size={18} />
                 </button>
@@ -480,20 +431,10 @@ export default function AttemptPage() {
             const marked = markedForReview[index];
 
             return (
-              <button
-                key={index}
-                type="button"
-                onClick={() => goToQuestion(index)}
-                className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${active
-                  ? "bg-black text-white"
-                  : answered
-                    ? "bg-primary text-white"
-                    : marked
-                      ? "button-secondary border-primary bg-(--surface) text-primary"
-                      : "button-secondary bg-(--surface) text-(--text)"
-                  }`}
-                aria-label={`Go to question ${index + 1}`}
-              >
+              <button key={index} type="button" onClick={() => goToQuestion(index)}
+                className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none
+                ${active ? "bg-black text-white" : answered ? "bg-primary text-white" : marked ? "button-secondary border-primary bg-(--surface) text-primary" : "button-secondary bg-(--surface) text-(--text)"}`} aria-label={`Go to question ${index + 1}`} >
+
                 <span className="flex items-center justify-center gap-1">
                   {answered ? <CheckCircle2 size={14} /> : marked ? <Bookmark size={13} /> : <Circle size={12} />}
                   {index + 1}
@@ -503,11 +444,7 @@ export default function AttemptPage() {
           })}
         </div>
         <div className="py-5 mt-5 border-t border-(--border)">
-          <button
-            disabled={submitting}
-            className={`gap-2 w-full ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-            onClick={openSubmitModal}
-          >
+          <button disabled={submitting} className={`gap-2 w-full ${submitting ? "cursor-not-allowed opacity-65" : ""}`} onClick={openSubmitModal}>
             {submitting ? "Submitting" : "Submit test"}
             <Send size={18} />
           </button>
@@ -530,8 +467,7 @@ export default function AttemptPage() {
         markedForReview={markedForReview}
         onClose={() => setPaletteOpen(false)}
         onSelectQuestion={goToQuestion}
-        onSubmit={openSubmitModal}
-      />
+        onSubmit={openSubmitModal} />
 
       <SubmitConfirmModal
         open={confirmOpen}
@@ -541,8 +477,7 @@ export default function AttemptPage() {
         totalQuestions={questions.length}
         unansweredCount={unansweredCount}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={submitTest}
-      />
+        onConfirm={submitTest} />
     </div>
   );
 }
@@ -641,20 +576,10 @@ function MobilePaletteDrawer({
               const marked = markedForReview[index];
 
               return (
-                <button
-                  key={index}
-                  type="button"
-                  onClick={() => onSelectQuestion(index)}
-                  className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${active
-                    ? "bg-black text-white"
-                    : answered
-                      ? "bg-primary text-white"
-                      : marked
-                        ? "button-secondary border-primary bg-(--surface) text-primary"
-                        : "button-secondary bg-(--surface) text-(--text)"
-                    }`}
-                  aria-label={`Go to question ${index + 1}`}
-                >
+                <button key={index} type="button" onClick={() => onSelectQuestion(index)}
+                  className={`h-11 rounded-none px-0 text-sm shadow-none hover:transform-none hover:shadow-none
+                  ${active ? "bg-black text-white" : answered ? "bg-primary text-white" : marked ? "button-secondary border-primary bg-(--surface) text-primary" : "button-secondary bg-(--surface) text-(--text)"}`} aria-label={`Go to question ${index + 1}`} >
+
                   <span className="flex items-center justify-center gap-1">
                     {answered ? <CheckCircle2 size={14} /> : marked ? <Bookmark size={13} /> : <Circle size={12} />}
                     {index + 1}
@@ -665,14 +590,7 @@ function MobilePaletteDrawer({
           </div>
 
           <div className="sticky bottom-0 mt-4 border-t border-(--border) bg-(--surface) py-4">
-            <button
-              disabled={submitting}
-              className={`w-full gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`}
-              onClick={() => {
-                onClose();
-                onSubmit();
-              }}
-            >
+            <button disabled={submitting} className={`w-full gap-2 ${submitting ? "cursor-not-allowed opacity-65" : ""}`} onClick={() => { onClose(); onSubmit(); }} >
               {submitting ? "Submitting" : "Submit test"}
               <Send size={18} />
             </button>
@@ -706,15 +624,15 @@ function SubmitConfirmModal({
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !loading) onClose();
     };
-
     if (open) {
       window.addEventListener("keydown", handleEsc);
     }
-
     return () => window.removeEventListener("keydown", handleEsc);
   }, [loading, onClose, open]);
 
-  if (!open) return null;
+  if (!open) {
+    return null;
+  }
 
   const hasUnanswered = unansweredCount > 0;
   const hasReview = reviewCount > 0;
@@ -736,15 +654,11 @@ function SubmitConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/50" onClick={safeClose} />
-      <div
-        className="relative w-full max-w-md rounded-lg border border-primary bg-surface p-6 shadow-lg"
-        onClick={(event) => event.stopPropagation()}
-      >
+      <div className="relative w-full max-w-md rounded-lg border border-primary bg-surface p-6 shadow-lg" onClick={(event) => event.stopPropagation()}>
         <div
           role="button"
           tabIndex={loading ? -1 : 0}
-          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full ${loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-70"
-            }`}
+          className={`absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full ${loading ? "cursor-not-allowed opacity-60" : "cursor-pointer hover:opacity-70"}`}
           onClick={safeClose}
           onKeyDown={(event) => {
             if ((event.key === "Enter" || event.key === " ") && !loading) {
@@ -752,9 +666,8 @@ function SubmitConfirmModal({
               onClose();
             }
           }}
-          aria-disabled={loading}
-          aria-label="Close submit confirmation"
-        >
+          aria-disabled={loading} aria-label="Close submit confirmation" >
+
           <X size={18} />
         </div>
 
