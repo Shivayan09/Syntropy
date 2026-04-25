@@ -5,32 +5,26 @@ import { parseSyllabus } from "../services/syllabusParser.service.js";
 
 export const uploadSyllabus = async (req, res) => {
     const file = req.file;
-
     try {
         const userId = req.user._id;
-
         if (!file) {
             return res.status(400).json({
                 success: false,
                 message: "No file uploaded"
             });
         }
-
         const rawText = await extractTextFromFile(file.path, file.mimetype);
         console.log("RAW OCR TEXT:\n", rawText.slice(0, 1000));
-
         let subjects = [];
         try {
             subjects = await parseSyllabus(rawText);
         } catch (err) {
             console.error("PARSER FAILED:", err.message);
         }
-
         const existingSyllabus = await Syllabus.findOne({ user: userId }).sort({ createdAt: -1 });
         if (existingSyllabus) {
             await Syllabus.deleteMany({ user: userId, _id: { $ne: existingSyllabus._id } });
         }
-
         const syllabus = existingSyllabus || new Syllabus({ user: userId });
         syllabus.title = file.originalname;
         syllabus.fileType = file.mimetype === "application/pdf" ? "pdf" : "image";
@@ -39,13 +33,10 @@ export const uploadSyllabus = async (req, res) => {
         syllabus.subjects = subjects && subjects.length > 0 ? subjects : [];
         syllabus.source = "upload";
         syllabus.parsed = syllabus.subjects.length > 0;
-
         if (!syllabus.parsed) {
             console.log("No subjects parsed, saving raw only");
         }
-
         await syllabus.save();
-
         return res.status(200).json({
             success: true,
             syllabus,

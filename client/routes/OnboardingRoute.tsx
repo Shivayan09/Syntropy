@@ -13,15 +13,12 @@ export default function OnboardingRoute({ children }: { children: React.ReactNod
             if (!user) {
                 router.replace("/auth/login");
             }
-            else if (user.onboardingCompleted) {
-                router.replace("/main/dashboard");
-            }
         }
     }, [user, loading, router]);
     if (loading) {
         return <Loader />;
     }
-    if (!user || user.onboardingCompleted) {
+    if (!user) {
         return null;
     }
     return <>{children}</>;
