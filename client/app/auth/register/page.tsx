@@ -33,7 +33,7 @@ export default function RegisterPage() {
     const back = () => setStep((s) => Math.max(s - 1, 1));
 
     const validatePassword = (value: string) => {
-        let messages: string[] = [];
+        const messages: string[] = [];
         if (value.length < 8) messages.push("Minimum 8 characters");
         if (!/[A-Z]/.test(value)) messages.push("Add uppercase letter");
         if (!/[a-z]/.test(value)) messages.push("Add lowercase letter");
@@ -84,33 +84,33 @@ export default function RegisterPage() {
     };
 
     const verifyOtp = async () => {
-        // try {
-        //     setLoading(true);
-        //     const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json"
-        //         },
-        //         credentials: "include",
-        //         body: JSON.stringify({
-        //             email: form.email,
-        //             otp
-        //         })
-        //     });
-        //     const data = await res.json();
-        //     if (!res.ok) {
-        //         toast.warn(data.message);
-        //         return;
-        //     }
-        //     setOtpVerified(true);
-        //     toast.success(data.message || "OTP verified");
-        //     next();
-        // } catch (err: unknown) {
-        //     console.error(err);
-        //     toast.error("Failed to verify OTP");
-        // } finally {
-        //     setLoading(false);
-        // }
+        try {
+            setLoading(true);
+            const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify({
+                    email: form.email,
+                    otp
+                })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.warn(data.message);
+                return;
+            }
+            setOtpVerified(true);
+            toast.success(data.message || "OTP verified");
+            next();
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error("Failed to verify OTP");
+        } finally {
+            setLoading(false);
+        }
         next();
     };
 
