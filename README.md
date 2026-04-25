@@ -1,4 +1,4 @@
-# <img src="/logo.png" width="45" align="center" /> Syntropy
+# <img src="client/public/logo.png" width="45" align="center" /> Syntropy
 
 syntropy is a full-stack mock test platform for students preparing for semester exams, placements, and other timed assessments. It lets users create manual tests, generate AI-powered tests, attempt them in a timed interface, review results, track performance trends, upload syllabi, and manage AI test credits through paid plans.
 
