@@ -7,7 +7,7 @@ on:
     branches: ["main", "develop"]
 
 jobs:
-  server:
+  build-and-test:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -17,13 +17,17 @@ jobs:
         node-version: [20.x]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: |
+            client/package-lock.json
+            server/package-lock.json
 
       - name: Install server dependencies
         working-directory: server
@@ -40,25 +44,6 @@ jobs:
       - name: Build server
         working-directory: server
         run: npm run build --if-present
-
-
-  client:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: [20.x]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: client/package-lock.json
 
       - name: Install client dependencies
         working-directory: client
