@@ -2,6 +2,7 @@ import Groq from "groq-sdk";
 import Test from "../models/test.model.js";
 import { jsonrepair } from "jsonrepair";
 import { getNextTestTitle } from "../utils/testTitle.utils.js";
+import Syllabus from "../models/syllabus.model.js";
 
 export async function generateTest(data, userId) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
