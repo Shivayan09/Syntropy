@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, DragEvent, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { toast } from "react-toastify";
