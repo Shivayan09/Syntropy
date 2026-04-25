@@ -30,18 +30,17 @@ type SyllabusRecord = {
 
 export default function SyllabusManager() {
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-    const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [syllabus, setSyllabus] = useState<SyllabusRecord | null>(null);
     const [original, setOriginal] = useState<SyllabusRecord | null>(null);
     const [editingSubject, setEditingSubject] = useState<number | null>(null);
     const [fetching, setFetching] = useState(true);
     const [deleteSubjectIndex, setDeleteSubjectIndex] = useState<number | null>(null);
-    const [dragActive, setDragActive] = useState(false);
 
     const fetchSyllabus = useCallback(async () => {
         try {
             setFetching(true);
+            setLoading(true);
             const res = await fetch(BACKEND_URL + "/api/syllabus/my", { credentials: "include" });
             const data = await res.json();
             const currentSyllabus = data.syllabus?.[0] || null;
@@ -51,68 +50,13 @@ export default function SyllabusManager() {
             console.error(err);
         } finally {
             setFetching(false);
+            setLoading(false);
         }
     }, [BACKEND_URL]);
 
     useEffect(() => {
         fetchSyllabus();
     }, [fetchSyllabus]);
-
-    const acceptFile = (nextFile: File | null) => {
-        if (!nextFile) return;
-        setFile(nextFile);
-        setDragActive(false);
-    };
-
-    const upload = async () => {
-        if (!file) {
-            return;
-        }
-
-        const form = new FormData();
-        form.append("file", file);
-        setLoading(true);
-
-        try {
-            const res = await fetch(BACKEND_URL + "/api/syllabus/upload", {
-                method: "POST",
-                body: form,
-                credentials: "include",
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                toast.warn(data.message || "Syllabus upload failed");
-                return;
-            }
-
-            toast.success(data.overwritten ? "Syllabus replaced successfully" : "Syllabus uploaded successfully");
-            setFile(null);
-            await fetchSyllabus();
-        } catch (err) {
-            console.error(err);
-            toast.error("Syllabus upload failed");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        acceptFile(event.target.files?.[0] || null);
-    };
-
-    const handleDragState = (event: DragEvent<HTMLLabelElement>, active: boolean) => {
-        event.preventDefault();
-        event.stopPropagation();
-        setDragActive(active);
-    };
-
-    const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
-        event.preventDefault();
-        event.stopPropagation();
-        acceptFile(event.dataTransfer.files?.[0] || null);
-    };
 
     const update = (updated: SyllabusRecord) => {
         setSyllabus(structuredClone(updated));
