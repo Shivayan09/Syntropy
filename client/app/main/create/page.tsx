@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function CreateTestPage() {
     const router = useRouter();
     const { tokenStatus } = useAiTokens();
-    const { user, getMe } = useAuth();
+    const { user } = useAuth();
 
     return (
         <div className="max-w-5xl mx-auto space-y-8 relative">

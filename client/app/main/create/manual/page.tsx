@@ -46,7 +46,7 @@ export default function Create() {
   const [mcqQuestions, setMcqQuestions] = useState<McqQuestion[]>([createEmptyMcqQuestion()]);
   const [subjectiveQuestions, setSubjectiveQuestions] = useState<SubjectiveQuestion[]>([createEmptySubjectiveQuestion()]);
   const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
-  const { user, getMe } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchSyllabus = async () => {

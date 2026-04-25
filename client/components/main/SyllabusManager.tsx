@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, DragEvent, useCallback, useEffect, useState } from "react";
-import { FileImage, FileText, Sparkles, Trash2, UploadCloud } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { toast } from "react-toastify";
 import DeleteModal from "../modals/DeleteModal";
@@ -216,6 +216,10 @@ export default function SyllabusManager() {
         return (
             <SyllabusUpload onUploadSuccess={fetchSyllabus} />
         );
+    }
+
+    if(loading) {
+        return <Loader2/>
     }
 
     return (

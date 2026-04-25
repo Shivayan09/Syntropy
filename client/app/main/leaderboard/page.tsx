@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3, CheckCircle2, Medal, Search, Trophy, User2, Users } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import Image from 'next/image'
 
 type LeaderboardUser = {
   _id: string;
@@ -140,10 +141,12 @@ export default function LeaderboardPage() {
                     </p>
                     <div>
                       {user.avatar ? (
-                        <img
+                        <Image
                           src={user.avatar}
                           alt={user.name || "User"}
-                          className="h-10 w-10 rounded-full object-cover border"
+                          width={40}
+                          height={40}
+                          className="rounded-full object-cover border"
                         />
                       ) : (
                         <User2 className="h-10 w-10 rounded-full border p-2" />

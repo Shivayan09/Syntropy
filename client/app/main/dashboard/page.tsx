@@ -62,7 +62,7 @@ export default function Dashboard() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
-  const {user, getMe} = useAuth();
+  const {user} = useAuth();
 
   useEffect(() => {
     const fetchAttempts = async () => {
