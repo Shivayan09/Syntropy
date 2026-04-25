@@ -28,11 +28,8 @@ export default function CreateAITest() {
     const { tokenStatus, refreshTokenStatus, setTokenStatus } = useAiTokens();
     const preferredDifficulty = user?.preferences?.difficulty || "Medium";
     const preferredQuestions = Math.min(user?.preferences?.questionsPerTest || 20, MAX_GENERATED_QUESTIONS);
-
-    // ✅ NEW
     const [testFormat, setTestFormat] = useState<TestFormat>("mcq");
     const [totalMarks, setTotalMarks] = useState(MAX_SUBJECTIVE_MARKS);
-
     const [subjects, setSubjects] = useState<string[]>([]);
     const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
     const [input, setInput] = useState("");
@@ -42,7 +39,6 @@ export default function CreateAITest() {
     const [loading, setLoading] = useState(false);
     const [topicFocus, setTopicFocus] = useState("");
     const [mixedSubjects] = useState(true);
-
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
     const hasTokens = tokenStatus?.hasTokens ?? false;
     const tokenStatusUnavailable = !tokenStatus;
@@ -95,8 +91,6 @@ export default function CreateAITest() {
         }
         try {
             setLoading(true);
-
-            // ✅ UPDATED PAYLOAD
             const payload =
                 testFormat === "mcq"
                     ? { subjects, difficulty, questions, time, topicFocus, mixedSubjects, college, semester, testFormat }
@@ -110,9 +104,7 @@ export default function CreateAITest() {
                 credentials: "include",
                 body: JSON.stringify(payload)
             });
-
             const data = await res.json();
-
             if (!res.ok) {
                 toast.warn(data.message);
                 if (data.aiTokenStatus) {
@@ -143,7 +135,14 @@ export default function CreateAITest() {
     }
 
     return (
-        <div className="mx-auto max-w-5xl">
+        <div className="relative">
+
+            {!user?.onboardingCompleted &&
+                <div className="md:absolute mb-5 md:mb-0 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
+                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+                    Add your syllabus in profile for personalized tests
+                </div>
+            }
 
             <div className="mb-5">
                 <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
@@ -159,59 +158,59 @@ export default function CreateAITest() {
                 <p className="font-bold text-lg mb-5">Choose test format :</p>
                 <div className="flex gap-5">
                     <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setTestFormat("mcq")}
-                    onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setTestFormat("mcq");
-                        }
-                    }}
-                    className="card cursor-pointer p-5 text-left"
-                    style={
-                        testFormat === "mcq"
-                            ? {
-                                backgroundColor: "var(--primary)",
-                                color: "white",
-                                borderColor: "var(--primary)",
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setTestFormat("mcq")}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                setTestFormat("mcq");
                             }
-                            : undefined
-                    }
-                >
-                    <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
-                    <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
-                    <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
-                        Generate a focused multiple-choice paper with one correct option per question.
-                    </p>
-                </div>
-                <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setTestFormat("subjective")}
-                    onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setTestFormat("subjective");
+                        }}
+                        className="card cursor-pointer p-5 text-left"
+                        style={
+                            testFormat === "mcq"
+                                ? {
+                                    backgroundColor: "var(--primary)",
+                                    color: "white",
+                                    borderColor: "var(--primary)",
+                                }
+                                : undefined
                         }
-                    }}
-                    className="card cursor-pointer p-5 text-left"
-                    style={
-                        testFormat === "subjective"
-                            ? {
-                                backgroundColor: "var(--primary)",
-                                color: "white",
-                                borderColor: "var(--primary)",
+                    >
+                        <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
+                        <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
+                        <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
+                            Generate a focused multiple-choice paper with one correct option per question.
+                        </p>
+                    </div>
+                    <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setTestFormat("subjective")}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                setTestFormat("subjective");
                             }
-                            : undefined
-                    }
-                >
-                    <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>Subjective Test</p>
-                    <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
-                    <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
-                        Generate descriptive questions with marks-based evaluation for written answers.
-                    </p>
-                </div>
+                        }}
+                        className="card cursor-pointer p-5 text-left"
+                        style={
+                            testFormat === "subjective"
+                                ? {
+                                    backgroundColor: "var(--primary)",
+                                    color: "white",
+                                    borderColor: "var(--primary)",
+                                }
+                                : undefined
+                        }
+                    >
+                        <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>Subjective Test</p>
+                        <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
+                        <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
+                            Generate descriptive questions with marks-based evaluation for written answers.
+                        </p>
+                    </div>
                 </div>
             </section>
 
@@ -228,7 +227,6 @@ export default function CreateAITest() {
                         <p className="font-bold">{difficulty}</p>
                     </div>
 
-                    {/* ✅ CONDITIONAL */}
                     {testFormat === "mcq" && (
                         <div>
                             <p className="text-xs text-gray-500">Questions</p>
@@ -262,7 +260,6 @@ export default function CreateAITest() {
                 </div>
             </div>
 
-            {/* SUBJECTS BLOCK (UNCHANGED) */}
             <div className="mb-7">
                 <p className="font-bold">Subjects</p>
                 {!subjects.length && (
@@ -302,7 +299,6 @@ export default function CreateAITest() {
                 )}
             </div>
 
-            {/* SETTINGS */}
             <div className="grid md:grid-cols-3 gap-10 mb-3">
 
                 <div>
@@ -314,7 +310,6 @@ export default function CreateAITest() {
                     </select>
                 </div>
 
-                {/* MCQ */}
                 {testFormat === "mcq" && (
                     <div>
                         <p className="font-bold mb-3">Questions</p>
@@ -323,7 +318,6 @@ export default function CreateAITest() {
                     </div>
                 )}
 
-                {/* SUBJECTIVE */}
                 {testFormat === "subjective" && (
                     <div>
                         <p className="font-bold mb-3">Total Marks</p>

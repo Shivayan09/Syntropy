@@ -2,18 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  BarChart3,
-  BrainCircuit,
-  CalendarDays,
-  Clock3,
-  Flame,
-  Target,
-  Trophy,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, BarChart3, BrainCircuit, CalendarDays, Clock3, Flame, Target, Trophy, TrendingUp} from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import { useAuth } from "@/context/AuthContext";
 
 type TestSummary = {
   _id?: string;
@@ -71,6 +62,7 @@ export default function Dashboard() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
+  const {user, getMe} = useAuth();
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -156,7 +148,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 relative">
+      {!user?.onboardingCompleted &&
+        <div className="md:absolute mb-5 md:mb-0 -top-2 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
+          <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+          Add your syllabus in profile for personalized tests
+        </div>
+      }
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">

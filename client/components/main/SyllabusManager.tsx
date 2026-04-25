@@ -5,6 +5,7 @@ import { FileImage, FileText, Sparkles, Trash2, UploadCloud } from "lucide-react
 import Loader2 from "@/components/utils/Loader2";
 import { toast } from "react-toastify";
 import DeleteModal from "../modals/DeleteModal";
+import SyllabusUpload from "./SyllabusUpload";
 
 type Topic = {
     name: string;
@@ -213,76 +214,7 @@ export default function SyllabusManager() {
 
     if (!syllabus) {
         return (
-            <div className="card space-y-4">
-                <div>
-                    <p className="font-bold">No syllabus uploaded yet</p>
-                    <p className="mt-1 text-sm opacity-70">
-                        Upload a syllabus PDF or image to generate your editable subject structure.
-                    </p>
-                </div>
-
-                <label
-                    htmlFor="syllabus-upload-empty"
-                    onDragEnter={(event) => handleDragState(event, true)}
-                    onDragOver={(event) => handleDragState(event, true)}
-                    onDragLeave={(event) => handleDragState(event, false)}
-                    onDrop={handleDrop}
-                    className={`block cursor-pointer border p-5 transition ${dragActive
-                        ? "bg-primary text-white shadow-[6px_6px_0px_black]"
-                        : "bg-(--surface) shadow-[4px_4px_0px_black]"
-                        }`}
-                >
-                    <input
-                        id="syllabus-upload-empty"
-                        type="file"
-                        accept=".pdf,image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-
-                    <div className="flex items-start gap-4">
-                        <div className={`grid h-12 w-12 shrink-0 place-items-center border ${dragActive ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary) text-primary"}`}>
-                            <UploadCloud size={22} />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold uppercase opacity-70">Upload syllabus</p>
-                            <h3 className="mt-1 text-xl font-extrabold">Drop your file here or browse</h3>
-                            <p className="mt-2 text-sm opacity-75">
-                                Works with PDF pages and clear syllabus images. We will extract subjects, units, and topics.
-                            </p>
-
-                            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase">
-                                <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--bg-secondary)"}`}>
-                                    <FileText size={14} />
-                                    PDF
-                                </span>
-                                <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--bg-secondary)"}`}>
-                                    <FileImage size={14} />
-                                    Image
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </label>
-
-                <p className="text-sm text-amber-700">
-                    Uploading a new syllabus later will overwrite your current syllabus data.
-                </p>
-
-                {file && (
-                    <div className="border border-(--border) bg-(--surface) p-4 shadow-[4px_4px_0px_black]">
-                        <p className="text-xs font-bold uppercase text-primary">Selected file</p>
-                        <p className="mt-1 truncate text-sm font-semibold">{file.name}</p>
-                    </div>
-                )}
-
-                <div className="flex items-center gap-3">
-                    <button onClick={upload} disabled={!file || loading} className={!file || loading ? "opacity-70 cursor-not-allowed" : ""}>
-                        {loading ? "Uploading..." : "Upload Syllabus"}
-                    </button>
-                </div>
-            </div>
+            <SyllabusUpload onUploadSuccess={fetchSyllabus} />
         );
     }
 
@@ -301,71 +233,9 @@ export default function SyllabusManager() {
                 </div>
             </div>
 
-            <div className="card mb-6 space-y-4">
-                <div>
-                    <p className="font-bold">Replace syllabus</p>
-                    <p className="mt-1 text-sm opacity-70">
-                        Uploading a new syllabus will overwrite the current one and remove the previous upload.
-                    </p>
-                </div>
-
-                <label
-                    htmlFor="syllabus-upload-replace"
-                    onDragEnter={(event) => handleDragState(event, true)}
-                    onDragOver={(event) => handleDragState(event, true)}
-                    onDragLeave={(event) => handleDragState(event, false)}
-                    onDrop={handleDrop}
-                    className={`block cursor-pointer border p-5 transition ${dragActive
-                        ? "bg-primary text-white shadow-[6px_6px_0px_black]"
-                        : "bg-(--surface) shadow-[4px_4px_0px_black]"
-                        }`}
-                >
-                    <input
-                        id="syllabus-upload-replace"
-                        type="file"
-                        accept=".pdf,image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                    />
-
-                    <div className="flex items-start gap-4">
-                        <div className={`grid h-12 w-12 shrink-0 place-items-center border ${dragActive ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary) text-primary"}`}>
-                            {loading ? <Sparkles size={22} className="animate-pulse" /> : <UploadCloud size={22} />}
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                            <p className="text-sm font-bold uppercase opacity-70">Replace upload</p>
-                            <h3 className="mt-1 text-xl font-extrabold">Drag in a new syllabus file</h3>
-                            <p className="mt-2 text-sm opacity-75">
-                                Keep your profile current by replacing the existing upload with a fresher syllabus PDF or image.
-                            </p>
-
-                            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold uppercase">
-                                <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--bg-secondary)"}`}>
-                                    <FileText size={14} />
-                                    PDF
-                                </span>
-                                <span className={`inline-flex items-center gap-2 border px-3 py-1 ${dragActive ? "border-white/60 bg-white/10" : "border-(--border) bg-(--bg-secondary)"}`}>
-                                    <FileImage size={14} />
-                                    Image
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </label>
-
-                <div className="flex flex-col gap-3 md:flex-row md:items-center">
-                    <button onClick={upload} disabled={!file || loading} className={!file || loading ? "opacity-70 cursor-not-allowed" : ""}>
-                        {loading ? "Uploading..." : "Upload New Syllabus"}
-                    </button>
-                </div>
-
-                {file && (
-                    <div className="border border-(--border) bg-(--surface) p-4 shadow-[4px_4px_0px_black]">
-                        <p className="text-xs font-bold uppercase text-primary">Selected file</p>
-                        <p className="mt-1 truncate text-sm font-semibold">{file.name}</p>
-                    </div>
-                )}
+            <div className="my-5">
+                <p className="mb-3 text-yellow-600 opacity-50 text-sm">Note: Uploading syllabus once again would over-write the current syllabus</p>
+                <SyllabusUpload onUploadSuccess={fetchSyllabus} />
             </div>
 
             {syllabus.subjects.map((subject, subjectIndex) => (

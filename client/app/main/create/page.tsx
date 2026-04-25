@@ -4,13 +4,21 @@ import { Sparkles, ClipboardPen, FlaskConical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import { useAiTokens } from "@/context/AiTokenContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CreateTestPage() {
     const router = useRouter();
     const { tokenStatus } = useAiTokens();
+    const { user, getMe } = useAuth();
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-5xl mx-auto space-y-8 relative">
+            {!user?.onboardingCompleted &&
+                <div className="md:absolute mb-5 md:mb-0 -top-2 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
+                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+                    Add your syllabus in profile for personalized tests
+                </div>
+            }
             <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">

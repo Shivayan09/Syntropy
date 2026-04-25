@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/context/AuthContext";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -45,6 +46,7 @@ export default function Create() {
   const [mcqQuestions, setMcqQuestions] = useState<McqQuestion[]>([createEmptyMcqQuestion()]);
   const [subjectiveQuestions, setSubjectiveQuestions] = useState<SubjectiveQuestion[]>([createEmptySubjectiveQuestion()]);
   const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
+  const { user, getMe } = useAuth();
 
   useEffect(() => {
     const fetchSyllabus = async () => {
@@ -191,7 +193,13 @@ export default function Create() {
   };
 
   return (
-    <div>
+    <div className="relative">
+      {!user?.onboardingCompleted &&
+        <div className="md:absolute mb-5 md:mb-0 -top-2 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
+          <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+          Add your syllabus in profile for personalized tests
+        </div>
+      }
       <div className="mb-6">
         <h1 className="text-3xl font-extrabold">Create Test</h1>
         <p className="mt-2 text-stone-500">
@@ -203,62 +211,62 @@ export default function Create() {
         <p className="font-bold text-lg mb-5">Choose test format :</p>
         <div className="flex gap-5">
           <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setTestFormat("mcq")}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setTestFormat("mcq");
-            }
-          }}
-          className="card cursor-pointer p-5 text-left"
-          style={
-            testFormat === "mcq"
-              ? {
-                backgroundColor: "var(--primary)",
-                color: "white",
-                borderColor: "var(--primary)",
+            role="button"
+            tabIndex={0}
+            onClick={() => setTestFormat("mcq")}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setTestFormat("mcq");
               }
-              : undefined
-          }
-        >
-          <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
-          <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
-          <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
-            Keep the existing multiple-choice authoring flow with four options and one correct answer.
-          </p>
-        </div>
+            }}
+            className="card cursor-pointer p-5 text-left"
+            style={
+              testFormat === "mcq"
+                ? {
+                  backgroundColor: "var(--primary)",
+                  color: "white",
+                  borderColor: "var(--primary)",
+                }
+                : undefined
+            }
+          >
+            <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
+            <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
+            <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
+              Keep the existing multiple-choice authoring flow with four options and one correct answer.
+            </p>
+          </div>
 
-        <div
-          role="button"
-          tabIndex={0}
-          onClick={() => setTestFormat("subjective")}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setTestFormat("subjective");
-            }
-          }}
-          className="card cursor-pointer p-5 text-left"
-          style={
-            testFormat === "subjective"
-              ? {
-                backgroundColor: "var(--primary)",
-                color: "white",
-                borderColor: "var(--primary)",
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setTestFormat("subjective")}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setTestFormat("subjective");
               }
-              : undefined
-          }
-        >
-          <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>
-            Subjective Test
-          </p>
-          <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
-          <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
-            Set marks per question and optionally add model answers plus key points to guide evaluation.
-          </p>
-        </div>
+            }}
+            className="card cursor-pointer p-5 text-left"
+            style={
+              testFormat === "subjective"
+                ? {
+                  backgroundColor: "var(--primary)",
+                  color: "white",
+                  borderColor: "var(--primary)",
+                }
+                : undefined
+            }
+          >
+            <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>
+              Subjective Test
+            </p>
+            <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
+            <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
+              Set marks per question and optionally add model answers plus key points to guide evaluation.
+            </p>
+          </div>
         </div>
       </section>
 

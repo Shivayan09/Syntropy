@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import SyllabusUpload from "@/components/main/SyllabusUpload";
 
 type UserForm = {
   name: string;
@@ -395,6 +396,11 @@ export default function Profile() {
                 </select>
               </label>
             </div>
+            {!user?.onboardingCompleted &&
+              <div className="mt-6">
+                <SyllabusUpload onUploadSuccess={() => Promise.resolve()} />
+              </div>
+            }
           </section>
 
           <section className="card p-6 md:p-7">

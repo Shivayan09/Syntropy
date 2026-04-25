@@ -325,6 +325,9 @@ export default function Onboarding() {
                     <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
 
                     <div className="card">
+                        <div onClick={() => {router.push('/main/dashboard'); toast.warn("Onboarding skipped")}} className="text-yellow-500 underline absolute top-5 right-5 cursor-pointer text-sm">
+                            Skip onboarding
+                        </div>
 
                         {/* HEADER */}
                         <div className="mb-8 text-center">
