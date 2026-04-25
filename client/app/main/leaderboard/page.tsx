@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  BarChart3,
-  CheckCircle2,
-  Medal,
-  Search,
-  Trophy,
-  Users,
-} from "lucide-react";
+import { BarChart3, CheckCircle2, Medal, Search, Trophy, User2, Users } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type LeaderboardUser = {
@@ -17,6 +10,7 @@ type LeaderboardUser = {
   avgAccuracy?: number;
   avgScore?: number;
   testsTaken?: number;
+  avatar?: string;
 };
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
@@ -138,16 +132,23 @@ export default function LeaderboardPage() {
               return (
                 <article
                   key={user._id}
-                  className="card grid gap-4 p-5 lg:grid-cols-[5rem_1fr_8rem_8rem_8rem] lg:items-center"
+                  className="card grid gap-4 p-5 lg:grid-cols-[6rem_1fr_8rem_8rem_8rem] lg:items-center"
                 >
                   <div className="flex items-center gap-3">
-                    <span
-                      className={`grid h-10 w-10 place-items-center border border-black text-sm font-extrabold shadow-[3px_3px_0px_black] ${
-                        isTopThree ? "bg-primary text-white" : "bg-(--surface)"
-                      }`}
-                    >
+                    <p className={`grid h-8 w-8 place-items-centertext-sm font-extrabold ${isTopThree ? "text-primary" : ""}`}>
                       #{rank}
-                    </span>
+                    </p>
+                    <div>
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={user.name || "User"}
+                          className="h-10 w-10 rounded-full object-cover border"
+                        />
+                      ) : (
+                        <User2 className="h-10 w-10 rounded-full border p-2" />
+                      )}
+                    </div>
                   </div>
 
                   <div className="min-w-0">

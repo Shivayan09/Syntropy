@@ -37,7 +37,8 @@ export const getLeaderboard = async (req, res) => {
           avgScore: 1,
           testsTaken: 1,
           name: "$user.name",
-          username: "$user.username"
+          username: "$user.username",
+          avatar: "$user.avatar"
         }
       }
     ]);
