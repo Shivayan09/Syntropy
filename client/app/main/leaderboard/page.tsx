@@ -105,7 +105,7 @@ export default function LeaderboardPage() {
       </section>
 
       <section>
-        <div className="mb-3 grid grid-cols-[5rem_1fr_8rem_8rem_8rem] gap-4 px-5 text-xs font-extrabold uppercase opacity-50 max-lg:hidden">
+        <div className="mb-3 grid grid-cols-[6rem_1fr_8rem_8rem_8rem] gap-4 px-5 text-xs font-extrabold uppercase opacity-50 max-lg:hidden">
           <span>Rank</span>
           <span>Student</span>
           <span>Accuracy</span>
