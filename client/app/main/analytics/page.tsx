@@ -3,16 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ElementType } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  BarChart3,
-  BookOpenCheck,
-  BrainCircuit,
-  CalendarDays,
-  FileQuestion,
-  Target,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowRight, BarChart3, BookOpenCheck, BrainCircuit, CalendarDays, FileQuestion, Target, TrendingUp } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type Difficulty = "Easy" | "Medium" | "Hard";
@@ -68,8 +59,9 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
 
 const formatDate = (value?: string) => {
-  if (!value) return "Not recorded";
-
+  if (!value) {
+    return "Not recorded";
+  }
   return new Date(value).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
@@ -80,28 +72,23 @@ const getQuestionTotal = (attempt: Attempt) => attempt.test?.totalQuestions || a
 
 const getAccuracy = (attempt: Attempt) => {
   if (typeof attempt.accuracy === "number") return clampPercent(attempt.accuracy);
-
   const total = getQuestionTotal(attempt);
   return total > 0 ? clampPercent(((attempt.correct || 0) / total) * 100) : 0;
 };
 
 const getDurationMinutes = (attempt: Attempt) => {
-  if (!attempt.startedAt || !attempt.completedAt) return null;
-
+  if (!attempt.startedAt || !attempt.completedAt) {
+    return null;
+  }
   const minutes = Math.round(
     (new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000,
   );
-
   return Number.isFinite(minutes) && minutes >= 0 ? minutes : null;
 };
 
 const getAttemptSubject = (attempt: Attempt) => attempt.test?.subjects?.[0] || "General";
 
-const addBreakdownResult = (
-  map: Map<string, Omit<Breakdown, "name" | "accuracy">>,
-  key: string,
-  result: "correct" | "wrong" | "skipped",
-) => {
+const addBreakdownResult = (map: Map<string, Omit<Breakdown, "name" | "accuracy">>, key: string, result: "correct" | "wrong" | "skipped") => {
   const current = map.get(key) || { correct: 0, wrong: 0, skipped: 0, total: 0 };
   map.set(key, {
     correct: current.correct + (result === "correct" ? 1 : 0),
@@ -112,13 +99,11 @@ const addBreakdownResult = (
 };
 
 const makeBreakdown = (entries: Map<string, Omit<Breakdown, "name" | "accuracy">>) =>
-  Array.from(entries.entries())
-    .map(([name, stat]) => ({
-      name,
-      ...stat,
-      accuracy: stat.total > 0 ? clampPercent((stat.correct / stat.total) * 100) : 0,
-    }))
-    .sort((a, b) => b.accuracy - a.accuracy || b.total - a.total);
+  Array.from(entries.entries()).map(([name, stat]) => ({
+    name,
+    ...stat,
+    accuracy: stat.total > 0 ? clampPercent((stat.correct / stat.total) * 100) : 0,
+  })).sort((a, b) => b.accuracy - a.accuracy || b.total - a.total);
 
 export default function Analytics() {
   const router = useRouter();
@@ -140,7 +125,6 @@ export default function Analytics() {
         setLoading(false);
       }
     };
-
     fetchAttempts();
   }, []);
 
@@ -155,7 +139,9 @@ export default function Analytics() {
     const averageAccuracy =
       attempts.length > 0 ? clampPercent(attempts.reduce((total, attempt) => total + getAccuracy(attempt), 0) / attempts.length) : 0;
     const bestAttempt = attempts.reduce<Attempt | undefined>((best, attempt) => {
-      if (!best) return attempt;
+      if (!best) {
+        return attempt;
+      }
       return getAccuracy(attempt) > getAccuracy(best) ? attempt : best;
     }, undefined);
 
@@ -164,8 +150,7 @@ export default function Analytics() {
         const minutes = getDurationMinutes(attempt);
         const questions = getQuestionTotal(attempt);
         return minutes !== null && questions > 0 ? (minutes * 60) / questions : null;
-      })
-      .filter((value): value is number => value !== null);
+      }).filter((value): value is number => value !== null);
     const averagePace = paceSamples.length > 0 ? Math.round(paceSamples.reduce((total, value) => total + value, 0) / paceSamples.length) : 0;
 
     const trend: TrendPoint[] = chronological.slice(-7).map((attempt) => ({
@@ -177,10 +162,8 @@ export default function Analytics() {
 
     const firstWindow = chronological.slice(0, 3);
     const latestWindow = chronological.slice(-3);
-    const firstAverage =
-      firstWindow.length > 0 ? firstWindow.reduce((total, attempt) => total + getAccuracy(attempt), 0) / firstWindow.length : 0;
-    const latestAverage =
-      latestWindow.length > 0 ? latestWindow.reduce((total, attempt) => total + getAccuracy(attempt), 0) / latestWindow.length : 0;
+    const firstAverage = firstWindow.length > 0 ? firstWindow.reduce((total, attempt) => total + getAccuracy(attempt), 0) / firstWindow.length : 0;
+    const latestAverage = latestWindow.length > 0 ? latestWindow.reduce((total, attempt) => total + getAccuracy(attempt), 0) / latestWindow.length : 0;
     const improvement = attempts.length >= 2 ? Math.round(latestAverage - firstAverage) : 0;
 
     const subjectMap = new Map<string, Omit<Breakdown, "name" | "accuracy">>();
@@ -220,12 +203,12 @@ export default function Analytics() {
     const retakeLift =
       retakeGroups.length > 0
         ? Math.round(
-            retakeGroups.reduce((total, group) => {
-              const first = group[0];
-              const last = group[group.length - 1];
-              return total + (getAccuracy(last) - getAccuracy(first));
-            }, 0) / retakeGroups.length,
-          )
+          retakeGroups.reduce((total, group) => {
+            const first = group[0];
+            const last = group[group.length - 1];
+            return total + (getAccuracy(last) - getAccuracy(first));
+          }, 0) / retakeGroups.length,
+        )
         : 0;
 
     return {
@@ -414,10 +397,7 @@ export default function Analytics() {
 
             <div className="space-y-3">
               {attempts.slice(0, 5).map((attempt) => (
-                <article
-                  key={attempt._id}
-                  className="grid gap-4 border border-(--border) bg-(--surface) p-4 lg:grid-cols-[1fr_8rem_8rem_7rem] lg:items-center"
-                >
+                <article key={attempt._id} className="grid gap-4 border border-(--border) bg-(--surface) p-4 lg:grid-cols-[1fr_8rem_8rem_7rem] lg:items-center">
                   <div className="min-w-0">
                     <p className="truncate font-extrabold">{attempt.test?.title || "Mock Test"}</p>
                     <p className="mt-1 flex items-center gap-2 text-xs opacity-60">
@@ -427,10 +407,7 @@ export default function Analytics() {
                   </div>
                   <p className="font-bold">{getAccuracy(attempt)}% accuracy</p>
                   <p className="font-bold">{attempt.correct || 0}/{getQuestionTotal(attempt)}</p>
-                  <button
-                    onClick={() => router.push(`/main/history/review/${attempt._id}`)}
-                    className="button-secondary w-full gap-2 lg:w-fit"
-                  >
+                  <button onClick={() => router.push(`/main/history/review/${attempt._id}`)} className="button-secondary w-full gap-2 lg:w-fit">
                     Review
                     <ArrowRight size={18} />
                   </button>
