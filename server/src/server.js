@@ -12,6 +12,7 @@ import attemptRouter from "./routes/attempt.routes.js";
 import leaderboardRouter from "./routes/leaderboard.routes.js";
 import syllabusRouter from "./routes/syllabus.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
+import healthRouter from "./routes/health.routes.js";
 
 const app = express();
 await connectDB();
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+app.use("/health", healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/test', testRouter);
