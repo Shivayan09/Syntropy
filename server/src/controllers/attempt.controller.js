@@ -2,7 +2,7 @@ import Attempt from "../models/attempt.model.js";
 import Test from "../models/test.model.js";
 import { evaluateSubjective } from "../services/evaluateSubjective.service.js";
 
-const normalizeAttemptAnswers = (answers = []) =>
+const normalizeAttemptAnswers = (answers = []) => {
     answers.map((entry) => {
         if (typeof entry === "number" || entry === null || entry === undefined) {
             return {
@@ -17,6 +17,7 @@ const normalizeAttemptAnswers = (answers = []) =>
             feedback: entry?.feedback ?? ""
         };
     });
+}
 
 const serializeAttempt = (attempt) => {
     const plainAttempt = attempt.toObject({ minimize: false });
