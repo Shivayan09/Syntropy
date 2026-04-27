@@ -5,12 +5,24 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { OAuth2Client } from "google-auth-library";
 import { normalizePlan } from "../config/plan.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const setAuthCookie = (res, userId) => {
+    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+};
 
 const validateRegistrationInput = ({ name, email, phoneNumber, password }, requirePassword = true) => {
     if (!name) {
@@ -174,15 +186,15 @@ export const register = async (req, res) => {
             });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, phoneNumber, email: normalizedEmail, password: hashedPassword });
-        await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
+        const user = await User.create({
+            name,
+            phoneNumber,
+            email: normalizedEmail,
+            password: hashedPassword,
+            emailVerified: true,
         });
+        await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
+        setAuthCookie(res, user._id);
         const savedUser = await User.findById(user._id);
         return res.status(200).json({
             success: true,
@@ -211,11 +223,18 @@ export const login = async (req, res) => {
         })
     }
     try {
-        const user = await User.findOne({ email }).select("+password");
+        const normalizedEmail = normalizeEmail(email);
+        const user = await User.findOne({ email: normalizedEmail }).select("+password");
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not found!"
+            })
+        }
+        if (!user.password) {
+            return res.status(400).json({
+                success: false,
+                message: "This account uses Google sign-in. Continue with Google to log in."
             })
         }
         const matched = await bcrypt.compare(password, user.password)
@@ -225,13 +244,7 @@ export const login = async (req, res) => {
                 message: "Incorrect credentials"
             })
         }
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+        setAuthCookie(res, user._id);
         return res.status(200).json({
             success: true,
             message: "Logged In successfully"
@@ -243,6 +256,92 @@ export const login = async (req, res) => {
         })
     }
 }
+
+export const googleLogin = async (req, res) => {
+    try {
+        const { idToken } = req.body;
+        if (!process.env.GOOGLE_CLIENT_ID) {
+            return res.status(500).json({
+                success: false,
+                message: "Google login is not configured on the server."
+            });
+        }
+        if (!idToken) {
+            return res.status(400).json({
+                success: false,
+                message: "Google ID token is required."
+            });
+        }
+
+        const ticket = await googleClient.verifyIdToken({
+            idToken,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+
+        if (!payload?.email || !payload.email_verified || !payload.sub) {
+            return res.status(401).json({
+                success: false,
+                message: "Unable to verify your Google account."
+            });
+        }
+
+        const normalizedEmail = normalizeEmail(payload.email);
+        let user = await User.findOne({ email: normalizedEmail });
+
+        if (user) {
+            if (user.googleId && user.googleId !== payload.sub) {
+                return res.status(409).json({
+                    success: false,
+                    message: "This email is already linked to another Google account."
+                });
+            }
+
+            let shouldSave = false;
+            if (!user.googleId) {
+                user.googleId = payload.sub;
+                shouldSave = true;
+            }
+            if (!user.emailVerified) {
+                user.emailVerified = true;
+                shouldSave = true;
+            }
+            if (!user.avatar && payload.picture) {
+                user.avatar = payload.picture;
+                shouldSave = true;
+            }
+            if (!user.name && payload.name) {
+                user.name = payload.name;
+                shouldSave = true;
+            }
+            if (shouldSave) {
+                await user.save();
+            }
+        } else {
+            user = await User.create({
+                name: payload.name || normalizedEmail.split("@")[0],
+                email: normalizedEmail,
+                emailVerified: true,
+                googleId: payload.sub,
+                provider: "google",
+                avatar: payload.picture || "",
+            });
+        }
+
+        setAuthCookie(res, user._id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged in with Google successfully",
+            user,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Google sign-in failed"
+        });
+    }
+};
 
 export const logout = (req, res) => {
     res.cookie("token", "", {

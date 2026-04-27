@@ -13,6 +13,8 @@ import {
   Phone,
   Save,
   Settings,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import SyllabusUpload from "@/components/main/SyllabusUpload";
@@ -76,7 +78,7 @@ const planMeta = {
 } as const;
 
 export default function Profile() {
-  const { user, loading } = useAuth();
+  const { user, loading, getMe } = useAuth();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [original, setOriginal] = useState<UserForm | null>(null);
@@ -191,6 +193,7 @@ export default function Profile() {
       }
 
       toast.success("Profile updated");
+      await getMe();
       setOriginal(form);
       setDirty(false);
     } catch (error) {
@@ -225,6 +228,7 @@ export default function Profile() {
   }
 
   const activePlan = planMeta[user?.plan || "free"];
+  const emailVerified = user?.provider === "google" || Boolean(user?.emailVerified);
   const billingState =
     user?.plan === "free"
       ? "No billing"
@@ -298,6 +302,18 @@ export default function Profile() {
             <p className="text-sm font-bold opacity-60">Profile status</p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Email</span>
+                <span
+                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${emailVerified
+                    ? "border-black bg-primary text-white"
+                    : "border-black bg-[#fff3e8] text-[#8a3b12]"
+                    }`}
+                >
+                  {emailVerified ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                  {emailVerified ? "Verified" : "Verify your email"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
                 <span className="opacity-70">College</span>
                 <span className="font-extrabold">{form.college || "Not set"}</span>
               </div>
@@ -321,6 +337,19 @@ export default function Profile() {
                 <h2 className="text-2xl font-extrabold">Personal information</h2>
               </div>
             </div>
+
+            {!emailVerified && (
+              <div className="mb-5 flex items-start gap-3 border border-black bg-[#fff7ef] p-4 text-sm text-[#7a3413] shadow-[4px_4px_0px_rgba(0,0,0,0.12)]">
+                <ShieldAlert size={18} className="mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-extrabold">Verify your email</p>
+                  <p className="mt-1 opacity-85">
+                    Your account is active, but this email address has not been verified yet.
+                    If you recently changed it, please verify it before relying on it for account recovery and important updates.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="grid gap-4 md:grid-cols-2">
               <label className="space-y-2">

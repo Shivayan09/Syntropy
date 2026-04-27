@@ -1,5 +1,5 @@
 import express from 'express'
-import { forgotPassword, getMe, login, logout, register, resetPassword, sendRegistrationOtp, verifyRegistrationOtp } from '../controllers/auth.controller.js';
+import { forgotPassword, getMe, googleLogin, login, logout, register, resetPassword, sendRegistrationOtp, verifyRegistrationOtp } from '../controllers/auth.controller.js';
 import { protect } from '../middlewares/auth.middleware.js';
 
 const authRouter = express.Router();
@@ -8,6 +8,7 @@ authRouter.post('/register', register);
 authRouter.post('/register/send-otp', sendRegistrationOtp);
 authRouter.post('/register/verify-otp', verifyRegistrationOtp);
 authRouter.post('/login', login);
+authRouter.post('/google', googleLogin);
 authRouter.post('/logout', logout);
 authRouter.get('/getMe', protect, getMe);
 authRouter.post('/forgot-password', forgotPassword)

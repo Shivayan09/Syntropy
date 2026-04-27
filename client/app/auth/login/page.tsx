@@ -1,20 +1,59 @@
 "use client";
 
 import Image from "next/image";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { div } from "framer-motion/client";
+
+type GoogleCredentialResponse = {
+    credential?: string;
+};
+
+declare global {
+    interface Window {
+        google?: {
+            accounts: {
+                id: {
+                    initialize: (options: {
+                        client_id: string;
+                        callback: (response: GoogleCredentialResponse) => void;
+                        ux_mode?: "popup";
+                    }) => void;
+                    renderButton: (
+                        element: HTMLElement,
+                        options: {
+                            type?: "standard";
+                            theme?: "outline" | "filled_blue" | "filled_black";
+                            text?: "signin_with" | "signup_with" | "continue_with" | "signin";
+                            shape?: "pill" | "rectangular";
+                            size?: "large" | "medium" | "small";
+                            width?: number;
+                            logo_alignment?: "left" | "center";
+                        }
+                    ) => void;
+                    prompt: () => void;
+                };
+            };
+        };
+    }
+}
 
 export default function LoginPage() {
 
     const router = useRouter();
-    const { getMe } = useAuth();
+    const { user, getMe } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [googleReady, setGoogleReady] = useState(false);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+    const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const googleButtonRef = useRef<HTMLDivElement | null>(null);
     const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : "Something went wrong";
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -33,8 +72,12 @@ export default function LoginPage() {
                 return;
             } else {
                 await getMe();
-                toast.success("Logged in successfully")
-                router.push("/main/dashboard");
+                toast.success("Logged in successfully");
+                if (!user?.onboardingCompleted) {
+                    router.push('/onboarding');
+                } else {
+                    router.push("/main/dashboard");
+                }
             }
         } catch (error: unknown) {
             console.error(error);
@@ -44,8 +87,71 @@ export default function LoginPage() {
         }
     };
 
+    const handleGoogleLogin = useEffectEvent(async (credentialResponse: GoogleCredentialResponse) => {
+        if (!credentialResponse.credential) {
+            toast.error("Google sign-in did not return a valid credential.");
+            return;
+        }
+        try {
+            setGoogleLoading(true);
+            const res = await fetch(BACKEND_URL + "/api/auth/google", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ idToken: credentialResponse.credential }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                toast.warn(data.message || "Google sign-in failed");
+                return;
+            }
+            await getMe();
+            toast.success("Logged in with Google");
+            if (!user?.onboardingCompleted) {
+                router.push('/onboarding');
+            } else {
+                router.push("/main/dashboard");
+            }
+        } catch (error: unknown) {
+            console.error(error);
+            toast.error(getErrorMessage(error));
+        } finally {
+            setGoogleLoading(false);
+        }
+    });
+
+    useEffect(() => {
+        if (!googleReady || !GOOGLE_CLIENT_ID || !googleButtonRef.current || !window.google) {
+            return;
+        }
+
+        googleButtonRef.current.innerHTML = "";
+        window.google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleLogin,
+            ux_mode: "popup",
+        });
+        const buttonWidth = Math.min(360, googleButtonRef.current.clientWidth || 360);
+        window.google.accounts.id.renderButton(googleButtonRef.current, {
+            type: "standard",
+            theme: "outline",
+            text: "continue_with",
+            shape: "pill",
+            size: "large",
+            width: buttonWidth,
+            logo_alignment: "left",
+        });
+    }, [GOOGLE_CLIENT_ID, googleReady]);
+
     return (
         <section className="h-screen flex">
+            {GOOGLE_CLIENT_ID ? (
+                <Script
+                    src="https://accounts.google.com/gsi/client"
+                    strategy="afterInteractive"
+                    onLoad={() => setGoogleReady(true)}
+                />
+            ) : null}
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
                 <div className="flex gap-1 mb-5">
@@ -153,8 +259,26 @@ export default function LoginPage() {
                                 Login
                             </button>
                         </form>
-                        <div className="my-6 border-t-2 border-black"></div>
-                        <p className="text-sm text-center">
+                        <div className="mt-6 mb-4 flex items-center gap-3">
+                            <div className="h-px flex-1 bg-black"></div>
+                            <span className="text-xs font-bold tracking-[0.24em] text-gray-500">OR</span>
+                            <div className="h-px flex-1 bg-black"></div>
+                        </div>
+                        {GOOGLE_CLIENT_ID ? (
+                            <div className="flex items-center justify-center">
+                                <div className="rounded-[28px] border border-black/10 bg-white shadow-[3px_3px_0px_rgba(0,0,0,0.08)]">
+                                    <div
+                                        ref={googleButtonRef}
+                                        className={`min-h-10 w-full overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""}`}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="rounded-3xl border border-dashed border-black/20 bg-secondary px-4 py-3 text-center text-sm text-gray-600">
+                                Add `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google sign-in.
+                            </p>
+                        )}
+                        <p className="text-sm text-center mt-5">
                             New here?{" "}
                             <span className="text-primary font-bold cursor-pointer" onClick={() => router.push("/auth/register")}>
                                 Create account

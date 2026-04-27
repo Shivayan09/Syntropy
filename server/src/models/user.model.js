@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: function () { return !this.googleId }, minlength: 6, select: false },
     resetToken: { type: String },
     resetTokenExpiry: { type: Date },
+    emailVerified: { type: Boolean, default: false },
     googleId: { type: String, unique: true, sparse: true },
     provider: { type: String, enum: ["local", "google"], default: "local" },
     college: { type: String, trim: true, minLength: 2 },

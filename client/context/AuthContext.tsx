@@ -8,6 +8,8 @@ type User = {
   username?: string;
   name: string;
   email: string;
+  emailVerified?: boolean;
+  provider?: "local" | "google";
   phoneNumber?: string;
   avatar?: string;
   college?: string;

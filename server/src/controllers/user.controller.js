@@ -3,6 +3,8 @@ import User from "../models/user.model.js";
 import validator from 'validator'
 import { buildAiTokenStatus, syncAiTokens } from "../utils/aiToken.utils.js";
 
+const normalizeEmail = (email) => email?.trim().toLowerCase();
+
 export const getAiTokenStatus = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
@@ -31,6 +33,13 @@ export const updateProfile = async (req, res) => {
     try {
         const userId = req.user._id;
         const { name, username, phoneNumber, email, college, semester, preferences, onboardingCompleted } = req.body;
+        const currentUser = await User.findById(userId).select("email");
+        if (!currentUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
         if (username !== undefined) {
             const existingUsername = await User.findOne({ username, _id: { $ne: userId } });
             if (existingUsername) {
@@ -41,7 +50,8 @@ export const updateProfile = async (req, res) => {
             }
         }
         if (email !== undefined) {
-            const existingEmail = await User.findOne({ email, _id: { $ne: userId } });
+            const normalizedEmail = normalizeEmail(email);
+            const existingEmail = await User.findOne({ email: normalizedEmail, _id: { $ne: userId } });
             if (existingEmail) {
                 return res.status(400).json({
                     success: false,
@@ -96,7 +106,11 @@ export const updateProfile = async (req, res) => {
                     message: "Please enter a valid email!"
                 })
             }
-            updateData.email = email;
+            const normalizedEmail = normalizeEmail(email);
+            updateData.email = normalizedEmail;
+            if (normalizedEmail !== currentUser.email) {
+                updateData.emailVerified = false;
+            }
         }
         if (college !== undefined) {
             if (college.length < 2) {
