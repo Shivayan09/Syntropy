@@ -1,7 +1,7 @@
 import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
-import { generateTest } from "../services/aiTest.service.js";
-import { generateSubjectiveTest } from "../services/subjectiveTest.service.js";
+import { generateTest } from "../services/aiMcqTest.service.js";
+import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
 import { buildAiTokenStatus, consumeAiCredit, refundAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
 import { getTestNumber } from "../utils/testTitle.utils.js";
 
