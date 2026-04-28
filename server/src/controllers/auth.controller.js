@@ -12,7 +12,10 @@ const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 const DEFAULT_FRONTEND_URL = "https://syntropy-tests.vercel.app";
 
-const normalizeEmail = (email) => email?.trim().toLowerCase();
+const normalizeEmail = (email) => {
+    email?.trim().toLowerCase();
+}
+
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const setAuthCookie = (res, userId) => {
@@ -73,7 +76,6 @@ const getFirstName = (name = "") => {
 const buildWelcomeEmailHtml = (name) => {
     const firstName = escapeHtml(getFirstName(name));
     const frontendUrl = getFrontendUrl();
-    const logoUrl = `${frontendUrl}/logo.png`;
 
     return `
         <div style="margin:0;padding:0;background-color:#ffffff;font-family:Inter,system-ui,-apple-system,sans-serif;color:#111111;">
