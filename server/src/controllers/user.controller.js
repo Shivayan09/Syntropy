@@ -1,9 +1,17 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
 import validator from 'validator'
+import nodemailer from "nodemailer";
 import { buildAiTokenStatus, syncAiTokens } from "../utils/aiToken.utils.js";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
+const createEmailTransporter = () => nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 
 export const getAiTokenStatus = async (req, res) => {
     try {
@@ -190,6 +198,98 @@ export const updateAvatar = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: error.message,
+        });
+    }
+};
+
+export const contactSupport = async (req, res) => {
+    try {
+        const { name, email, message } = req.body;
+
+        if (!name?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Name is required"
+            });
+        }
+
+        if (!email || !validator.isEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email!"
+            });
+        }
+
+        if (!message?.trim()) {
+            return res.status(400).json({
+                success: false,
+                message: "Message is required"
+            });
+        }
+
+        if (message.trim().length < 10) {
+            return res.status(400).json({
+                success: false,
+                message: "Message is too short"
+            });
+        }
+
+        const user = await User.findById(req.user._id).select("name email username");
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const transporter = createEmailTransporter();
+        const normalizedEmail = normalizeEmail(email);
+        const safeMessage = message.trim();
+
+        await transporter.sendMail({
+            from: process.env.EMAIL,
+            to: process.env.EMAIL,
+            replyTo: normalizedEmail,
+            subject: `Support request from ${name.trim()}`,
+            text: `Support request received
+
+Name: ${name.trim()}
+Email: ${normalizedEmail}
+User ID: ${user._id}
+Username: ${user.username || "Not set"}
+Account Name: ${user.name || "Not set"}
+Account Email: ${user.email || "Not set"}
+
+Message:
+${safeMessage}`,
+            html: `
+                <div style="font-family:Arial,sans-serif;color:#111111;line-height:1.6;">
+                    <h2 style="margin:0 0 16px;">New support request</h2>
+                    <p style="margin:0 0 8px;"><strong>Name:</strong> ${name.trim()}</p>
+                    <p style="margin:0 0 8px;"><strong>Email:</strong> ${normalizedEmail}</p>
+                    <p style="margin:0 0 8px;"><strong>User ID:</strong> ${user._id}</p>
+                    <p style="margin:0 0 8px;"><strong>Username:</strong> ${user.username || "Not set"}</p>
+                    <p style="margin:0 0 8px;"><strong>Account Name:</strong> ${user.name || "Not set"}</p>
+                    <p style="margin:0 0 16px;"><strong>Account Email:</strong> ${user.email || "Not set"}</p>
+                    <p style="margin:0 0 8px;"><strong>Message:</strong></p>
+                    <div style="white-space:pre-wrap;border:1px solid #d4d4d4;padding:12px;background:#f7f7f7;">${safeMessage
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;")}</div>
+                </div>
+            `,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Support message sent successfully"
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
         });
     }
 };

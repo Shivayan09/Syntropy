@@ -1,12 +1,17 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MessageSquare, HelpCircle, ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SupportPage() {
+    const { user } = useAuth();
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
     const [active, setActive] = useState<number | null>(0);
+    const [submitting, setSubmitting] = useState(false);
 
     const faqs = [
         {
@@ -37,18 +42,53 @@ export default function SupportPage() {
         message: "",
     });
 
+    useEffect(() => {
+        if (!user) {
+            return;
+        }
+
+        setForm((prev) => ({
+            ...prev,
+            name: prev.name || user.name || "",
+            email: prev.email || user.email || "",
+        }));
+    }, [user]);
+
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        // TODO: connect backend
-        console.log(form);
+        try {
+            setSubmitting(true);
 
-        alert("Message sent. Now pray someone reads it.");
-        setForm({ name: "", email: "", message: "" });
+            const res = await fetch(BACKEND_URL + "/api/user/contact-support", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(form)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                toast.warn(data.message || "Failed to send support message");
+                setSubmitting(false);
+                return;
+            }
+
+            toast.success("Support message sent");
+            setForm((prev) => ({ ...prev, message: "" }));
+        } catch (error) {
+            console.error("Failed to send support message", error);
+            toast.error("Could not send your message right now");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -99,7 +139,9 @@ export default function SupportPage() {
                             className="w-full"
                         />
 
-                        <button type="submit">Send Message</button>
+                        <button type="submit" disabled={submitting} className={submitting ? "cursor-not-allowed opacity-70" : ""}>
+                            {submitting ? "Sending..." : "Send Message"}
+                        </button>
                     </form>
                 </div>
                 <div className="flex flex-col gap-3">
@@ -113,7 +155,7 @@ export default function SupportPage() {
 
                     <div className="card">
                         <Mail className="mb-3 text-primary" />
-                        <h3 className="font-bold text-lg mb-1">Email Support</h3>
+                        <p className="font-extrabold text-lg mb-1">Our email : <span className="font-semibold text-gray-500 text-sm">syntropy.tests@gmail.com</span></p>
                         <p className="text-sm text-gray-500">
                             Get a response within 24–48 hours. Usually.
                         </p>

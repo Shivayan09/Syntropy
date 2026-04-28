@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
 import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
 import { buildAiTokenStatus, consumeAiCredit, refundAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
+import { sanitizeSubjects } from "../utils/subjectValidation.js";
 import { getTestNumber } from "../utils/testTitle.utils.js";
 
 export const createTest = async (req, res) => {
@@ -124,6 +125,24 @@ export const aiTest = async (req, res) => {
 
     try {
         const userId = req.user._id;
+        const { subjects: rawSubjects } = req.body;
+        const { subjects, invalidSubjects } = sanitizeSubjects(rawSubjects);
+
+        if (!subjects.length) {
+            return res.status(400).json({
+                success: false,
+                message: "Enter at least 1 valid subject"
+            });
+        }
+
+        if (invalidSubjects.length) {
+            return res.status(400).json({
+                success: false,
+                message: `Invalid subject${invalidSubjects.length > 1 ? "s" : ""}: ${invalidSubjects.join(", ")}`
+            });
+        }
+
+        req.body.subjects = subjects;
         user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({

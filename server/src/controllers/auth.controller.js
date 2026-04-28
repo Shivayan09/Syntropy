@@ -13,7 +13,7 @@ const MAX_OTP_ATTEMPTS = 5;
 const DEFAULT_FRONTEND_URL = "https://syntropy-tests.vercel.app";
 
 const normalizeEmail = (email) => {
-    email?.trim().toLowerCase();
+    return email?.trim().toLowerCase();
 }
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
