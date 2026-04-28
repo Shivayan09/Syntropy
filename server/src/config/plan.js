@@ -1,4 +1,4 @@
-export const FREE_TRIAL_TESTS = 3;
+export const FREE_MONTHLY_TESTS = 10;
 
 export const PLAN_CATALOG = {
   starter_monthly: {
@@ -7,10 +7,10 @@ export const PLAN_CATALOG = {
     plan: "starter",
     label: "Starter Monthly",
     amountPaise: 9900,
-    credits: 15,
+    credits: 30,
     billingCycle: "monthly",
     durationMonths: 1,
-    description: "15 AI test generations per month",
+    description: "30 AI test generations per month",
   },
   pro_monthly: {
     key: "pro_monthly",
@@ -18,21 +18,10 @@ export const PLAN_CATALOG = {
     plan: "pro",
     label: "Pro Monthly",
     amountPaise: 24900,
-    credits: 50,
+    credits: 100,
     billingCycle: "monthly",
     durationMonths: 1,
-    description: "50 AI test generations per month",
-  },
-  pro_annual: {
-    key: "pro_annual",
-    kind: "plan",
-    plan: "pro",
-    label: "Pro Annual",
-    amountPaise: 199900,
-    credits: 50,
-    billingCycle: "annual",
-    durationMonths: 12,
-    description: "50 AI test generations per month for 12 months",
+    description: "100 AI test generations per month",
   },
   topup_1: {
     key: "topup_1",
@@ -46,7 +35,7 @@ export const PLAN_CATALOG = {
     key: "topup_5",
     kind: "topup",
     label: "Top-up 5",
-    amountPaise: 4900,
+    amountPaise: 3900,
     credits: 5,
     description: "5 extra AI tests",
   },
@@ -54,7 +43,7 @@ export const PLAN_CATALOG = {
     key: "topup_15",
     kind: "topup",
     label: "Top-up 15",
-    amountPaise: 9900,
+    amountPaise: 8900,
     credits: 15,
     description: "15 extra AI tests",
   },
@@ -67,22 +56,22 @@ export const LEGACY_PLAN_ALIASES = {
 export const PLAN_DETAILS = {
   free: {
     label: "Free",
-    credits: FREE_TRIAL_TESTS,
-    billingCycle: "lifetime",
+    credits: FREE_MONTHLY_TESTS,
+    billingCycle: "monthly",
   },
   starter: {
     label: "Starter",
-    credits: 15,
+    credits: 30,
     billingCycle: "monthly",
   },
   pro: {
     label: "Pro",
-    credits: 50,
+    credits: 100,
     billingCycle: "monthly",
   },
   power: {
     label: "Power",
-    credits: 150,
+    credits: 100,
     billingCycle: "monthly",
   },
 };

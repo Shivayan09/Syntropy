@@ -62,19 +62,19 @@ const semesterLabel = (value: string) => {
 const planMeta = {
   free: {
     label: "Free",
-    note: "3 total AI trial tests",
+    note: "10 AI tests each month",
   },
   starter: {
     label: "Starter",
-    note: "15 AI tests each month",
+    note: "30 AI tests each month",
   },
   pro: {
     label: "Pro",
-    note: "50 AI tests each month",
+    note: "100 AI tests each month",
   },
   power: {
     label: "Power",
-    note: "150 AI tests each month",
+    note: "Legacy access",
   },
 } as const;
 
@@ -232,7 +232,7 @@ export default function Profile() {
   const emailVerified = user?.provider === "google" || Boolean(user?.emailVerified);
   const billingState =
     user?.plan === "free"
-      ? "No billing"
+      ? "Monthly free"
       : user?.planBillingCycle === "annual"
         ? "Annual"
         : "Monthly";
@@ -570,7 +570,7 @@ export default function Profile() {
                 <div className="mt-4 inline-flex items-center gap-2 border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_var(--shadow)]">
                   <span className="h-2.5 w-2.5 rounded-full bg-primary" />
                   {user?.plan === "free"
-                    ? "Free trial access"
+                    ? "Monthly free access"
                     : user?.planBillingCycle === "annual"
                       ? "Annual subscription"
                       : "Monthly subscription"}

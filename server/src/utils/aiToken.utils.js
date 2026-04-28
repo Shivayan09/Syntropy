@@ -1,4 +1,4 @@
-import { FREE_TRIAL_TESTS, PLAN_DETAILS, normalizePlan } from "../config/plan.js";
+import { FREE_MONTHLY_TESTS, PLAN_DETAILS, normalizePlan } from "../config/plan.js";
 
 const addMonths = (date, months) => {
   const nextDate = new Date(date);
@@ -17,7 +17,7 @@ export const getCycleLimit = (user) => {
   const normalizedPlan = normalizePlan(user?.plan);
 
   if (normalizedPlan === "free") {
-    return FREE_TRIAL_TESTS;
+    return FREE_MONTHLY_TESTS;
   }
 
   return getPlanDetails(normalizedPlan).credits;
@@ -27,7 +27,7 @@ const getPlanCreditsRemaining = (user) => {
   const normalizedPlan = normalizePlan(user?.plan);
 
   if (normalizedPlan === "free") {
-    return Math.max(FREE_TRIAL_TESTS - (user?.freeAiTestsUsed || 0), 0);
+    return Math.max(FREE_MONTHLY_TESTS - (user?.freeAiTestsUsed || 0), 0);
   }
 
   return Math.max(user?.aiTokens || 0, 0);
@@ -42,13 +42,21 @@ const downgradeToFree = (user) => {
 };
 
 export const getNextCreditResetAt = (user) => {
-  const normalizedPlan = normalizePlan(user?.plan);
-
-  if (normalizedPlan === "free" || !user?.lastTokenReset || !user?.planExpiry) {
+  if (!user?.lastTokenReset) {
     return null;
   }
 
   const nextReset = addMonths(user.lastTokenReset, 1);
+  const normalizedPlan = normalizePlan(user?.plan);
+
+  if (normalizedPlan === "free") {
+    return nextReset;
+  }
+
+  if (!user?.planExpiry) {
+    return null;
+  }
+
   const expiry = new Date(user.planExpiry);
   return nextReset > expiry ? expiry : nextReset;
 };
@@ -64,8 +72,29 @@ export const syncAiTokens = async (user) => {
   }
 
   if (!isPaidPlan(user.plan)) {
+    if (!user.lastTokenReset) {
+      user.lastTokenReset = now;
+      shouldSave = true;
+    }
+
+    let cycleAnchor = new Date(user.lastTokenReset);
+
+    while (now >= addMonths(cycleAnchor, 1)) {
+      cycleAnchor = addMonths(cycleAnchor, 1);
+      user.lastTokenReset = cycleAnchor;
+      user.freeAiTestsUsed = 0;
+      shouldSave = true;
+    }
+
     if (user.planBillingCycle || user.planExpiry || user.aiTokens !== 0) {
-      downgradeToFree(user);
+      user.planBillingCycle = null;
+      user.planExpiry = undefined;
+      user.aiTokens = 0;
+      shouldSave = true;
+    }
+
+    if ((user.freeAiTestsUsed || 0) > FREE_MONTHLY_TESTS) {
+      user.freeAiTestsUsed = FREE_MONTHLY_TESTS;
       shouldSave = true;
     }
 
@@ -112,7 +141,7 @@ export const consumeAiCredit = async (user) => {
   const normalizedPlan = normalizePlan(user.plan);
 
   if (normalizedPlan === "free") {
-    const remainingFreeCredits = Math.max(FREE_TRIAL_TESTS - (user.freeAiTestsUsed || 0), 0);
+    const remainingFreeCredits = Math.max(FREE_MONTHLY_TESTS - (user.freeAiTestsUsed || 0), 0);
 
     if (remainingFreeCredits > 0) {
       user.freeAiTestsUsed = (user.freeAiTestsUsed || 0) + 1;
@@ -184,6 +213,6 @@ export const buildAiTokenStatus = (user) => {
     manualTestsUnlimited: true,
     plan: normalizedPlan,
     planLabel: getPlanDetails(normalizedPlan).label,
-    billingCycle: normalizedPlan === "free" ? "lifetime" : user.planBillingCycle || "monthly",
+    billingCycle: normalizedPlan === "free" ? "monthly" : user.planBillingCycle || "monthly",
   };
 };

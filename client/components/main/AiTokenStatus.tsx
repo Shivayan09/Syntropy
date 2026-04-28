@@ -20,8 +20,8 @@ const formatResetTime = (value?: string | null) => {
 };
 
 const getWindowCopy = (status: AiTokenStatusData) => {
-  if (status.billingCycle === "lifetime") {
-    return "Free trial total";
+  if (status.plan === "free") {
+    return "Monthly free allowance";
   }
 
   return status.billingCycle === "annual" ? "Monthly refill on annual plan" : "Monthly refill";
@@ -75,8 +75,8 @@ export default function AiTokenStatus({
             <p className="mt-1 text-xs opacity-65">
               {hasTokens
                 ? `${includedRemaining} plan credits and ${bonusRemaining} top-up credits available.`
-                : status.billingCycle === "lifetime"
-                  ? "Your free trial is exhausted. Buy a plan or a top-up to continue."
+                : status.plan === "free"
+                  ? `Your monthly free credits are finished. Next refill by ${resetTime}.`
                   : `Next refill by ${resetTime}.`}
             </p>
           </div>
@@ -109,8 +109,8 @@ export default function AiTokenStatus({
           <p className="mt-1 text-sm opacity-70">
             {hasTokens
               ? "Each AI-generated test uses 1 credit. Manual test creation stays unlimited."
-              : status.billingCycle === "lifetime"
-                ? "Your free trial credits are finished, but you can unlock more with a plan or a top-up."
+              : status.plan === "free"
+                ? "Your monthly free credits are finished, but you can unlock more with a plan or a top-up."
                 : "Your included credits are empty right now, but manual test creation is always unlimited."}
           </p>
         </div>
@@ -130,12 +130,8 @@ export default function AiTokenStatus({
           <p className="text-xs opacity-60">{getWindowCopy(status)}</p>
         </div>
         <div className="border border-black bg-(--surface) p-3">
-          <p className="text-xs font-extrabold uppercase opacity-55">
-            {status.billingCycle === "lifetime" ? "Trial" : "Next refill"}
-          </p>
-          <p className="mt-1 text-lg font-extrabold">
-            {status.billingCycle === "lifetime" ? "One-time" : resetTime}
-          </p>
+          <p className="text-xs font-extrabold uppercase opacity-55">Next refill</p>
+          <p className="mt-1 text-lg font-extrabold">{resetTime}</p>
           <p className="text-xs opacity-60">{status.planLabel} access</p>
         </div>
       </div>

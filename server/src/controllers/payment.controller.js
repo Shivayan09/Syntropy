@@ -60,6 +60,7 @@ export const createOrder = async (req, res) => {
         itemKey: item.key,
         kind: item.kind,
         plan: item.plan || "",
+        userId: String(req.user._id),
       },
     });
 
@@ -127,6 +128,35 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid purchase item",
+      });
+    }
+
+    const order = await razorpay.orders.fetch(razorpay_order_id);
+    if (!order) {
+      return res.status(400).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (order.amount !== item.amountPaise || order.currency !== "INR") {
+      return res.status(400).json({
+        success: false,
+        message: "Order amount mismatch",
+      });
+    }
+
+    if (order.notes?.itemKey !== item.key) {
+      return res.status(400).json({
+        success: false,
+        message: "Order item mismatch",
+      });
+    }
+
+    if (order.notes?.userId !== String(req.user._id)) {
+      return res.status(403).json({
+        success: false,
+        message: "This order does not belong to the current user",
       });
     }
 

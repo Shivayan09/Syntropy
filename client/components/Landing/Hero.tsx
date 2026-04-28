@@ -64,7 +64,7 @@ export default function Hero() {
                         <h3 className="font-bold text-2xl mt-3">From syllabus to score review</h3>
                     </div>
                     <div className="border border-black bg-secondary px-3 py-1 text-sm font-bold">
-                        Free plan: 3 AI tests
+                        Free plan: 10 AI tests/month
                     </div>
                 </div>
 

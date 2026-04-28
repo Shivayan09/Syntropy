@@ -3,14 +3,13 @@
 import { useMemo, useState } from "react";
 import Script from "next/script";
 import { toast } from "react-toastify";
-import { ArrowRight, Check, Crown, Shield, ShieldCheck, Sparkles, Star, Wallet, Zap } from "lucide-react";
+import { ArrowRight, Check, Crown, Shield, ShieldCheck, Sparkles, Wallet, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type PlanKey = "free" | "starter" | "pro" | "power";
 type PurchaseKey =
   | "starter_monthly"
   | "pro_monthly"
-  | "pro_annual"
   | "topup_1"
   | "topup_5"
   | "topup_15";
@@ -63,30 +62,30 @@ const plans = [
   {
     key: "free",
     name: "Free",
-    priceLabel: "₹0",
-    quota: "3 AI tests total",
-    description: "For first-time users who want to feel the workflow before paying.",
+    priceLabel: "Rs 0",
+    quota: "10 AI tests per month",
+    description: "For steady practice, with a monthly AI allowance and unlimited manual tests.",
     features: [
+      "10 AI test generations each month",
       "Basic analytics",
-      "Limited review depth",
-      "Watermarked AI",
-      "Manual tests always available",
+      "Manual tests always unlimited",
+      "Start without paying",
     ],
     highlighted: false,
-    cta: "Starter tier",
+    cta: "Free tier",
     itemKey: null,
   },
   {
     key: "starter",
     name: "Starter",
-    priceLabel: "₹99/month",
-    quota: "15 AI tests per month",
-    description: "For casual but paying students who want a low-friction study rhythm.",
+    priceLabel: "Rs 99/month",
+    quota: "30 AI tests per month",
+    description: "For students who want a reliable weekly AI practice rhythm without overspending.",
     features: [
-      "15 AI test generations per month",
+      "30 AI test generations per month",
       "Standard explanations",
       "Weak-topic analysis",
-      "Best impulse-buy plan",
+      "Best value for regular practice",
     ],
     highlighted: true,
     cta: "Upgrade",
@@ -95,14 +94,14 @@ const plans = [
   {
     key: "pro",
     name: "Pro",
-    priceLabel: "₹249/month",
-    quota: "50 AI tests per month",
-    description: "For serious learners who revise, retest, and improve every week.",
+    priceLabel: "Rs 249/month",
+    quota: "100 AI tests per month",
+    description: "For serious learners running repeated revision, retest, and correction cycles.",
     features: [
-      "50 AI test generations per month",
+      "100 AI test generations per month",
       "Better analytics",
       "Priority generation",
-      "Revision recommendations",
+      "Built for high-frequency prep",
     ],
     highlighted: false,
     cta: "Upgrade",
@@ -110,31 +109,23 @@ const plans = [
   },
 ] as const;
 
-const annualOffer = {
-  itemKey: "pro_annual" as const,
-  name: "Pro Annual",
-  priceLabel: "₹1,999 per year",
-  quota: "100 AI tests per month",
-  description: "Serious exam-prep students can stay on Pro for a full year with 2 months free.",
-};
-
 const topUps = [
   {
     itemKey: "topup_1" as const,
     name: "1 extra test",
     priceLabel: "Rs 9",
-    description: "For one more attempt before you stop.",
+    description: "For one more attempt before your next refill.",
   },
   {
     itemKey: "topup_5" as const,
     name: "5 extra tests",
-    priceLabel: "Rs 49",
-    description: "For short bursts between plan cycles.",
+    priceLabel: "Rs 39",
+    description: "For short bursts between monthly cycles.",
   },
   {
     itemKey: "topup_15" as const,
     name: "15 extra tests",
-    priceLabel: "Rs 99",
+    priceLabel: "Rs 89",
     description: "For recovery without committing to a bigger plan.",
   },
 ] as const;
@@ -142,23 +133,27 @@ const topUps = [
 const planMeta = {
   free: {
     icon: ShieldCheck,
-    summary: "A short trial that lets students experience the product before subscribing.",
-    status: "Trial access",
+    label: "Free",
+    summary: "A monthly free allowance that keeps AI practice accessible before you spend anything.",
+    status: "Monthly free tier",
   },
   starter: {
     icon: Zap,
-    summary: "Balanced for students who want weekly AI practice without overspending.",
+    label: "Starter",
+    summary: "Balanced for students who want regular AI practice without going overboard.",
     status: "Most popular tier",
   },
   pro: {
     icon: Crown,
+    label: "Pro",
     summary: "Built for serious prep cycles with repeated tests, review, and correction.",
     status: "Serious prep tier",
   },
   power: {
     icon: Sparkles,
-    summary: "Legacy tier",
-    status: "Hidden tier",
+    label: "Power",
+    summary: "Legacy access tier.",
+    status: "Legacy tier",
   },
 } as const;
 
@@ -170,10 +165,6 @@ const offerMeta = {
   pro_monthly: {
     name: "Pro",
     description: "Pro monthly subscription",
-  },
-  pro_annual: {
-    name: "Pro Annual",
-    description: "Pro annual subscription",
   },
   topup_1: {
     name: "1 extra test",
@@ -221,7 +212,23 @@ export default function PlansPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
   const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const currentPlanKey = (user?.plan || "free") as PlanKey;
-  const currentPlan = useMemo(() => plans.find((plan) => plan.key === currentPlanKey) || plans[0], [currentPlanKey]);
+  const currentPlan =
+    useMemo(
+      () =>
+        plans.find((plan) => plan.key === currentPlanKey) ||
+        {
+          key: currentPlanKey,
+          name: planMeta[currentPlanKey].label,
+          priceLabel: "Legacy",
+          quota: "Managed on your account",
+          description: planMeta[currentPlanKey].summary,
+          features: ["Legacy access remains active on your account"],
+          highlighted: false,
+          cta: "Current plan",
+          itemKey: null,
+        },
+      [currentPlanKey]
+    );
   const CurrentPlanIcon = planMeta[currentPlanKey].icon;
   const isPaidPlan = currentPlanKey !== "free";
   const currentRank = getPlanRank(currentPlanKey);
@@ -351,7 +358,6 @@ export default function PlansPage() {
         <section className="mt-7">
           <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
             <div className="card2 flex flex-col gap-6">
-              {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 border border-black bg-primary px-3 py-1 text-white">
                   <CurrentPlanIcon size={16} className="text-white" />
@@ -365,7 +371,6 @@ export default function PlansPage() {
                 </div>
               </div>
 
-              {/* Title */}
               <div>
                 <h1 className="text-3xl leading-tight font-extrabold md:text-4xl">
                   Your current setup is tuned for{" "}
@@ -373,12 +378,11 @@ export default function PlansPage() {
                 </h1>
               </div>
 
-              {/* Stats (FIXED) */}
               <div className="grid grid-cols-2 gap-4">
                 <StatTile
                   label="Progress loop"
                   value="Active user"
-                  note="test → review → improve"
+                  note="test -> review -> improve"
                 />
 
                 <StatTile
@@ -388,13 +392,12 @@ export default function PlansPage() {
                 />
               </div>
 
-              {/* Info Box */}
               <div className="border border-dashed border-black bg-(--bg-secondary) p-4">
                 <p className="text-sm font-extrabold">What this means for your prep</p>
 
                 <p className="mt-1 text-sm opacity-70">
                   {currentPlanKey === "free"
-                    ? "You can try the product properly, but regular AI practice will need a paid plan or a top-up."
+                    ? "You get 10 AI tests every month for free, and can scale with a paid plan or a top-up whenever needed."
                     : currentPlanKey === "starter"
                       ? "You can keep a weekly revision rhythm without overspending, and step up when prep intensity grows."
                       : "You can run repeated focused tests per week, making revision cycles tighter and more effective."}
@@ -403,7 +406,6 @@ export default function PlansPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-primary">
                   <Wallet size={18} />
@@ -413,7 +415,7 @@ export default function PlansPage() {
                 </div>
 
                 <span className="text-xs font-bold border border-black px-2 py-1 bg-primary text-white shadow-[2px_2px_0px_black]">
-                  Instant Credits ⚡
+                  Instant Credits
                 </span>
               </div>
 
@@ -421,50 +423,48 @@ export default function PlansPage() {
                 {topUps.map((pack, i) => (
                   <div
                     key={pack.itemKey}
-                    className={` group relative flex items-center justify-between gap-4  border-2 border-black bg-(--surface) p-5  shadow-[4px_4px_0px_black] transition-all duration-150`}
+                    className="group relative flex items-center justify-between gap-4 border-2 border-black bg-(--surface) p-5 shadow-[4px_4px_0px_black] transition-all duration-150"
                   >
-                    {/* Highlight Badge */}
                     {i === 1 && (
                       <span className="absolute -top-3 left-4 bg-primary text-white text-xs font-extrabold px-2 py-1 border border-black shadow-[2px_2px_0px_black]">
                         BEST VALUE
                       </span>
                     )}
 
-                    {/* Left */}
                     <div>
                       <p className="text-xl font-extrabold">{pack.name}</p>
                       <p className="mt-1 text-sm opacity-70 max-w-55">
                         {pack.description}
                       </p>
 
-                      {/* Value Hook */}
                       <p className="mt-2 text-xs font-bold text-primary">
-                        {i === 1
-                          ? "Most popular choice 🔥"
-                          : "Upgrade your performance"}
+                        {i === 1 ? "Most popular choice" : "Upgrade your performance"}
                       </p>
                     </div>
 
-                    {/* Right */}
                     <div className="flex flex-col items-end gap-3">
-                      {/* Price */}
                       <span className="border-2 border-black bg-secondary text-primary px-4 py-1 text-sm font-extrabold shadow-[2px_2px_0px_black]">
                         {pack.priceLabel}
                       </span>
 
-                      {/* Button */}
                       <button
                         onClick={() => handlePurchase(pack.itemKey)}
                         disabled={loading === pack.itemKey}
-                        className={` flex items-center justify-center gap-2  px-5 h-10 font-bold border-2 border-black  bg-(--bg-secondary) text-(--text) shadow-[4px_4px_0px_black] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_black] ${loading === pack.itemKey && "opacity-70 cursor-not-allowed"}`}
+                        className={`flex items-center justify-center gap-2 px-5 h-10 font-bold border-2 border-black bg-(--bg-secondary) text-(--text) shadow-[4px_4px_0px_black] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_black] ${loading === pack.itemKey ? "opacity-70 cursor-not-allowed" : ""}`}
                       >
-                        {loading === pack.itemKey ? "Processing..." : "Buy Now →"}
+                        {loading === pack.itemKey ? (
+                          "Processing..."
+                        ) : (
+                          <>
+                            <span className="sm:hidden">Buy</span>
+                            <span className="hidden sm:inline">Buy Now</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
         </section>
@@ -534,7 +534,7 @@ export default function PlansPage() {
                             ? "Your current workflow is mapped to this plan."
                             : isUpgrade
                               ? "Useful when AI generation becomes part of your regular prep routine."
-                              : "Best when you only need a guided first experience."}
+                              : "Best when you want recurring free usage before spending."}
                         </p>
                       </div>
                     </div>
@@ -546,8 +546,7 @@ export default function PlansPage() {
                         }
                       }}
                       disabled={isLoading || isCurrent || !plan.itemKey}
-                      className={`w-full gap-2 rounded-none border-x-0 border-b-0 shadow-none hover:translate-x-0 hover:translate-y-0 hover:shadow-none ${plan.highlighted && !isCurrent ? "" : "button-secondary"
-                        }`}
+                      className={`w-full gap-2 rounded-none border-x-0 border-b-0 shadow-none hover:translate-x-0 hover:translate-y-0 hover:shadow-none ${plan.highlighted && !isCurrent ? "" : "button-secondary"}`}
                     >
                       {isLoading ? "Processing..." : isCurrent ? "Current plan" : plan.cta}
                       {plan.itemKey && !isCurrent && <ArrowRight size={17} />}
@@ -559,50 +558,10 @@ export default function PlansPage() {
           </div>
         </section>
 
-        <section className="mt-10">
-          <div className="card2 flex flex-col gap-5">
-            <div className="flex items-center gap-2 text-primary">
-              <Star size={18} />
-              <p className="text-sm font-bold uppercase">Annual option</p>
-            </div>
-
-            <div>
-              <h2 className="text-3xl font-extrabold">{annualOffer.name}</h2>
-              <p className="mt-2 text-sm opacity-70">{annualOffer.description}</p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <StatTile label="Price" value={annualOffer.priceLabel} note="single yearly payment" />
-              <StatTile label="Access" value={annualOffer.quota} note="monthly refill" />
-              <StatTile label="Anchor" value="2 months free" note="best long-term value" />
-            </div>
-
-            <button
-              onClick={() => handlePurchase(annualOffer.itemKey)}
-              disabled={
-                loading === annualOffer.itemKey ||
-                (user?.plan === "pro" && user?.planBillingCycle === "annual")
-              }
-              className="w-full gap-2"
-            >
-              {loading === annualOffer.itemKey
-                ? "Processing..."
-                : user?.plan === "pro" && user?.planBillingCycle === "annual"
-                  ? "Current annual plan"
-                  : "Upgrade to Pro Annual"}
-              {!(user?.plan === "pro" && user?.planBillingCycle === "annual") && (
-                <ArrowRight size={17} />
-              )}
-            </button>
-          </div>
-
-
-        </section>
-
         <div className="mt-10 text-center text-sm opacity-60">
           {isPaidPlan
             ? `Your ${currentPlan.name.toLowerCase()} access is active through ${formatExpiry(user?.planExpiry)}.`
-            : "You are on the free trial right now. Upgrade anytime when you need more AI tests."}
+            : "You are on the monthly free plan right now. Upgrade anytime when you need more AI tests."}
         </div>
       </div>
     </div>
@@ -628,4 +587,3 @@ function StatTile({
     </div>
   );
 }
-

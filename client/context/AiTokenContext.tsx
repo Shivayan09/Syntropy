@@ -14,7 +14,7 @@ export type AiTokenStatus = {
   manualTestsUnlimited: boolean;
   plan: "free" | "starter" | "pro" | "power";
   planLabel: string;
-  billingCycle: "lifetime" | "monthly" | "annual";
+  billingCycle: "monthly" | "annual";
 };
 
 type AiTokenContextType = {

@@ -26,7 +26,7 @@ export default function FAQSection() {
         },
         {
             q: "How do AI credits and plans work?",
-            a: "The free plan includes 3 total AI test generations. If you need more, you can upgrade to paid plans or buy top-up credits while manual test creation stays unlimited.",
+            a: "The free plan includes 10 AI test generations each month. If you need more, you can upgrade to paid plans or buy top-up credits while manual test creation stays unlimited.",
         },
     ];
 

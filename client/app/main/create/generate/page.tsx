@@ -357,8 +357,8 @@ export default function CreateAITest() {
                                 ? "Checked on submit"
                                 : hasTokens
                                     ? "Ready"
-                                    : tokenStatus?.billingCycle === "lifetime"
-                                        ? "Trial exhausted"
+                                    : tokenStatus?.plan === "free"
+                                        ? "Monthly quota used"
                                         : "Refill pending"}
                         </p>
                     </div>
