@@ -402,7 +402,7 @@ export default function PlansPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-primary">
@@ -417,8 +417,7 @@ export default function PlansPage() {
                 </span>
               </div>
 
-              {/* Packs */}
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {topUps.map((pack, i) => (
                   <div
                     key={pack.itemKey}

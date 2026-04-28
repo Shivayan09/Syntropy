@@ -15,6 +15,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import { useAuth } from "@/context/AuthContext";
+import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
 
 type Test = {
   _id: string;
@@ -50,6 +52,7 @@ export default function TestsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortMode>("newest");
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchTests = async () => {
@@ -95,7 +98,10 @@ export default function TestsPage() {
         : "No AI generated tests match this view. Generate a new set for fast topic practice.";
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 relative">
+      {!user?.onboardingCompleted &&
+        <AddSyllabusBanner />
+      }
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
@@ -113,8 +119,8 @@ export default function TestsPage() {
               key={testMode}
               onClick={() => setMode(testMode)}
               className={`h-10 rounded-none px-4 shadow-none hover:transform-none hover:shadow-none ${mode === testMode
-                  ? "bg-primary text-white"
-                  : "button-secondary border-transparent bg-transparent text-(--text)"
+                ? "bg-primary text-white"
+                : "button-secondary border-transparent bg-transparent text-(--text)"
                 }`}
             >
               {testMode === "generated" ? (
@@ -198,12 +204,12 @@ export default function TestsPage() {
               </p>
               <button
                 onClick={() =>
-                  router.push(mode === "generated" ? "/main/create/generate" : "/main/create/manual")
+                  router.push(mode === "all" ? "/main/create" : `${mode === "generated" ? "/main/create/generate" : "/main/create/manual"}`)
                 }
                 className="mt-6 gap-2"
               >
                 <Plus size={18} />
-                {mode === "generated" ? "Generate AI test" : "Create manual test"}
+                {mode==="all" ? "Create a test" : `${mode === "generated" ? "Generate AI test" : "Create manual test"}`}
               </button>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { FileImage, FileText, Sparkles, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, ChangeEvent, DragEvent } from "react";
+import { useEffect, useState, ChangeEvent, DragEvent, useRef } from "react";
 import { toast } from "react-toastify";
 
 type Preferences = {
@@ -40,7 +40,7 @@ export default function Onboarding() {
     const totalSteps = steps.length;
     const router = useRouter();
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-    const { getMe } = useAuth();
+    const { user, getMe } = useAuth();
 
     const [form, setForm] = useState<FormDataType>({
         name: "",
@@ -58,6 +58,26 @@ export default function Onboarding() {
     const [loading, setLoading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const [processingStep, setProcessingStep] = useState(0);
+    const initializedFromUser = useRef(false);
+
+    useEffect(() => {
+        if (!user || initializedFromUser.current) return;
+
+        setForm((current) => ({
+            ...current,
+            name: user.name || current.name,
+            username: user.username || current.username,
+            college: user.college || current.college,
+            semester: user.semester || current.semester,
+            preferences: {
+                difficulty: user.preferences?.difficulty || current.preferences.difficulty,
+                questionsPerTest: user.preferences?.questionsPerTest || current.preferences.questionsPerTest,
+                targetRole: user.preferences?.targetRole || current.preferences.targetRole,
+            },
+        }));
+
+        initializedFromUser.current = true;
+    }, [user]);
 
     useEffect(() => {
         if (!loading || step !== 4) return;
@@ -346,11 +366,11 @@ export default function Onboarding() {
                                 <div className="flex flex-col gap-5">
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Enter your full name:</p>
-                                        <input name="name" placeholder="Full Name" onChange={handleChange} className="w-full" />
+                                        <input name="name" value={form.name} placeholder="Full Name" onChange={handleChange} className="w-full" />
                                     </div>
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Set a username:</p>
-                                        <input name="username" placeholder="username" onChange={handleChange} className="w-full" />
+                                        <input name="username" value={form.username} placeholder="username" onChange={handleChange} className="w-full" />
                                     </div>
                                 </div>
                             )}
@@ -359,11 +379,11 @@ export default function Onboarding() {
                                 <div className="flex flex-col gap-5">
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Enter your college:</p>
-                                        <input name="college" placeholder="College name" onChange={handleChange} className="w-full" />
+                                        <input name="college" value={form.college} placeholder="College name" onChange={handleChange} className="w-full" />
                                     </div>
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Current semester:</p>
-                                        <input name="semester" placeholder="Semester" type="number" onChange={handleChange} className="w-full" />
+                                        <input name="semester" value={form.semester} placeholder="Semester" type="number" onChange={handleChange} className="w-full" />
                                     </div>
                                 </div>
                             )}
@@ -372,11 +392,11 @@ export default function Onboarding() {
                                 <div className="flex flex-col gap-5">
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Enter your target role:</p>
-                                        <input placeholder="Target role" onChange={(e) => handlePref("targetRole", e.target.value)} className="w-full" />
+                                        <input value={form.preferences.targetRole} placeholder="Target role" onChange={(e) => handlePref("targetRole", e.target.value)} className="w-full" />
                                     </div>
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Preffered test difficulty:</p>
-                                        <select className="w-full" onChange={(e) => handlePref("difficulty", e.target.value)}>
+                                        <select value={form.preferences.difficulty} className="w-full" onChange={(e) => handlePref("difficulty", e.target.value)}>
                                             <option>Easy</option>
                                             <option>Medium</option>
                                             <option>Hard</option>
@@ -384,7 +404,7 @@ export default function Onboarding() {
                                     </div>
                                     <div>
                                         <p className="font-semibold mb-2 text-lg">Preffered questions per test:</p>
-                                        <input type="number" className="w-full" placeholder="Questions" onChange={(e) => handlePref("questionsPerTest", Number(e.target.value))} />
+                                        <input type="number" value={form.preferences.questionsPerTest} className="w-full" placeholder="Questions" onChange={(e) => handlePref("questionsPerTest", Number(e.target.value))} />
                                     </div>
 
                                 </div>

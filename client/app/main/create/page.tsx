@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import { useAiTokens } from "@/context/AiTokenContext";
 import { useAuth } from "@/context/AuthContext";
+import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
 
 export default function CreateTestPage() {
     const router = useRouter();
@@ -14,10 +15,7 @@ export default function CreateTestPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-8 relative">
             {!user?.onboardingCompleted &&
-                <div className="md:absolute mb-5 md:mb-0 -top-2 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
-                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
-                    Add your syllabus in profile for personalized tests
-                </div>
+                <AddSyllabusBanner/>
             }
             <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
                 <div>

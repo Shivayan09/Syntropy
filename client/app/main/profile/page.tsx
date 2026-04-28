@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import SyllabusUpload from "@/components/main/SyllabusUpload";
+import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
 
 type UserForm = {
   name: string;
@@ -257,6 +258,8 @@ export default function Profile() {
       </section>
 
       <section className="space-y-6">
+        {!user?.onboardingCompleted && <CompleteOnboardingBanner />}
+
         <div className="flex flex-col md:flex-row gap-5">
           <div className="card2 p-6 md:p-7 w-full md:w-1/2">
             <div className="flex items-center gap-5">
@@ -324,6 +327,19 @@ export default function Profile() {
               <div className="flex items-center justify-between gap-3">
                 <span className="opacity-70">Target</span>
                 <span className="font-extrabold">{form.targetRole || "Not set"}</span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Onboarding</span>
+                <span
+                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${
+                    user?.onboardingCompleted
+                      ? "border-black bg-primary text-white"
+                      : "border-black bg-[#fff3e8] text-[#8a3b12]"
+                  }`}
+                >
+                  {user?.onboardingCompleted ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                  {user?.onboardingCompleted ? "Completed" : "Incomplete"}
+                </span>
               </div>
             </div>
           </div>
@@ -427,6 +443,9 @@ export default function Profile() {
             </div>
             {!user?.onboardingCompleted &&
               <div className="mt-6">
+                <p className="mb-3 text-sm text-gray-500">
+                  Complete onboarding by uploading your syllabus or continue the full setup flow.
+                </p>
                 <SyllabusUpload onUploadSuccess={() => Promise.resolve()} />
               </div>
             }

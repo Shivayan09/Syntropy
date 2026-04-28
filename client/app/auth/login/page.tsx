@@ -7,7 +7,6 @@ import { Target, BarChart3 } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import { div } from "framer-motion/client";
 
 type GoogleCredentialResponse = {
     credential?: string;
