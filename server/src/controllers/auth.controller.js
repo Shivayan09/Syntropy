@@ -10,6 +10,7 @@ import { normalizePlan } from "../config/plan.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
+const DEFAULT_FRONTEND_URL = "https://syntropy-tests.vercel.app";
 
 const normalizeEmail = (email) => email?.trim().toLowerCase();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -50,6 +51,147 @@ const createEmailTransporter = () => nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
+const getFrontendUrl = () => process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
+
+const escapeHtml = (value = "") =>
+    value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+const getFirstName = (name = "") => {
+    const trimmed = name.trim();
+    if (!trimmed) {
+        return "there";
+    }
+    return trimmed.split(/\s+/)[0];
+};
+
+const buildWelcomeEmailHtml = (name) => {
+    const firstName = escapeHtml(getFirstName(name));
+    const frontendUrl = getFrontendUrl();
+    const logoUrl = `${frontendUrl}/logo.png`;
+
+    return `
+        <div style="margin:0;padding:0;background-color:#ffffff;font-family:Inter,system-ui,-apple-system,sans-serif;color:#111111;">
+            <div style="max-width:680px;margin:0 auto;">
+                <div style="background-color:#00a85a;padding:22px 24px;text-align:center;">
+                    <p style="margin:0;font-size:28px;line-height:1.2;font-weight:800;color:#ffffff;text-transform:uppercase;letter-spacing:0.05em;">
+                        Welcome to Syntropy
+                    </p>
+                </div>
+
+                <div style="padding:28px 24px 36px;background-color:#ffffff;">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+                        <h1 style="margin:0;font-size:30px;line-height:1.1;font-weight:800;color:#111111;">Hi ${firstName},</h1>
+                    </div>
+
+                    <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">
+                        You&rsquo;ve just stepped into a smarter way to prepare for exams, placements, and timed assessments.
+                        No fluff, no guesswork, just focused practice and real insights.
+                    </p>
+
+                    <p style="margin:0 0 18px;font-size:16px;font-weight:700;">Here&rsquo;s what you can start doing right away:</p>
+
+                    <div style="margin:0 0 14px;">
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#00a85a;">1. Set up your profile</p>
+                        <p style="margin:0;font-size:15px;line-height:1.7;">Add your academic details so your tests and recommendations actually make sense.</p>
+                    </div>
+
+                    <div style="margin:0 0 14px;">
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#00a85a;">2. Upload your syllabus</p>
+                        <p style="margin:0;font-size:15px;line-height:1.7;">We&rsquo;ll break it down into subjects, units, and topics, so you don&rsquo;t have to.</p>
+                    </div>
+
+                    <div style="margin:0 0 14px;">
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#00a85a;">3. Create or generate tests</p>
+                        <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7;">
+                            <li>Build manual tests your way</li>
+                            <li>Or let AI generate them based on your subjects, difficulty, and goals</li>
+                        </ul>
+                    </div>
+
+                    <div style="margin:0 0 14px;">
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#00a85a;">4. Attempt tests in a real exam environment</p>
+                        <p style="margin:0;font-size:15px;line-height:1.7;">Timed interface, question navigation, review flags, the whole deal.</p>
+                    </div>
+
+                    <div style="margin:0 0 20px;">
+                        <p style="margin:0 0 6px;font-size:16px;font-weight:800;color:#00a85a;">5. Track your performance</p>
+                        <p style="margin:0;font-size:15px;line-height:1.7;">Get insights on accuracy, weak areas, and improvement trends so you know exactly what to fix.</p>
+                    </div>
+
+                    <p style="margin:0 0 8px;font-size:16px;font-weight:800;">Your starting credits are already active.</p>
+                    <p style="margin:0 0 20px;font-size:15px;line-height:1.7;">Use them to generate your first AI-powered tests and see how far you can push yourself.</p>
+
+                    <p style="margin:0 0 14px;font-size:15px;line-height:1.7;">Syntropy isn&rsquo;t about doing more tests.</p>
+                    <p style="margin:0 0 14px;font-size:15px;line-height:1.7;">It&rsquo;s about doing the <strong>right</strong> ones and actually improving.</p>
+
+                    <div style="margin:24px 0 18px;">
+                        <a
+                            href="${frontendUrl}"
+                            style="display:inline-block;background-color:#00a85a;color:#ffffff;text-decoration:none;border:1px solid #000000;border-radius:999px;padding:12px 22px;font-size:15px;font-weight:700;box-shadow:4px 4px 0px #000000;"
+                        >
+                            Get started
+                        </a>
+                    </div>
+
+                    <p style="margin:0;font-size:15px;line-height:1.7;">Let&rsquo;s make your preparation count.</p>
+                    <p style="margin:16px 0 0;font-size:15px;font-weight:700;">- Team Syntropy</p>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+const sendWelcomeEmail = async (email, name) => {
+    const transporter = createEmailTransporter();
+    const frontendUrl = getFrontendUrl();
+
+    await transporter.sendMail({
+        from: process.env.EMAIL,
+        to: email,
+        subject: "Welcome to Syntropy",
+        html: buildWelcomeEmailHtml(name),
+        text: `Hi ${getFirstName(name)},
+
+Welcome to Syntropy.
+
+You’ve just stepped into a smarter way to prepare for exams, placements, and timed assessments. No fluff, no guesswork, just focused practice and real insights.
+
+1. Set up your profile
+Add your academic details so your tests and recommendations actually make sense.
+
+2. Upload your syllabus
+We’ll break it down into subjects, units, and topics, so you don’t have to.
+
+3. Create or generate tests
+- Build manual tests your way
+- Or let AI generate them based on your subjects, difficulty, and goals
+
+4. Attempt tests in a real exam environment
+Timed interface, question navigation, review flags, the whole deal.
+
+5. Track your performance
+Get insights on accuracy, weak areas, and improvement trends so you know exactly what to fix.
+
+Your starting credits are already active.
+Use them to generate your first AI-powered tests and see how far you can push yourself.
+
+Syntropy isn’t about doing more tests.
+It’s about doing the right ones and actually improving.
+
+Get started here:
+${frontendUrl}
+
+Let’s make your preparation count.
+
+- Team Syntropy`,
+    });
+};
 
 const sendRegistrationOtpEmail = async (email, otp) => {
     const transporter = createEmailTransporter();
@@ -196,6 +338,11 @@ export const register = async (req, res) => {
         await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
         setAuthCookie(res, user._id);
         const savedUser = await User.findById(user._id);
+
+        sendWelcomeEmail(normalizedEmail, name).catch((emailError) => {
+            console.error("Welcome email failed", emailError);
+        });
+
         return res.status(200).json({
             success: true,
             user: savedUser
@@ -288,6 +435,7 @@ export const googleLogin = async (req, res) => {
 
         const normalizedEmail = normalizeEmail(payload.email);
         let user = await User.findOne({ email: normalizedEmail });
+        let isNewUser = false;
 
         if (user) {
             if (user.googleId && user.googleId !== payload.sub) {
@@ -326,9 +474,16 @@ export const googleLogin = async (req, res) => {
                 provider: "google",
                 avatar: payload.picture || "",
             });
+            isNewUser = true;
         }
 
         setAuthCookie(res, user._id);
+
+        if (isNewUser) {
+            sendWelcomeEmail(normalizedEmail, user.name).catch((emailError) => {
+                console.error("Welcome email failed", emailError);
+            });
+        }
 
         return res.status(200).json({
             success: true,
