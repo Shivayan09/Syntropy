@@ -11,6 +11,8 @@ import { normalizePlan } from "../config/plan.js";
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
 const DEFAULT_FRONTEND_URL = "https://syntropy-tests.vercel.app";
+const DEFAULT_SMTP_HOST = "smtp.gmail.com";
+const DEFAULT_SMTP_PORT = 465;
 
 const normalizeEmail = (email) => {
     return email?.trim().toLowerCase();
@@ -50,12 +52,36 @@ const validateRegistrationInput = ({ name, email, phoneNumber, password }, requi
     return null;
 };
 
+const getSmtpConfig = () => {
+    const user = process.env.EMAIL;
+    const pass = process.env.EMAIL_PASS;
+
+    if (!user || !pass) {
+        throw new Error("Email service is not configured. Missing EMAIL or EMAIL_PASS.");
+    }
+
+    const host = process.env.SMTP_HOST || DEFAULT_SMTP_HOST;
+    const port = Number(process.env.SMTP_PORT || DEFAULT_SMTP_PORT);
+    const secure = process.env.SMTP_SECURE
+        ? process.env.SMTP_SECURE === "true"
+        : port === 465;
+
+    return {
+        host,
+        port,
+        secure,
+        auth: {
+            user,
+            pass,
+        },
+    };
+};
+
 const createEmailTransporter = () => nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASS,
-    },
+    ...getSmtpConfig(),
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
 });
 
 const getFrontendUrl = () => process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
@@ -200,13 +226,29 @@ Let’s make your preparation count.
 
 const sendRegistrationOtpEmail = async (email, otp) => {
     const transporter = createEmailTransporter();
+    const startedAt = Date.now();
 
-    await transporter.sendMail({
-        from: process.env.EMAIL,
-        to: email,
-        subject: 'Verify your email',
-        html: `<p>Your registration OTP is <strong>${otp}</strong>.</p><p>This code expires in ${OTP_EXPIRY_MINUTES} minutes.</p>`,
-    });
+    try {
+        await transporter.sendMail({
+            from: process.env.EMAIL,
+            to: email,
+            subject: 'Verify your email',
+            html: `<p>Your registration OTP is <strong>${otp}</strong>.</p><p>This code expires in ${OTP_EXPIRY_MINUTES} minutes.</p>`,
+        });
+        console.log("Registration OTP email sent", {
+            email,
+            durationMs: Date.now() - startedAt,
+        });
+    } catch (error) {
+        console.error("Registration OTP email send failed", {
+            email,
+            message: error?.message,
+            code: error?.code,
+            command: error?.command,
+            durationMs: Date.now() - startedAt,
+        });
+        throw error;
+    }
 };
 
 export const sendRegistrationOtp = async (req, res) => {

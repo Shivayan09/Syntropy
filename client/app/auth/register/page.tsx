@@ -30,11 +30,16 @@ export default function RegisterPage() {
     });
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
-    const getErrorMessage = (err: unknown) => err instanceof Error ? err.message : "Something went wrong";
+    const getErrorMessage = (err: unknown) => {
+        if (err instanceof DOMException && err.name === "AbortError") {
+            return "OTP request timed out. The server may be stuck while sending the email.";
+        }
+        return err instanceof Error ? err.message : "Something went wrong";
+    };
     const next = () => setStep((s) => Math.min(s + 1, 3));
     const back = () => setStep((s) => Math.max(s - 1, 1));
 
-    const fetchWithTimeout = async (input: RequestInfo | URL, init?: RequestInit, timeoutMs = 15000) => {
+    const fetchWithTimeout = async (input: RequestInfo | URL, init?: RequestInit, timeoutMs = 30000) => {
         const controller = new AbortController();
         const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
