@@ -36,6 +36,7 @@ declare global {
                             logo_alignment?: "left" | "center";
                         }
                     ) => void;
+                    prompt: () => void;
                 };
             };
         };
