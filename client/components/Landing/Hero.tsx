@@ -1,12 +1,7 @@
 "use client";
 
-import {
-    ArrowDown,
-    BookOpenCheck,
-    ClipboardList,
-    TimerReset,
-    Trophy,
-} from "lucide-react";
+import Image from "next/image";
+import { ArrowDown, BookOpenCheck, ClipboardList, TimerReset, Trophy } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Hero() {
@@ -57,53 +52,8 @@ export default function Hero() {
                 </div>
             </div>
 
-            <div className="card bg-surface w-full md:w-1/2 space-y-5">
-                <div className="flex items-center justify-between gap-4">
-                    <div>
-                        <p className="text-sm font-bold text-primary">YOUR PRACTICE LOOP</p>
-                        <h3 className="font-bold text-2xl mt-3">From syllabus to score review</h3>
-                    </div>
-                    <div className="border border-black bg-secondary px-3 py-1 text-sm font-bold">
-                        Free plan: 10 AI tests/month
-                    </div>
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                    {[
-                        {
-                            icon: BookOpenCheck,
-                            title: "Upload syllabus",
-                            desc: "Parse subjects and units once, then reuse them while creating tests.",
-                        },
-                        {
-                            icon: ClipboardList,
-                            title: "Generate tests",
-                            desc: "Set difficulty, duration, marks, and student context for AI papers.",
-                        },
-                        {
-                            icon: TimerReset,
-                            title: "Attempt on timer",
-                            desc: "Navigate questions, mark for review, and auto-submit on time out.",
-                        },
-                        {
-                            icon: Trophy,
-                            title: "Review and rank",
-                            desc: "See feedback, analytics, weak zones, and leaderboard impact.",
-                        },
-                    ].map((item) => {
-                        const Icon = item.icon;
-
-                        return (
-                            <div key={item.title} className="border border-black bg-secondary p-4">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Icon size={20} className="text-primary" />
-                                <p className="font-bold">{item.title}</p>
-                                </div>
-                                <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
-                            </div>
-                        );
-                    })}
-                </div>
+            <div className="w-full md:w-1/2 space-y-5">
+                <div className="logo-img w-full h-140" />
             </div>
             <div className="absolute bottom-10 left-1/2 hidden md:flex p-3 bg-secondary rounded-full animate-bounce">
                 <ArrowDown className="opacity-70" />

@@ -164,3 +164,14 @@ input:focus, textarea:focus {
   outline: 2px dashed var(--primary);
   outline-offset: 3px;
 }
+
+.logo-img {
+  background-image: url("/platform-light.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.dark .logo-img {
+  background-image: url("/platform-dark.png");
+}
