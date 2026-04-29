@@ -13,7 +13,7 @@ export default function CreateTestPage() {
     const { user } = useAuth();
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 relative">
+        <div className="mx-auto space-y-7 relative">
             {!user?.onboardingCompleted &&
                 <AddSyllabusBanner/>
             }
@@ -26,7 +26,7 @@ export default function CreateTestPage() {
                 </div>
             </section>
 
-            <div className="card2">
+            <div className="card2 -mt-3">
                 <p className="text-sm opacity-70 mb-2">CREATE MODE</p>
                 <h1 className="text-4xl font-extrabold">
                     Build a test that fits your goal.

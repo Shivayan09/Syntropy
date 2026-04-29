@@ -2,17 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Circle,
-  Clock3,
-  FileQuestion,
-  RotateCcw,
-  Target,
-  XCircle,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Clock3, FileQuestion, RotateCcw, Target, XCircle } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type Question = {
@@ -213,27 +203,27 @@ export default function AttemptReviewPage() {
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <section className="flex flex-col gap-4 border-b border-(--border) pb-5 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
-          <button onClick={() => router.push("/main/history")} className="button-secondary mb-4 gap-2">
-            <ArrowLeft size={18} />
-            History
-          </button>
-          <p className="mb-2 flex items-center gap-2 text-xs font-extrabold uppercase text-primary">
-            <FileQuestion size={15} />
-            Answer review
-          </p>
-          <h1 className="truncate text-3xl font-extrabold leading-tight">{attempt.test?.title || "Mock Test"}</h1>
-          <p className="mt-2 text-sm opacity-65">
-            Attempted on {formatDateTime(attempt.completedAt || attempt.createdAt)} · {subjectLabel}
-          </p>
+        <div className="min-w-0 w-full">
+          <div className="flex items-center justify-between">
+            <p className="flex items-center gap-2 text-xs font-extrabold uppercase text-primary">
+              <FileQuestion size={15} />
+              Answer review
+            </p>
+            <p className="text-sm opacity-65">
+              Attempted on {formatDateTime(attempt.completedAt || attempt.createdAt)} · {subjectLabel}
+            </p>
+          </div>
+          <div className="flex items-center justify-between mt-3">
+            <h1 className="truncate text-3xl font-extrabold leading-tight">{attempt.test?.title || "Mock Test"}</h1>
+            {attempt.test?._id && (
+              <button onClick={() => router.push(`/main/test/preview/${attempt.test?._id}`)} className="gap-2">
+                <RotateCcw size={18} />
+                Retake test
+              </button>
+            )}
+          </div>
         </div>
 
-        {attempt.test?._id && (
-          <button onClick={() => router.push(`/main/test/preview/${attempt.test?._id}`)} className="gap-2">
-            <RotateCcw size={18} />
-            Retake test
-          </button>
-        )}
       </section>
 
       <section className="grid gap-4 md:grid-cols-4">
@@ -299,19 +289,17 @@ export default function AttemptReviewPage() {
                 return (
                   <div
                     key={`${option}-${index}`}
-                    className={`flex min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${
-                      isCorrect
-                        ? "border-primary bg-primary text-white"
-                        : isWrongSelection
-                          ? "border-[#ef4444] bg-[#ef4444] text-white"
-                          : "border-(--border) bg-(--surface)"
-                    }`}
+                    className={`flex min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${isCorrect
+                      ? "border-primary bg-primary text-white"
+                      : isWrongSelection
+                        ? "border-[#ef4444] bg-[#ef4444] text-white"
+                        : "border-(--border) bg-(--surface)"
+                      }`}
                   >
                     <div className="flex items-start gap-4">
                       <span
-                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${
-                          isCorrect || isWrongSelection ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
-                        }`}
+                        className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${isCorrect || isWrongSelection ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"
+                          }`}
                       >
                         {optionLabels[index] || index + 1}
                       </span>
@@ -437,15 +425,14 @@ export default function AttemptReviewPage() {
                   <div
                     key={index}
                     onClick={() => setActive(index)}
-                    className={`h-11 cursor-pointer items-center justify-center rounded-lg px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${
-                      isActive
-                        ? "flex bg-primary text-white"
-                        : state === "correct" || state === "answered"
-                          ? "button-secondary flex bg-(--surface) text-(--text)"
-                          : state === "wrong"
-                            ? "flex border border-[#ef4444]"
-                            : "button-secondary flex bg-(--surface) text-(--text)"
-                    }`}
+                    className={`h-11 cursor-pointer items-center justify-center rounded-lg px-0 text-sm shadow-none hover:transform-none hover:shadow-none ${isActive
+                      ? "flex bg-primary text-white"
+                      : state === "correct" || state === "answered"
+                        ? "button-secondary flex bg-(--surface) text-(--text)"
+                        : state === "wrong"
+                          ? "flex border border-[#ef4444]"
+                          : "button-secondary flex bg-(--surface) text-(--text)"
+                      }`}
                     aria-label={`Review question ${index + 1}`}
                   >
                     <span className="flex items-center justify-center gap-1.5">

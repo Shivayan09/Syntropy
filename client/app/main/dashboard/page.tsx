@@ -189,7 +189,7 @@ export default function Dashboard() {
           },
           {
             label: "Average score",
-            value: attempts.length > 0 ? `${averageScore}%` : "--",
+            value: attempts.length > 0 ? `${averageScore}` : "--",
             note: "First attempts counted",
           },
           {
@@ -199,7 +199,7 @@ export default function Dashboard() {
           },
           {
             label: "Best score",
-            value: bestAttempt ? `${clampPercent(bestAttempt.score || 0)}%` : "--",
+            value: bestAttempt ? `${clampPercent(bestAttempt.score || 0)}` : "--",
             note: bestAttempt?.test?.title || "No top score yet",
           },
         ].map((stat) => {

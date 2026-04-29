@@ -54,6 +54,12 @@ type TrendPoint = {
   accuracy: number;
 };
 
+type SubjectStat = {
+  name: string;
+  attempts: number;
+  average: number;
+};
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
 
 const clampPercent = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
@@ -109,6 +115,30 @@ export default function Analytics() {
   const router = useRouter();
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const subjectStats = useMemo<SubjectStat[]>(() => {
+    const subjectMap = new Map<string, { total: number; count: number }>();
+
+    attempts.forEach((attempt) => {
+      const subject = attempt.test?.subjects?.[0] || "Mixed practice";
+      const current = subjectMap.get(subject) || { total: 0, count: 0 };
+      subjectMap.set(subject, {
+        total: current.total + getAccuracy(attempt),
+        count: current.count + 1,
+      });
+    });
+
+    return Array.from(subjectMap.entries())
+      .map(([name, stat]) => ({
+        name,
+        attempts: stat.count,
+        average: clampPercent(stat.total / stat.count),
+      }))
+      .sort((a, b) => b.average - a.average);
+  }, [attempts]);
+
+  const topSubject = subjectStats[0];
+  const displayedSubjectStats = subjectStats.slice(0, 4);
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -235,7 +265,7 @@ export default function Analytics() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
-      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
+      <section className="flex items-center justify-between gap-2 md:gap-5 border-b border-(--border) pb-2">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
             <BarChart3 size={18} />
@@ -286,7 +316,7 @@ export default function Analytics() {
 
             </div>
 
-            <div className="card p-6 md:p-7">
+            <div className="card p-6 md:p-7 hidden md:flex flex-col">
               <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-bold opacity-60">Recent trend</p>
@@ -337,23 +367,82 @@ export default function Analytics() {
 
           <section className="grid gap-6 xl:grid-cols-[1fr_0.7fr]">
             <div className="card p-6 md:p-7">
-              <div className="mb-6 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-bold opacity-60">Subject map</p>
-                  <h2 className="text-2xl font-extrabold">Where marks are coming from</h2>
-                </div>
-                <BookOpenCheck className="text-primary" size={25} />
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-bold opacity-60">Subject map</p>
+              <h2 className="text-2xl font-extrabold">Accuracy by practice zone</h2>
+            </div>
+            <button onClick={() => router.push("/main/analytics")} className="button-secondary gap-2">
+              Analytics
+              <ArrowRight size={18} />
+            </button>
+          </div>
+
+          {subjectStats.length === 0 ? (
+            <div className="grid min-h-44 place-items-center border border-dashed border-black p-6 text-center">
+              <div>
+                <p className="font-extrabold">No subjects mapped yet</p>
+                <p className="mt-1 text-sm opacity-60">Your first attempt will unlock this view.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-1 flex-col">
+              <div className="space-y-1">
+                {displayedSubjectStats.map((subject) => (
+                  <div key={subject.name} className="py-1">
+                    <div className="mb-2 flex items-center justify-between gap-4 text-sm">
+                      <p className="font-bold">{subject.name}</p>
+                      <p className="font-extrabold">{subject.average}%</p>
+                    </div>
+                    <div className="h-4 overflow-clip rounded-full border border-black bg-secondary">
+                      <div
+                        className="h-full border-r border-black bg-primary"
+                        style={{ width: `${subject.average}%` }}
+                      />
+                    </div>
+                    <p className="mt-1 text-xs opacity-60">{subject.attempts} attempts</p>
+                  </div>
+                ))}
               </div>
 
-              {analytics.subjects.length === 0 ? (
-                <EmptyState text="No subject-level question data is available yet." />
-              ) : (
-                <div className="space-y-4">
-                  {analytics.subjects.slice(0, 6).map((subject) => (
-                    <MetricBar key={subject.name} label={subject.name} value={subject.accuracy} note={`${subject.total} questions`} />
-                  ))}
+              {displayedSubjectStats.length <= 2 && topSubject && (
+                <div className="mt-6 grid gap-3 border-t border-(--border) pt-5 sm:grid-cols-3">
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Primary zone</p>
+                    <p className="mt-2 text-lg font-extrabold">{topSubject.name}</p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1 ? "Current mapped subject" : "Strongest mapped subject"}
+                    </p>
+                  </div>
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Tracked attempts</p>
+                    <p className="mt-2 text-lg font-extrabold">
+                      {displayedSubjectStats.reduce((total, subject) => total + subject.attempts, 0)}
+                    </p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1 ? "Attempts in this zone" : "Attempts across mapped zones"}
+                    </p>
+                  </div>
+                  <div className="border border-(--border) bg-(--bg-secondary) p-4">
+                    <p className="text-xs font-bold uppercase opacity-60">Current accuracy</p>
+                    <p className="mt-2 text-lg font-extrabold">
+                      {displayedSubjectStats.length === 1
+                        ? `${topSubject.average}%`
+                        : `${Math.round(
+                          displayedSubjectStats.reduce((total, subject) => total + subject.average, 0) /
+                          displayedSubjectStats.length
+                        )}%`}
+                    </p>
+                    <p className="mt-1 text-xs opacity-60">
+                      {displayedSubjectStats.length === 1
+                        ? "Baseline before more subjects appear"
+                        : "Average across the mapped subjects"}
+                    </p>
+                  </div>
                 </div>
               )}
+            </div>
+          )}
             </div>
 
             <div className="card p-6 md:p-7">
@@ -512,23 +601,6 @@ function TrendLineChart({ points, onSelect }: { points: TrendPoint[]; onSelect: 
             </div>
           ))}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function MetricBar({ label, value, note }: { label: string; value: number; note: string }) {
-  return (
-    <div>
-      <div className="mb-2 flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <p className="truncate font-extrabold">{label}</p>
-          <p className="text-xs opacity-60">{note}</p>
-        </div>
-        <p className="font-extrabold">{value}%</p>
-      </div>
-      <div className="h-3 border border-(--border) bg-(--surface) rounded-full overflow-clip">
-        <div className="h-full bg-primary" style={{ width: `${value}%` }} />
       </div>
     </div>
   );

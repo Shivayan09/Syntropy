@@ -117,9 +117,9 @@ export default function AttemptsPage() {
   const averageAccuracy =
     completedAttempts.length > 0
       ? Math.round(
-          completedAttempts.reduce((total, attempt) => total + (attempt.accuracy || 0), 0) /
-            completedAttempts.length,
-        )
+        completedAttempts.reduce((total, attempt) => total + (attempt.accuracy || 0), 0) /
+        completedAttempts.length,
+      )
       : 0;
   const bestAttempt = attempts.reduce<Attempt | null>((best, attempt) => {
     if (!best) return attempt;
@@ -144,7 +144,7 @@ export default function AttemptsPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-7">
-      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
+      <section className="flex items-center justify-between gap-2 md:gap-5 border-b border-(--border) pb-2">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
             <History size={18} />
@@ -158,28 +158,34 @@ export default function AttemptsPage() {
         </button>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="card2 p-5">
-          <CheckCircle2 size={23} className="mb-4 text-primary" />
-          <p className="text-sm font-bold opacity-60">Completed attempts</p>
+      <section className="grid gap-4 grid-cols-2 md:grid-cols-3 -mt-3">
+        <div className="card p-5">
+          <div className="flex items-center gap-2 ">
+            <CheckCircle2 size={23} className=" text-primary" />
+            <p className="text-sm font-bold opacity-60">Completed attempts</p>
+          </div>
           <p className="mt-2 text-3xl font-extrabold">{completedAttempts.length}</p>
-          <p className="text-xs opacity-60">{attempts.length} total records</p>
+          <p className="text-xs opacity-60 mt-1">{attempts.length} total records</p>
         </div>
 
         <div className="card p-5">
-          <Target size={23} className="mb-4 text-primary" />
-          <p className="text-sm font-bold opacity-60">Average accuracy</p>
+          <div className="flex items-center gap-2">
+            <Target size={23} className="text-primary" />
+            <p className="text-sm font-bold opacity-60">Average accuracy</p>
+          </div>
           <p className="mt-2 text-3xl font-extrabold">{completedAttempts.length ? `${averageAccuracy}%` : "--"}</p>
-          <p className="text-xs opacity-60">across completed tests</p>
+          <p className="text-xs opacity-60 mt-1">across completed tests</p>
         </div>
 
-        <div className="card p-5">
-          <TrendingUp size={23} className="mb-4 text-primary" />
-          <p className="text-sm font-bold opacity-60">Best score</p>
+        <div className="card p-5 hidden md:block">
+          <div className="flex items-center gap-2">
+            <TrendingUp size={23} className="text-primary" />
+            <p className="text-sm font-bold opacity-60">Best score</p>
+          </div>
           <p className="mt-2 text-3xl font-extrabold">
             {bestAttempt ? Math.round(bestAttempt.score || 0) : "--"}
           </p>
-          <p className="truncate text-xs opacity-60">{bestAttempt?.test?.title || `${totalMinutes} min practiced`}</p>
+          <p className="truncate text-xs opacity-60 mt-1">{bestAttempt?.test?.title || `${totalMinutes} min practiced`}</p>
         </div>
       </section>
 
