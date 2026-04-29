@@ -2,18 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  CalendarDays,
-  Clock3,
-  ClipboardList,
-  ClipboardPen,
-  FileQuestion,
-  ListFilter,
-  Plus,
-  Search,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, CalendarDays, Clock3, ClipboardList, ClipboardPen, FileQuestion, ListFilter, Plus, Search, Sparkles } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { useAuth } from "@/context/AuthContext";
 import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
@@ -112,7 +101,7 @@ export default function TestsPage() {
 
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+      <section className="grid gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center -mt-3">
         <div className="flex justify-between md:gap-3">
           {(["all", "manual", "generated"] as TestMode[]).map((testMode) => (
             <button
@@ -209,7 +198,7 @@ export default function TestsPage() {
                 className="mt-6 gap-2"
               >
                 <Plus size={18} />
-                {mode==="all" ? "Create a test" : `${mode === "generated" ? "Generate AI test" : "Create manual test"}`}
+                {mode === "all" ? "Create a test" : `${mode === "generated" ? "Generate AI test" : "Create manual test"}`}
               </button>
             </div>
           </div>

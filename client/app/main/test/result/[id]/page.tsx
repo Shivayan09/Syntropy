@@ -2,12 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  FileQuestion,
-  Target,
-  Trophy,
-} from "lucide-react";
+import { ArrowRight, FileQuestion, Target, Trophy } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
@@ -64,7 +59,7 @@ const formatAttemptDuration = (result: AttemptResult) => {
   const seconds = Math.round(
     (new Date(result.completedAt).getTime() -
       new Date(result.startedAt).getTime()) /
-      1000
+    1000
   );
 
   return Number.isFinite(seconds) && seconds >= 0
@@ -181,11 +176,11 @@ export default function ResultPage() {
     performanceRatio >= 0.8
       ? "Excellent control"
       : performanceRatio >= 0.6
-      ? "Solid attempt"
-      : "Needs focused review";
+        ? "Solid attempt"
+        : "Needs focused review";
 
   return (
-    <div className="mx-auto space-y-7 overflow-y-auto px-8 py-6">
+    <div className="mx-auto space-y-7 overflow-y-auto px-4 md:px-8 py-6">
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
@@ -232,9 +227,8 @@ export default function ResultPage() {
             <div
               className="grid h-52 w-52 place-items-center justify-self-center rounded-full border border-(--border)"
               style={{
-                background: `conic-gradient(var(--primary) ${
-                  (isMCQ ? accuracy : performanceRatio * 100) * 3.6
-                }deg, var(--surface) 0deg)`,
+                background: `conic-gradient(var(--primary) ${(isMCQ ? accuracy : performanceRatio * 100) * 3.6
+                  }deg, var(--surface) 0deg)`,
               }}
             >
               <div className="grid h-36 w-36 place-items-center rounded-full border border-(--border) bg-(--bg-secondary) text-center">
@@ -281,7 +275,7 @@ export default function ResultPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 grid-cols-3">
             {isMCQ ? (
               <>
                 <ResultMetric label="Correct" value={correct} tone="primary" />
@@ -364,9 +358,8 @@ function ResultMetric({
     <div className="card p-5">
       <p className="text-sm font-bold opacity-60">{label}</p>
       <p
-        className={`mt-2 text-4xl font-extrabold ${
-          tone === "primary" ? "text-primary" : ""
-        }`}
+        className={`mt-2 text-4xl font-extrabold ${tone === "primary" ? "text-primary" : ""
+          }`}
       >
         {value}
       </p>

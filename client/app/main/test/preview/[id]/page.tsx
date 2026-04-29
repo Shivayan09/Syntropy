@@ -2,18 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CalendarDays,
-  CheckCircle2,
-  Clock3,
-  ClipboardPen,
-  FileQuestion,
-  Gauge,
-  Layers3,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock3, ClipboardPen, FileQuestion, Gauge, Layers3, Sparkles } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type TestPreviewData = {
@@ -126,14 +115,14 @@ export default function TestPreview() {
   }
 
   return (
-    <div className="mx-auto space-y-7 px-8 py-6">
+    <div className="mx-auto space-y-7 px-4 md:px-8 py-6">
       <section className="flex flex-col gap-5 border-b border-(--border) pb-6 lg:flex-row lg:items-end lg:justify-between">
         <div className="flex items-center gap-3 md:gap-7">
           <div>
             <button onClick={() => router.push("/main/tests")} className="button-secondary gap-2">
-            <ArrowLeft size={18} />
-            Tests
-          </button>
+              <ArrowLeft size={18} />
+              Tests
+            </button>
           </div>
 
           <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">
