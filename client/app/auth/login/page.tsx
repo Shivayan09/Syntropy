@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { Target, BarChart3, X } from "lucide-react";
+import { Target, BarChart3, Globe, X } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
@@ -51,6 +51,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [googleReady, setGoogleReady] = useState(false);
+    const [googleButtonMounted, setGoogleButtonMounted] = useState(false);
     const [googleTermsOpen, setGoogleTermsOpen] = useState(false);
     const [googleTermsAccepted, setGoogleTermsAccepted] = useState(false);
     const [pendingGoogleCredential, setPendingGoogleCredential] = useState<string | null>(null);
@@ -170,10 +171,17 @@ export default function LoginPage() {
     };
 
     useEffect(() => {
+        if (window.google) {
+            setGoogleReady(true);
+        }
+    }, []);
+
+    useEffect(() => {
         if (!googleReady || !GOOGLE_CLIENT_ID || !googleButtonRef.current || !window.google) {
             return;
         }
 
+        setGoogleButtonMounted(false);
         googleButtonRef.current.innerHTML = "";
         window.google.accounts.id.initialize({
             client_id: GOOGLE_CLIENT_ID,
@@ -190,6 +198,8 @@ export default function LoginPage() {
             width: buttonWidth,
             logo_alignment: "left",
         });
+
+        requestAnimationFrame(() => setGoogleButtonMounted(true));
     }, [GOOGLE_CLIENT_ID, googleReady]);
 
     return (
@@ -315,10 +325,21 @@ export default function LoginPage() {
                         </div>
                         {GOOGLE_CLIENT_ID ? (
                             <div className="flex items-center justify-center">
-                                <div className="rounded-[28px] border border-black/10 bg-white shadow-[3px_3px_0px_rgba(0,0,0,0.08)]">
+                                <div className="relative mx-auto w-full max-w-90 rounded-[28px] border border-black/10 bg-white shadow-[3px_3px_0px_rgba(0,0,0,0.08)]">
+                                    {!googleButtonMounted && (
+                                        <div
+                                            aria-hidden="true"
+                                            className="absolute inset-0 flex min-h-10 items-center justify-center rounded-full text-sm font-semibold text-gray-700"
+                                        >
+                                            <div className="flex h-10 w-full items-center justify-center gap-3 rounded-full border border-black/10 bg-white px-4">
+                                                <Globe size={18} className="text-gray-700" />
+                                                <span>{googleReady ? "Preparing Google sign-in..." : "Loading Google sign-in..."}</span>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div
                                         ref={googleButtonRef}
-                                        className={`min-h-10 w-full overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""}`}
+                                        className={`min-h-10 w-full overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""} ${googleButtonMounted ? "opacity-100" : "opacity-0"}`}
                                     />
                                 </div>
                             </div>
