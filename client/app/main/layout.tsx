@@ -22,14 +22,21 @@ export default function Layout({
       <div className="flex h-screen overflow-hidden">
         {!isTestPage && (<Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />)}
 
-        <main className={`flex-1 ${isTestPage ? 'overflow-y-auto' : 'overflow-y-auto px-4 md:px-8 py-6 pt-20 md:pt-6'}`}>
-          {children}
-          {!isTestPage && (
-            <div className="mt-10">
-              <Footer />
-            </div>
-          )}
-        </main>
+        <main className={`flex-1 overflow-y-auto`}>
+      
+      {/* CONTENT (with padding) */}
+      <div className={isTestPage ? "" : "px-4 md:px-8 py-6 pt-20 md:pt-6"}>
+        {children}
+      </div>
+
+      {/* FOOTER (no padding) */}
+      {!isTestPage && (
+        <div className="mt-10">
+          <Footer />
+        </div>
+      )}
+      
+    </main>
       </div>
     </ProtectedRoute>
   );

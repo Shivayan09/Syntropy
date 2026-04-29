@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
     plan: { type: String, enum: ["free", "starter", "pro", "power", "elite"], default: "free" },
     planBillingCycle: { type: String, enum: ["monthly", "annual", null], default: null },
     planExpiry: { type: Date },
+    termsAcceptedAt: { type: Date },
     preferences: {
         type: {
             subjects: { type: [String], default: [] },

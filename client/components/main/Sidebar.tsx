@@ -2,21 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-import {
-  BarChart3,
-  BookOpen,
-  History,
-  LayoutDashboard,
-  LogOut,
-  Menu,
-  Pen,
-  Settings,
-  X,
-  PanelLeft,
-  Trophy,
-  Crown,
-  Headphones
-} from "lucide-react";
+import {BarChart3,BookOpen,History,LayoutDashboard,LogOut,Menu,Pen,Settings,X,PanelLeft,Trophy,Crown,Headphones} from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -169,7 +155,7 @@ export default function Sidebar({
       </aside>
 
       {/* DESKTOP SIDEBAR */}
-      <aside className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between transition-all duration-300 ease-in-out ${collapsed ? "w-18 px-2" : "w-50 px-3"} py-6`}>
+      <aside className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between transition-all duration-300 ease-in-out ${collapsed ? "w-18 px-2" : "w-50 px-3"} py-6 border-r border-(--border)`}>
 
         <div className={`absolute  ${collapsed ? 'bottom-20 right-5.5' : 'bottom-6.5 right-1'}`}>
           <ThemeToggle />

@@ -303,13 +303,19 @@ export const verifyRegistrationOtp = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-    const { name, email, phoneNumber, password } = req.body
+    const { name, email, phoneNumber, password, acceptedTerms } = req.body
     const validationError = validateRegistrationInput({ name, email, phoneNumber, password });
     if (validationError) {
         return res.status(400).json({
             success: false,
             message: validationError
         })
+    }
+    if (acceptedTerms !== true) {
+        return res.status(400).json({
+            success: false,
+            message: "Please accept the Terms and Conditions to create an account"
+        });
     }
     try {
         const normalizedEmail = normalizeEmail(email);
@@ -339,6 +345,7 @@ export const register = async (req, res) => {
             email: normalizedEmail,
             password: hashedPassword,
             emailVerified: true,
+            termsAcceptedAt: new Date(),
         });
         await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
         setAuthCookie(res, user._id);
@@ -405,7 +412,7 @@ export const login = async (req, res) => {
 
 export const googleLogin = async (req, res) => {
     try {
-        const { idToken } = req.body;
+        const { idToken, acceptedTerms } = req.body;
         if (!process.env.GOOGLE_CLIENT_ID) {
             return res.status(500).json({
                 success: false,
@@ -465,6 +472,13 @@ export const googleLogin = async (req, res) => {
                 await user.save();
             }
         } else {
+            if (acceptedTerms !== true) {
+                return res.status(428).json({
+                    success: false,
+                    requiresTermsAcceptance: true,
+                    message: "Please accept the Terms and Conditions to continue with Google"
+                });
+            }
             user = await User.create({
                 name: payload.name || normalizedEmail.split("@")[0],
                 email: normalizedEmail,
@@ -472,6 +486,7 @@ export const googleLogin = async (req, res) => {
                 googleId: payload.sub,
                 provider: "google",
                 avatar: payload.picture || "",
+                termsAcceptedAt: new Date(),
             });
             isNewUser = true;
         }

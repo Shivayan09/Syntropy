@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Target, BarChart3 } from "lucide-react";
@@ -18,6 +19,7 @@ export default function RegisterPage() {
     const [passwordFeedback, setPasswordFeedback] = useState<string[]>([]);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -123,6 +125,10 @@ export default function RegisterPage() {
             toast.error("Passwords do not match");
             return;
         }
+        if (!acceptedTerms) {
+            toast.warn("Please accept the Terms and Conditions to continue");
+            return;
+        }
 
         try {
             setLoading(true);
@@ -137,7 +143,8 @@ export default function RegisterPage() {
                     name: form.name,
                     email: form.email,
                     phoneNumber: form.phoneNumber,
-                    password: form.password
+                    password: form.password,
+                    acceptedTerms
                 })
             });
             const data = await res.json();
@@ -369,6 +376,22 @@ export default function RegisterPage() {
                                     </div>
                                 </div>
 
+                                <label className="flex items-start gap-3 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        className="mt-1 h-4 w-4 shrink-0"
+                                        checked={acceptedTerms}
+                                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                    />
+                                    <span>
+                                        I agree to the{" "}
+                                        <Link href="/terms-and-conditions" target="_blank" className="font-bold text-primary underline">
+                                            Terms and Conditions
+                                        </Link>
+                                        .
+                                    </span>
+                                </label>
+
                                 <div className="flex gap-3">
                                     <button className="button-secondary w-1/2" onClick={back}>
                                         Back
@@ -377,7 +400,7 @@ export default function RegisterPage() {
                                     <button
                                         className={`w-full ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                                         onClick={handleRegister}
-                                        disabled={loading}
+                                        disabled={loading || !acceptedTerms}
                                     >
                                         {loading ? "Creating..." : "Create Account"}
                                     </button>
