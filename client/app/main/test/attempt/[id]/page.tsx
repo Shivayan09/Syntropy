@@ -114,7 +114,6 @@ export default function AttemptPage() {
           credentials: "include",
         });
         const data = await res.json();
-        console.log("API RESPONSE:", data);
         if (!data || !data.attempt) {
           console.error("Invalid attempt response", data);
           return;

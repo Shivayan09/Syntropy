@@ -1,6 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
-import validator from 'validator'
+import validator from "validator";
 import nodemailer from "nodemailer";
 import { buildAiTokenStatus, syncAiTokens } from "../utils/aiToken.utils.js";
 
@@ -32,7 +32,7 @@ export const getAiTokenStatus = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to load AI token status"
         });
     }
 };
@@ -73,13 +73,13 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "Name is too short (2 chars min)"
-                })
+                });
             }
             if (name.length > 50) {
                 return res.status(400).json({
                     success: false,
                     message: "Name is too long (50 chars max)"
-                })
+                });
             }
             updateData.name = name;
         }
@@ -88,13 +88,13 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "Username is too short (3 chars min)"
-                })
+                });
             }
             if (username.length > 30) {
                 return res.status(400).json({
                     success: false,
                     message: "Username is too long (30 chars max)"
-                })
+                });
             }
             updateData.username = username;
         }
@@ -103,7 +103,7 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "Please enter a valid phone number!"
-                })
+                });
             }
             updateData.phoneNumber = phoneNumber;
         }
@@ -112,7 +112,7 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "Please enter a valid email!"
-                })
+                });
             }
             const normalizedEmail = normalizeEmail(email);
             updateData.email = normalizedEmail;
@@ -125,7 +125,7 @@ export const updateProfile = async (req, res) => {
                 return res.status(400).json({
                     success: false,
                     message: "College name is too short (2 chars min)"
-                })
+                });
             }
             updateData.college = college;
         }
@@ -158,7 +158,7 @@ export const updateProfile = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to update profile"
         });
     }
 };
@@ -197,7 +197,7 @@ export const updateAvatar = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message,
+            message: "Unable to update avatar",
         });
     }
 };
@@ -289,7 +289,7 @@ ${safeMessage}`,
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to send support request"
         });
     }
 };

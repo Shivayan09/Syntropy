@@ -3,7 +3,7 @@ import Test from "../models/test.model.js";
 import { evaluateSubjective } from "../services/evaluateSubjective.service.js";
 
 const normalizeAttemptAnswers = (answers = []) => {
-    answers.map((entry) => {
+    return answers.map((entry) => {
         if (typeof entry === "number" || entry === null || entry === undefined) {
             return {
                 answer: entry ?? null,
@@ -17,7 +17,27 @@ const normalizeAttemptAnswers = (answers = []) => {
             feedback: entry?.feedback ?? ""
         };
     });
-}
+};
+
+const sanitizeQuestionForAttempt = (question = {}) => ({
+    question: question.question,
+    options: question.options,
+    marks: question.marks,
+    subject: question.subject,
+    difficulty: question.difficulty,
+    topic: question.topic,
+});
+
+const sanitizeAttemptForActiveSession = (attempt) => {
+    const plainAttempt = attempt.toObject({ minimize: false });
+    plainAttempt.answers = normalizeAttemptAnswers(plainAttempt.answers);
+
+    if (plainAttempt.test?.questions) {
+        plainAttempt.test.questions = plainAttempt.test.questions.map(sanitizeQuestionForAttempt);
+    }
+
+    return plainAttempt;
+};
 
 const serializeAttempt = (attempt) => {
     const plainAttempt = attempt.toObject({ minimize: false });
@@ -150,12 +170,14 @@ export const getAttemptById = async (req, res) => {
         }
         return res.json({
             success: true,
-            attempt: serializeAttempt(attempt)
+            attempt: attempt.status === "in_progress"
+                ? sanitizeAttemptForActiveSession(attempt)
+                : serializeAttempt(attempt)
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to load attempt"
         });
     }
 };
@@ -179,7 +201,7 @@ export const startAttempt = async (req, res) => {
     try {
         const userId = req.user._id;
         const { testId } = req.body;
-        const test = await Test.findById(testId);
+        const test = await Test.findOne({ _id: testId, createdBy: userId });
         if (!test) {
             return res.status(404).json({
                 success: false,
@@ -194,7 +216,7 @@ export const startAttempt = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to start attempt"
         });
     }
 };
@@ -223,7 +245,7 @@ export const heartbeatAttempt = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to update attempt activity"
         });
     }
 };

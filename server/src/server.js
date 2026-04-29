@@ -13,6 +13,7 @@ import leaderboardRouter from "./routes/leaderboard.routes.js";
 import syllabusRouter from "./routes/syllabus.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import healthRouter from "./routes/health.routes.js";
+import { errorHandler } from "./middlewares/error.middleware.js";
 
 const app = express();
 await connectDB();
@@ -24,7 +25,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
@@ -39,6 +40,7 @@ app.use("/api/attempt", attemptRouter);
 app.use("/api/leaderboard", leaderboardRouter);
 app.use("/api/syllabus", syllabusRouter);
 app.use("/api/payment", paymentRouter);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

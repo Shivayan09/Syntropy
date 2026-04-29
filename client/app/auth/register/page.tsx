@@ -69,7 +69,7 @@ export default function RegisterPage() {
                 })
             });
             const data = await res.json();
-            if (!res.ok) {
+            if (!res.ok || data.success === false) {
                 toast.warn(data.message);
                 return;
             }
@@ -111,7 +111,6 @@ export default function RegisterPage() {
         } finally {
             setLoading(false);
         }
-        next();
     };
 
     const handleRegister = async () => {

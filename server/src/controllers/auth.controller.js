@@ -28,6 +28,9 @@ const setAuthCookie = (res, userId) => {
     });
 };
 
+const hashResetToken = (token) =>
+    crypto.createHash("sha256").update(token).digest("hex");
+
 const validateRegistrationInput = ({ name, email, phoneNumber, password }, requirePassword = true) => {
     if (!name) {
         return "Name is required";
@@ -219,9 +222,9 @@ export const sendRegistrationOtp = async (req, res) => {
         const normalizedEmail = normalizeEmail(email);
         const existingUser = await User.findOne({ email: normalizedEmail });
         if (existingUser) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
-                message: "User already exists!"
+                message: "If this email is eligible, an OTP will be sent."
             });
         }
         const otp = crypto.randomInt(100000, 1000000).toString();
@@ -238,12 +241,12 @@ export const sendRegistrationOtp = async (req, res) => {
         await sendRegistrationOtpEmail(normalizedEmail, otp);
         return res.status(200).json({
             success: true,
-            message: "OTP sent successfully",
+            message: "If this email is eligible, an OTP will be sent.",
         });
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to process OTP request"
         });
     }
 };
@@ -294,7 +297,7 @@ export const verifyRegistrationOtp = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to verify OTP"
         });
     }
 };
@@ -314,7 +317,7 @@ export const register = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({
                 success: false,
-                message: "User already exists!"
+                message: "Unable to complete registration"
             })
         }
         const verifiedOtp = await RegistrationOtp.findOne({
@@ -352,7 +355,7 @@ export const register = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to complete registration"
         })
     }
 }
@@ -374,23 +377,17 @@ export const login = async (req, res) => {
     try {
         const normalizedEmail = normalizeEmail(email);
         const user = await User.findOne({ email: normalizedEmail }).select("+password");
-        if (!user) {
-            return res.status(404).json({
+        if (!user || !user.password) {
+            return res.status(401).json({
                 success: false,
-                message: "User not found!"
-            })
-        }
-        if (!user.password) {
-            return res.status(400).json({
-                success: false,
-                message: "This account uses Google sign-in. Continue with Google to log in."
+                message: "Invalid credentials"
             })
         }
         const matched = await bcrypt.compare(password, user.password)
         if (!matched) {
             return res.status(401).json({
                 success: false,
-                message: "Incorrect credentials"
+                message: "Invalid credentials"
             })
         }
         setAuthCookie(res, user._id);
@@ -401,7 +398,7 @@ export const login = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to log in"
         })
     }
 }
@@ -495,7 +492,7 @@ export const googleLogin = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message || "Google sign-in failed"
+            message: "Google sign-in failed"
         });
     }
 };
@@ -526,7 +523,7 @@ export const getMe = async (req, res) => {
         }
         return res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Unable to load profile" });
     }
 };
 
@@ -534,18 +531,19 @@ export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         if (!email) {
-            return res.json({ success: false, message: "Please enter your email!" });
+            return res.status(200).json({ success: true, message: "If the account exists, a password reset link will be sent." });
         }
 
-        const user = await User.findOne({ email });
+        const normalizedEmail = normalizeEmail(email);
+        const user = await User.findOne({ email: normalizedEmail });
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found!" });
+            return res.status(200).json({ success: true, message: "If the account exists, a password reset link will be sent." });
         }
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
+        const resetToken = crypto.randomBytes(32).toString("hex");
         const resetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes
 
-        user.resetToken = resetToken;
+        user.resetToken = hashResetToken(resetToken);
         user.resetTokenExpiry = resetTokenExpiry;
         await user.save({ validateBeforeSave: false });
 
@@ -553,10 +551,10 @@ export const forgotPassword = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Password reset email sent successfully",
+            message: "If the account exists, a password reset link will be sent.",
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: "Unable to process password reset request" });
     }
 };
 
@@ -582,8 +580,13 @@ export const resetPassword = async (req, res) => {
             return res.json({ success: false, message: "Please provide token and new password!" });
         }
 
+        if (typeof newPassword !== "string" || newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: "Password must be at least 6 characters long." });
+        }
+
+        const resetTokenHash = hashResetToken(resetToken);
         const user = await User.findOne({
-            resetToken,
+            resetToken: resetTokenHash,
             resetTokenExpiry: { $gt: Date.now() }
         });
 
@@ -602,6 +605,6 @@ export const resetPassword = async (req, res) => {
             message: "Password reset successful"
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: "Unable to reset password" });
     }
 };

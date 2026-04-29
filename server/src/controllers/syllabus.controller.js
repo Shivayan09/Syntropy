@@ -14,12 +14,11 @@ export const uploadSyllabus = async (req, res) => {
             });
         }
         const rawText = await extractTextFromFile(file.path, file.mimetype);
-        console.log("RAW OCR TEXT:\n", rawText.slice(0, 1000));
         let subjects = [];
         try {
             subjects = await parseSyllabus(rawText);
         } catch (err) {
-            console.error("PARSER FAILED:", err.message);
+            console.error("Syllabus parser failed");
         }
         const existingSyllabus = await Syllabus.findOne({ user: userId }).sort({ createdAt: -1 });
         if (existingSyllabus) {
@@ -33,9 +32,6 @@ export const uploadSyllabus = async (req, res) => {
         syllabus.subjects = subjects && subjects.length > 0 ? subjects : [];
         syllabus.source = "upload";
         syllabus.parsed = syllabus.subjects.length > 0;
-        if (!syllabus.parsed) {
-            console.log("No subjects parsed, saving raw only");
-        }
         await syllabus.save();
         return res.status(200).json({
             success: true,
@@ -43,10 +39,10 @@ export const uploadSyllabus = async (req, res) => {
             overwritten: Boolean(existingSyllabus)
         });
     } catch (error) {
-        console.error("UPLOAD ERROR:", error.message);
+        console.error("Syllabus upload failed");
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to process syllabus upload"
         });
     } finally {
         if (file?.path) {
@@ -65,7 +61,7 @@ export const getMySyllabus = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to load syllabus"
         });
     }
 };
@@ -86,7 +82,7 @@ export const getSyllabusById = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: "Unable to load syllabus"
         });
     }
 };
@@ -112,7 +108,7 @@ export const updateSyllabus = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message,
+            message: "Unable to update syllabus",
         });
     }
 };
