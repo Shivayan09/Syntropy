@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, BarChart3, BrainCircuit, CalendarDays, Clock3, Flame, Target, Trophy, TrendingUp} from "lucide-react";
+import { ArrowRight, BrainCircuit, CalendarDays, Clock3, Flame, TicketCheck } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { useAuth } from "@/context/AuthContext";
-import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
+import { useAiTokens } from "@/context/AiTokenContext";
 
 type TestSummary = {
   _id?: string;
@@ -63,7 +63,8 @@ export default function Dashboard() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
-  const {user} = useAuth();
+  const { user } = useAuth();
+  const { tokenStatus } = useAiTokens();
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -150,16 +151,32 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-7 relative">
-      {!user?.onboardingCompleted &&
-        <AddSyllabusBanner/>
-      }
-      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
-            <BarChart3 size={18} />
-            Dashboard
+      <section className="flex flex-col border-b border-(--border) gap-6 pb-4 lg:flex-row lg:justify-between">
+
+        <div className="space-y-3">
+          <div>
+            <h2 className="text-3xl font-bold text-(--text)">
+              {user?.onboardingCompleted ? `Welcome back ${user?.username} 👋` : `Welcome ${user?.name} 👋`}
+            </h2>
+            <p className="mt-2 text-muted-foreground">
+              Let&apos;s continue your exam preparation.
+            </p>
           </div>
+
         </div>
+        <div className="bg-surface card flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-sm text-primary text-muted-foreground flex items-center gap-2">
+              <TicketCheck className="text-primary" size={18} />
+              AI Test Credits
+            </p>
+            <p className="text-2xl font-bold text-(--text)">
+              {tokenStatus?.remaining} <span className="text-xs opacity-70">left for this month</span>
+            </p>
+          </div>
+
+        </div>
+
       </section>
 
       <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -168,34 +185,29 @@ export default function Dashboard() {
             label: "Tests taken",
             value: uniqueAttempts.length || "--",
             note: attempts.length > 0 ? `${attempts.length} total attempts` : "Awaiting first run",
-            icon: Target,
+
           },
           {
             label: "Average score",
             value: attempts.length > 0 ? `${averageScore}%` : "--",
             note: "First attempts counted",
-            icon: BarChart3,
           },
           {
             label: "Accuracy",
             value: attempts.length > 0 ? `${averageAccuracy}%` : "--",
             note: "Across completed tests",
-            icon: TrendingUp,
           },
           {
             label: "Best score",
             value: bestAttempt ? `${clampPercent(bestAttempt.score || 0)}%` : "--",
             note: bestAttempt?.test?.title || "No top score yet",
-            icon: Trophy,
           },
         ].map((stat) => {
-          const Icon = stat.icon;
 
           return (
             <div key={stat.label} className="card min-h-36 p-5">
               <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-bold opacity-60">{stat.label}</p>
-                <Icon size={22} className="text-primary" />
               </div>
               <p className="mt-4 text-4xl font-extrabold">{stat.value}</p>
               <p className="mt-1 line-clamp-1 text-xs opacity-60">{stat.note}</p>
@@ -299,9 +311,9 @@ export default function Dashboard() {
                       {displayedSubjectStats.length === 1
                         ? `${topSubject.average}%`
                         : `${Math.round(
-                            displayedSubjectStats.reduce((total, subject) => total + subject.average, 0) /
-                              displayedSubjectStats.length
-                          )}%`}
+                          displayedSubjectStats.reduce((total, subject) => total + subject.average, 0) /
+                          displayedSubjectStats.length
+                        )}%`}
                     </p>
                     <p className="mt-1 text-xs opacity-60">
                       {displayedSubjectStats.length === 1
