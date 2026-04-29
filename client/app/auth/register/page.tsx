@@ -2,17 +2,50 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { Target, BarChart3 } from "lucide-react";
+import { Target, BarChart3, Globe, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
 import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
+
+type GoogleCredentialResponse = {
+    credential?: string;
+};
+
+declare global {
+    interface Window {
+        google?: {
+            accounts: {
+                id: {
+                    initialize: (options: {
+                        client_id: string;
+                        callback: (response: GoogleCredentialResponse) => void;
+                        ux_mode?: "popup";
+                    }) => void;
+                    renderButton: (
+                        element: HTMLElement,
+                        options: {
+                            type?: "standard";
+                            theme?: "outline" | "filled_blue" | "filled_black";
+                            text?: "signin_with" | "signup_with" | "continue_with" | "signin";
+                            shape?: "pill" | "rectangular";
+                            size?: "large" | "medium" | "small";
+                            width?: number;
+                            logo_alignment?: "left" | "center";
+                        }
+                    ) => void;
+                };
+            };
+        };
+    }
+}
 
 export default function RegisterPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const { getMe } = useAuth();
+    const { user, getMe } = useAuth();
     const [loading, setLoading] = useState(false);
     const [otp, setOtp] = useState("");
     const [otpVerified, setOtpVerified] = useState(false);
@@ -20,6 +53,12 @@ export default function RegisterPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [googleReady, setGoogleReady] = useState(false);
+    const [googleButtonMounted, setGoogleButtonMounted] = useState(false);
+    const [googleTermsOpen, setGoogleTermsOpen] = useState(false);
+    const [googleTermsAccepted, setGoogleTermsAccepted] = useState(false);
+    const [pendingGoogleCredential, setPendingGoogleCredential] = useState<string | null>(null);
 
     const [form, setForm] = useState({
         name: "",
@@ -30,9 +69,11 @@ export default function RegisterPage() {
     });
 
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+    const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const googleButtonRef = useRef<HTMLDivElement | null>(null);
     const getErrorMessage = (err: unknown) => {
         if (err instanceof DOMException && err.name === "AbortError") {
-            return "OTP request timed out. The server may be stuck while sending the email.";
+            return "OTP request timed out. Please continue using Google to register.";
         }
         return err instanceof Error ? err.message : "Something went wrong";
     };
@@ -74,6 +115,140 @@ export default function RegisterPage() {
         }
     };
 
+    const submitGoogleLogin = async (idToken: string, acceptedTermsForGoogle = false) => {
+        const res = await fetch(BACKEND_URL + "/api/auth/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ idToken, acceptedTerms: acceptedTermsForGoogle }),
+        });
+        const data = await res.json();
+        return { res, data };
+    };
+
+    const completeGoogleLogin = async () => {
+        await getMe();
+        toast.success("Logged in with Google");
+        if (!user?.onboardingCompleted) {
+            router.push("/onboarding");
+        } else {
+            router.push("/main/dashboard");
+        }
+    };
+
+    const handleGoogleLogin = useEffectEvent(async (credentialResponse: GoogleCredentialResponse) => {
+        if (!credentialResponse.credential) {
+            toast.error("Google sign-in did not return a valid credential.");
+            return;
+        }
+
+        try {
+            setGoogleLoading(true);
+            const { res, data } = await submitGoogleLogin(credentialResponse.credential);
+            if (!res.ok) {
+                if (data.requiresTermsAcceptance) {
+                    setPendingGoogleCredential(credentialResponse.credential);
+                    setGoogleTermsAccepted(false);
+                    setGoogleTermsOpen(true);
+                    return;
+                }
+                toast.warn(data.message || "Google sign-in failed");
+                return;
+            }
+
+            await completeGoogleLogin();
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error(getErrorMessage(err));
+        } finally {
+            setGoogleLoading(false);
+        }
+    });
+
+    const handleGoogleTermsConfirm = async () => {
+        if (!pendingGoogleCredential) {
+            setGoogleTermsOpen(false);
+            return;
+        }
+        if (!googleTermsAccepted) {
+            toast.warn("Please accept the Terms and Conditions to continue");
+            return;
+        }
+
+        try {
+            setGoogleLoading(true);
+            const { res, data } = await submitGoogleLogin(pendingGoogleCredential, true);
+            if (!res.ok) {
+                toast.warn(data.message || "Google sign-in failed");
+                return;
+            }
+
+            setGoogleTermsOpen(false);
+            setPendingGoogleCredential(null);
+            await completeGoogleLogin();
+        } catch (err: unknown) {
+            console.error(err);
+            toast.error(getErrorMessage(err));
+        } finally {
+            setGoogleLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (window.google) {
+            setGoogleReady(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (step !== 1 || !googleReady || !GOOGLE_CLIENT_ID || !googleButtonRef.current || !window.google) {
+            return;
+        }
+
+        const renderGoogleButton = () => {
+            if (!googleButtonRef.current || !window.google) {
+                return;
+            }
+
+            setGoogleButtonMounted(false);
+            googleButtonRef.current.innerHTML = "";
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleLogin,
+                ux_mode: "popup",
+            });
+            const buttonWidth = Math.min(360, googleButtonRef.current.clientWidth || 360);
+            window.google.accounts.id.renderButton(googleButtonRef.current, {
+                type: "standard",
+                theme: "outline",
+                text: "continue_with",
+                shape: "pill",
+                size: "large",
+                width: buttonWidth,
+                logo_alignment: "left",
+            });
+
+            requestAnimationFrame(() => setGoogleButtonMounted(true));
+        };
+
+        const timeoutId = window.setTimeout(renderGoogleButton, 0);
+        const handleWindowFocus = () => renderGoogleButton();
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                renderGoogleButton();
+            }
+        };
+
+        window.addEventListener("focus", handleWindowFocus);
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            window.clearTimeout(timeoutId);
+            window.removeEventListener("focus", handleWindowFocus);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, [GOOGLE_CLIENT_ID, googleReady, step]);
+
     const sendOtp = async () => {
         try {
             setLoading(true);
@@ -90,7 +265,7 @@ export default function RegisterPage() {
             });
             const data = await res.json();
             if (!res.ok || data.success === false) {
-                toast.warn(data.message);
+                toast.warn(data.message || "OTP email is unavailable. Please continue using Google to register.");
                 return;
             }
             toast.success(data.message || "OTP sent");
@@ -183,6 +358,13 @@ export default function RegisterPage() {
 
     return (
         <section className="h-screen flex">
+            {GOOGLE_CLIENT_ID ? (
+                <Script
+                    src="https://accounts.google.com/gsi/client"
+                    strategy="afterInteractive"
+                    onLoad={() => setGoogleReady(true)}
+                />
+            ) : null}
 
             <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
 
@@ -314,6 +496,38 @@ export default function RegisterPage() {
                                 >
                                     {loading ? "Sending..." : "Continue"}
                                 </button>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="h-px flex-1 bg-black"></div>
+                                    <span className="text-xs font-bold tracking-[0.24em] text-gray-500">OR</span>
+                                    <div className="h-px flex-1 bg-black"></div>
+                                </div>
+
+                                {GOOGLE_CLIENT_ID ? (
+                                    <div className="flex items-center justify-center">
+                                        <div className="relative mx-auto w-full max-w-90 rounded-[28px] border border-black/10 bg-white shadow-[3px_3px_0px_rgba(0,0,0,0.08)]">
+                                            {!googleButtonMounted && (
+                                                <div
+                                                    aria-hidden="true"
+                                                    className="absolute inset-0 flex min-h-10 items-center justify-center rounded-full text-sm font-semibold text-gray-700"
+                                                >
+                                                    <div className="flex h-10 w-full items-center justify-center gap-3 rounded-full border border-black/10 bg-white px-4">
+                                                        <Globe size={18} className="text-gray-700" />
+                                                        <span>{googleReady ? "Preparing Google sign-in..." : "Loading Google sign-in..."}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <div
+                                                ref={googleButtonRef}
+                                                className={`min-h-10 w-full overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""} ${googleButtonMounted ? "opacity-100" : "opacity-0"}`}
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="rounded-3xl border border-dashed border-black/20 bg-secondary px-4 py-3 text-center text-sm text-gray-600">
+                                        Add `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google sign-in.
+                                    </p>
+                                )}
                             </div>
                         )}
 
@@ -438,6 +652,62 @@ export default function RegisterPage() {
                     </div>
                 </div>
             </div>
+            {googleTermsOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setGoogleTermsOpen(false)} />
+                    <div className="relative w-full max-w-md border border-primary bg-surface p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            onClick={() => setGoogleTermsOpen(false)}
+                            className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center cursor-pointer"
+                            aria-label="Close terms prompt"
+                        >
+                            <X size={20} />
+                        </div>
+
+                        <div className="pr-10">
+                            <p className="text-sm font-bold text-primary">NEW GOOGLE ACCOUNT</p>
+                            <h3 className="mt-2 text-xl font-extrabold">Accept terms to create your account</h3>
+                            <p className="mt-2 text-sm text-gray-600">
+                                Your Google sign-in looks like a first-time account creation. Please review and accept the terms before we continue.
+                            </p>
+                        </div>
+
+                        <label className="mt-5 flex items-start gap-3 text-sm">
+                            <input
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 shrink-0"
+                                checked={googleTermsAccepted}
+                                onChange={(e) => setGoogleTermsAccepted(e.target.checked)}
+                            />
+                            <span>
+                                I agree to the{" "}
+                                <Link href="/terms-and-conditions" target="_blank" className="font-bold text-primary underline">
+                                    Terms and Conditions
+                                </Link>
+                                .
+                            </span>
+                        </label>
+
+                        <div className="mt-6 flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setGoogleTermsOpen(false)}
+                                className="button-secondary w-1/2"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleGoogleTermsConfirm}
+                                disabled={googleLoading || !googleTermsAccepted}
+                                className={`w-1/2 ${googleLoading || !googleTermsAccepted ? "opacity-50 cursor-not-allowed" : ""}`}
+                            >
+                                {googleLoading ? "Continuing..." : "Continue"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

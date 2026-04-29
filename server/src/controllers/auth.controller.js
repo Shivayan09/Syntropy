@@ -291,9 +291,9 @@ export const sendRegistrationOtp = async (req, res) => {
             stack: error?.stack,
             email: req.body?.email,
         });
-        return res.status(500).json({
+        return res.status(503).json({
             success: false,
-            message: "Unable to process OTP request"
+            message: "OTP email is currently unavailable. Please continue using Google to register."
         });
     }
 };
