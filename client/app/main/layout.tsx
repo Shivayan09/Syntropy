@@ -5,6 +5,7 @@ import { useState } from "react";
 import Sidebar from "@/components/main/Sidebar";
 import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/routes/ProtectedRoute";
+import Footer from "@/components/Landing/Footer";
 
 export default function Layout({
   children,
@@ -23,6 +24,11 @@ export default function Layout({
 
         <main className={`flex-1 ${isTestPage ? 'overflow-y-auto' : 'overflow-y-auto px-4 md:px-8 py-6 pt-20 md:pt-6'}`}>
           {children}
+          {!isTestPage && (
+            <div className="mt-10">
+              <Footer />
+            </div>
+          )}
         </main>
       </div>
     </ProtectedRoute>
