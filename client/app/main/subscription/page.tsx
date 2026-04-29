@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Script from "next/script";
 import { toast } from "react-toastify";
-import { ArrowRight, Check, Crown, Shield, ShieldCheck, Sparkles, Wallet, Zap } from "lucide-react";
+import { ArrowRight, Check, Crown, Shield, ShieldCheck, Sparkles, Wallet, X, Zap } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 type PlanKey = "free" | "starter" | "pro" | "power";
@@ -205,10 +205,14 @@ const getPlanRank = (plan: PlanKey) => {
   return 1;
 };
 
+const formatPerTestCost = (totalRupees: number, totalTests: number) =>
+  `Rs ${Number((totalRupees / totalTests).toFixed(1)).toString()}/test`;
+
 export default function PlansPage() {
   const { user, getMe } = useAuth();
   const [loading, setLoading] = useState<PurchaseKey | null>(null);
   const [checkoutReady, setCheckoutReady] = useState(false);
+  const [creditsInfoOpen, setCreditsInfoOpen] = useState(false);
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL!;
   const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
   const currentPlanKey = (user?.plan || "free") as PlanKey;
@@ -232,6 +236,25 @@ export default function PlansPage() {
   const CurrentPlanIcon = planMeta[currentPlanKey].icon;
   const isPaidPlan = currentPlanKey !== "free";
   const currentRank = getPlanRank(currentPlanKey);
+
+  useEffect(() => {
+    if (!creditsInfoOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setCreditsInfoOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [creditsInfoOpen]);
 
   const verifyPayment = async (response: RazorpayResponse, itemKey: PurchaseKey) => {
     const verifyResponse = await fetch(`${backendUrl}/api/payment/verify-payment`, {
@@ -372,23 +395,23 @@ export default function PlansPage() {
               </div>
 
               <div>
-                <h1 className="text-3xl leading-tight font-extrabold md:text-4xl">
+                <h1 className="text-2xl leading-tight font-extrabold md:text-3xl">
                   Your current setup is tuned for{" "}
                   <span className="text-primary">consistent practice</span>
                 </h1>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
                 <StatTile
                   label="Progress loop"
                   value="Active user"
-                  note="test -> review -> improve"
+                  note="attempt tests -> review your attempts -> improve"
                 />
 
                 <StatTile
                   label={isPaidPlan ? "Valid till" : "Upgrade path"}
                   value={isPaidPlan ? formatExpiry(user?.planExpiry) : "Starter / Pro"}
-                  note={isPaidPlan ? "billing cycle" : "monthly or top-up"}
+                  note={currentPlan.name==="Pro" ? "Already on max level plan" : "Upgrade to the next plan for more benefits"}
                 />
               </div>
 
@@ -436,6 +459,13 @@ export default function PlansPage() {
                       <p className="mt-1 text-sm opacity-70 max-w-55">
                         {pack.description}
                       </p>
+                      {(pack.itemKey === "topup_5" || pack.itemKey === "topup_15") && (
+                        <div className="mt-3 inline-flex border-2 border-black bg-primary px-3 py-1 text-sm font-extrabold text-white shadow-[3px_3px_0px_black]">
+                          {pack.itemKey === "topup_5"
+                            ? formatPerTestCost(39, 5)
+                            : formatPerTestCost(89, 15)}
+                        </div>
+                      )}
 
                       <p className="mt-2 text-xs font-bold text-primary">
                         {i === 1 ? "Most popular choice" : "Upgrade your performance"}
@@ -510,6 +540,13 @@ export default function PlansPage() {
                       <div className="mt-5 py-2">
                         <p className="text-3xl font-extrabold">{plan.priceLabel}</p>
                         <p className="mt-1 text-sm font-bold text-primary">{plan.quota}</p>
+                        {(plan.key === "starter" || plan.key === "pro") && (
+                          <div className="mt-3 inline-flex border-2 border-black bg-primary px-3 py-1 text-sm font-extrabold text-white shadow-[3px_3px_0px_black]">
+                            {plan.key === "starter"
+                              ? formatPerTestCost(99, 30)
+                              : formatPerTestCost(249, 100)}
+                          </div>
+                        )}
                       </div>
 
                       <ul className="mt-5 space-y-3">
@@ -555,6 +592,24 @@ export default function PlansPage() {
                 );
               })}
             </div>
+
+            <div className="mt-6 flex flex-col gap-3 card2 border-black bg-(--bg-secondary) p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-extrabold">Credits policy</p>
+                <p className="mt-1 text-sm opacity-70">
+                  Monthly plan credits reset each billing cycle and unused included credits do not roll over. Top-up credits stay in your account until used.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCreditsInfoOpen(true)}
+                className="button-secondary gap-2 self-start sm:self-auto w-64"
+              >
+                How credits work
+                <ArrowRight size={17} />
+              </button>
+            </div>
           </div>
         </section>
 
@@ -564,6 +619,50 @@ export default function PlansPage() {
             : "You are on the monthly free plan right now. Upgrade anytime when you need more AI tests."}
         </div>
       </div>
+
+      {creditsInfoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setCreditsInfoOpen(false)} />
+
+          <div className="relative w-full max-w-lg border-2 border-black bg-(--surface) p-6 card">
+            <div
+              onClick={() => setCreditsInfoOpen(false)}
+              className=" flex items-center justify-center cursor-pointer absolute right-3 top-3 h-10 w-10 px-0"
+              aria-label="Close credits info"
+            >
+              <X size={20} />
+            </div>
+
+            <div className="pr-12">
+              <p className="text-sm font-extrabold uppercase text-primary">How Credits Work</p>
+              <h3 className="mt-2 text-2xl font-extrabold">Simple billing rules, before you buy</h3>
+            </div>
+
+            <div className="mt-6 space-y-3 text-sm">
+              <div className="border border-black bg-(--bg-secondary) p-4">
+                <p className="font-extrabold">Monthly plans</p>
+                <p className="mt-1 opacity-70">
+                  Starter and Pro credits belong to that billing cycle. When the next monthly cycle begins, the included credits reset and unused included credits do not roll over.
+                </p>
+              </div>
+
+              <div className="border border-black bg-(--bg-secondary) p-4">
+                <p className="font-extrabold">Top-up packs</p>
+                <p className="mt-1 opacity-70">
+                  Top-up credits are added separately and stay in your account until you use them.
+                </p>
+              </div>
+
+              <div className="border border-black bg-(--bg-secondary) p-4">
+                <p className="font-extrabold">Usage order</p>
+                <p className="mt-1 opacity-70">
+                  If you have an active paid plan, your included monthly credits are used first. Top-up credits remain available after that.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -102,7 +102,7 @@ export default function SupportPage() {
                 </div>
             </section>
 
-            <div className="flex gap-5">
+            <div className="flex flex-col md:flex-row gap-5">
 
 
                 {/* FORM */}

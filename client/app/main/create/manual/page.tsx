@@ -209,7 +209,7 @@ export default function Create() {
 
       <section className="mb-6">
         <p className="font-bold text-lg mb-5">Choose test format :</p>
-        <div className="flex gap-5">
+        <div className="flex flex-col md:flex-row gap-5">
           <div
             role="button"
             tabIndex={0}

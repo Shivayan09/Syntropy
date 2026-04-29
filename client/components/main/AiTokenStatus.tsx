@@ -103,7 +103,7 @@ export default function AiTokenStatus({
           <Sparkles size={24} />
         </div>
         <div>
-          <p className="text-xl font-extrabold">
+          <p className="text-md md:text-xl font-extrabold">
             {hasTokens ? "AI test credits available" : "No AI credits available"}
           </p>
           <p className="mt-1 text-sm opacity-70">
@@ -116,22 +116,22 @@ export default function AiTokenStatus({
         </div>
       </div>
 
-      <div className="flex gap-5">
+      <div className="flex flex-col md:flex-row gap-2 md:gap-5">
         <div className="border border-black bg-(--surface) p-3">
           <p className="text-xs font-extrabold uppercase opacity-55">Credits left</p>
-          <p className="mt-1 text-3xl font-extrabold">{remaining}</p>
+          <p className="mt-1 text-xl font-extrabold">{remaining}</p>
           <p className="text-xs opacity-60">
             {includedRemaining} plan + {bonusRemaining} top-up
           </p>
         </div>
         <div className="border border-black bg-(--surface) p-3">
-          <p className="text-xs font-extrabold uppercase opacity-55">Allowance</p>
-          <p className="mt-1 text-lg font-extrabold">{cycleLimit}</p>
+          <p className="text-xs font-extrabold uppercase opacity-55">Monthly allowance</p>
+          <p className="mt-1 text-xl font-extrabold">{cycleLimit}</p>
           <p className="text-xs opacity-60">{getWindowCopy(status)}</p>
         </div>
         <div className="border border-black bg-(--surface) p-3">
           <p className="text-xs font-extrabold uppercase opacity-55">Next refill</p>
-          <p className="mt-1 text-lg font-extrabold">{resetTime}</p>
+          <p className="mt-1 text-xl font-extrabold">{resetTime}</p>
           <p className="text-xs opacity-60">{status.planLabel} access</p>
         </div>
       </div>

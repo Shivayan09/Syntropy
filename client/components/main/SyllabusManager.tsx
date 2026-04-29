@@ -162,8 +162,8 @@ export default function SyllabusManager() {
         );
     }
 
-    if(loading) {
-        return <Loader2/>
+    if (loading) {
+        return <Loader2 />
     }
 
     return (
@@ -203,7 +203,12 @@ export default function SyllabusManager() {
 
                         <div className="flex items-center gap-3">
                             <button className="button-secondary" onClick={() => setEditingSubject(editingSubject === subjectIndex ? null : subjectIndex)}>
-                                {editingSubject === subjectIndex ? "Done" : "Edit Subject"}
+                                {editingSubject === subjectIndex ? ("Done") : (
+                                    <>
+                                        <span className="block sm:hidden">Edit</span>
+                                        <span className="hidden sm:block">Edit Subject</span>
+                                    </>
+                                )}
                             </button>
 
                             <Trash2 size={16} className="text-red-500 cursor-pointer" onClick={() => setDeleteSubjectIndex(subjectIndex)} />
