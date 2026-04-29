@@ -18,7 +18,7 @@ export const protect = async (req, res, next) => {
         }
         req.user = user;
         next();
-    } catch (error) {
+    } catch {
         return res.status(401).json({
             message: "Unauthorized"
         });

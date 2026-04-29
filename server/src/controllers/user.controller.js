@@ -29,7 +29,7 @@ export const getAiTokenStatus = async (req, res) => {
             success: true,
             aiTokenStatus: buildAiTokenStatus(user)
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to load AI token status"
@@ -155,7 +155,7 @@ export const updateProfile = async (req, res) => {
             message: "Profile updated successfully",
             user: updatedUser
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to update profile"
@@ -194,7 +194,7 @@ export const updateAvatar = async (req, res) => {
             success: true,
             avatar: user.avatar,
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to update avatar",
@@ -286,7 +286,7 @@ ${safeMessage}`,
             success: true,
             message: "Support message sent successfully"
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to send support request"

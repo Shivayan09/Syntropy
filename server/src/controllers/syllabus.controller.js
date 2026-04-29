@@ -17,7 +17,7 @@ export const uploadSyllabus = async (req, res) => {
         let subjects = [];
         try {
             subjects = await parseSyllabus(rawText);
-        } catch (err) {
+        } catch {
             console.error("Syllabus parser failed");
         }
         const existingSyllabus = await Syllabus.findOne({ user: userId }).sort({ createdAt: -1 });
@@ -38,7 +38,7 @@ export const uploadSyllabus = async (req, res) => {
             syllabus,
             overwritten: Boolean(existingSyllabus)
         });
-    } catch (error) {
+    } catch {
         console.error("Syllabus upload failed");
         return res.status(500).json({
             success: false,
@@ -58,7 +58,7 @@ export const getMySyllabus = async (req, res) => {
             success: true,
             syllabus
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to load syllabus"
@@ -79,7 +79,7 @@ export const getSyllabusById = async (req, res) => {
             success: true,
             syllabus
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to load syllabus"
@@ -105,7 +105,7 @@ export const updateSyllabus = async (req, res) => {
             success: true,
             syllabus,
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to update syllabus",

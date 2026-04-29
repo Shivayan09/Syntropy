@@ -174,7 +174,7 @@ export const getAttemptById = async (req, res) => {
                 ? sanitizeAttemptForActiveSession(attempt)
                 : serializeAttempt(attempt)
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to load attempt"
@@ -213,7 +213,7 @@ export const startAttempt = async (req, res) => {
         res.json({
             attemptId: attempt._id
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to start attempt"
@@ -242,7 +242,7 @@ export const heartbeatAttempt = async (req, res) => {
         res.json({
             success: true
         });
-    } catch (error) {
+    } catch {
         res.status(500).json({
             success: false,
             message: "Unable to update attempt activity"

@@ -243,7 +243,7 @@ export const sendRegistrationOtp = async (req, res) => {
             success: true,
             message: "If this email is eligible, an OTP will be sent.",
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to process OTP request"
@@ -294,7 +294,7 @@ export const verifyRegistrationOtp = async (req, res) => {
             success: true,
             message: "OTP verified successfully",
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to verify OTP"
@@ -352,7 +352,7 @@ export const register = async (req, res) => {
             success: true,
             user: savedUser
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to complete registration"
@@ -395,7 +395,7 @@ export const login = async (req, res) => {
             success: true,
             message: "Logged In successfully"
         })
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Unable to log in"
@@ -489,7 +489,7 @@ export const googleLogin = async (req, res) => {
             message: "Logged in with Google successfully",
             user,
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({
             success: false,
             message: "Google sign-in failed"
@@ -522,7 +522,7 @@ export const getMe = async (req, res) => {
             await user.save();
         }
         return res.status(200).json(user);
-    } catch (error) {
+    } catch {
         res.status(500).json({ message: "Unable to load profile" });
     }
 };
@@ -553,7 +553,7 @@ export const forgotPassword = async (req, res) => {
             success: true,
             message: "If the account exists, a password reset link will be sent.",
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({ success: false, message: "Unable to process password reset request" });
     }
 };
@@ -604,7 +604,7 @@ export const resetPassword = async (req, res) => {
             success: true,
             message: "Password reset successful"
         });
-    } catch (error) {
+    } catch {
         return res.status(500).json({ success: false, message: "Unable to reset password" });
     }
 };
