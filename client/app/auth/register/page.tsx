@@ -34,6 +34,20 @@ export default function RegisterPage() {
     const next = () => setStep((s) => Math.min(s + 1, 3));
     const back = () => setStep((s) => Math.max(s - 1, 1));
 
+    const fetchWithTimeout = async (input: RequestInfo | URL, init?: RequestInit, timeoutMs = 15000) => {
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            return await fetch(input, {
+                ...init,
+                signal: controller.signal,
+            });
+        } finally {
+            window.clearTimeout(timeoutId);
+        }
+    };
+
     const validatePassword = (value: string) => {
         const messages: string[] = [];
         if (value.length < 8) messages.push("Minimum 8 characters");
@@ -58,12 +72,11 @@ export default function RegisterPage() {
     const sendOtp = async () => {
         try {
             setLoading(true);
-            const res = await fetch(BACKEND_URL + "/api/auth/register/send-otp", {
+            const res = await fetchWithTimeout(BACKEND_URL + "/api/auth/register/send-otp", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                credentials: "include",
                 body: JSON.stringify({
                     name: form.name,
                     email: form.email,
@@ -79,7 +92,7 @@ export default function RegisterPage() {
             next();
         } catch (err: unknown) {
             console.error(err);
-            toast.error("Failed to send OTP");
+            toast.error(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -88,12 +101,11 @@ export default function RegisterPage() {
     const verifyOtp = async () => {
         try {
             setLoading(true);
-            const res = await fetch(BACKEND_URL + "/api/auth/register/verify-otp", {
+            const res = await fetchWithTimeout(BACKEND_URL + "/api/auth/register/verify-otp", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                credentials: "include",
                 body: JSON.stringify({
                     email: form.email,
                     otp
@@ -109,7 +121,7 @@ export default function RegisterPage() {
             next();
         } catch (err: unknown) {
             console.error(err);
-            toast.error("Failed to verify OTP");
+            toast.error(getErrorMessage(err));
         } finally {
             setLoading(false);
         }

@@ -243,7 +243,12 @@ export const sendRegistrationOtp = async (req, res) => {
             success: true,
             message: "If this email is eligible, an OTP will be sent.",
         });
-    } catch {
+    } catch (error) {
+        console.error("sendRegistrationOtp failed", {
+            message: error?.message,
+            stack: error?.stack,
+            email: req.body?.email,
+        });
         return res.status(500).json({
             success: false,
             message: "Unable to process OTP request"
@@ -294,7 +299,12 @@ export const verifyRegistrationOtp = async (req, res) => {
             success: true,
             message: "OTP verified successfully",
         });
-    } catch {
+    } catch (error) {
+        console.error("verifyRegistrationOtp failed", {
+            message: error?.message,
+            stack: error?.stack,
+            email: req.body?.email,
+        });
         return res.status(500).json({
             success: false,
             message: "Unable to verify OTP"

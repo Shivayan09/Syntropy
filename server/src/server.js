@@ -18,8 +18,39 @@ import { errorHandler } from "./middlewares/error.middleware.js";
 const app = express();
 await connectDB();
 
+const allowedOrigins = new Set([
+  "http://localhost:3000",
+  "https://syntropy-tests.vercel.app",
+  "https://syntropytest.in",
+  "https://www.syntropytest.in",
+  process.env.FRONTEND_URL,
+].filter(Boolean));
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  if (allowedOrigins.has(origin)) {
+    return true;
+  }
+
+  try {
+    const { hostname, protocol } = new URL(origin);
+    return protocol === "https:" && hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
-  origin: ["http://localhost:3000", "https://syntropy-tests.vercel.app", "https://syntropytest.in", "https://www.syntropytest.in" , process.env.FRONTEND_URL],
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Origin not allowed by CORS"));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
