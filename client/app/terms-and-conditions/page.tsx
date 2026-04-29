@@ -129,7 +129,7 @@ export default function TermsAndConditions() {
                 <section>
                     <h2 className="text-xl mb-2">12. Limitation of Liability</h2>
                     <p>
-                        Syntropy is provided "as is". The platform is intended for practice and
+                        Syntropy is provided &quot;as is&quot;. The platform is intended for practice and
                         self-assessment only. We do not guarantee academic performance,
                         exam results, or improvements in outcomes. Users are solely responsible
                         for their preparation and any decisions made based on platform usage.

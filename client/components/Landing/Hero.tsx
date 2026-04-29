@@ -103,8 +103,16 @@ export default function Hero() {
             </div>
 
             <div className="hidden md:block w-full md:w-1/2 space-y-5">
-                <div className="logo-img w-full h-140" />
-            </div>
+  <div className="relative w-full h-140 flex items-center justify-center">
+    
+    {/* Glow layer */}
+    <div className="absolute w-[70%] h-[70%] bg-(--primary) opacity-20 blur-3xl rounded-full" />
+
+    {/* Image */}
+    <div className="logo-img w-full h-full relative z-10" />
+
+  </div>
+</div>
             <div className="absolute bottom-10 left-1/2 hidden md:flex p-3 bg-secondary rounded-full animate-bounce">
                 <ArrowDown className="opacity-70" />
             </div>
