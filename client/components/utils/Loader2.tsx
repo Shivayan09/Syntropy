@@ -5,7 +5,6 @@ export default function Loader2() {
     <div className="w-full h-full flex items-center justify-center py-16">
       <div className="flex flex-col items-center gap-6">
 
-        {/* bouncing blocks */}
         <div className="flex gap-3">
           <div className="loader-block" />
           <div className="loader-block delay-150" />
