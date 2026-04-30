@@ -22,6 +22,14 @@ const getCheckoutItem = ({ itemKey, plan }) => {
   return null;
 };
 
+const buildReceipt = (receipt, itemKey) => {
+  if (typeof receipt === "string" && receipt.trim()) {
+    return receipt.trim().slice(0, 40);
+  }
+
+  return `${itemKey}_${Date.now()}`.slice(0, 40);
+};
+
 export const createOrder = async (req, res) => {
   try {
     const { amount, currency = "INR", receipt, itemKey, plan } = req.body;
@@ -55,7 +63,7 @@ export const createOrder = async (req, res) => {
     const order = await razorpay.orders.create({
       amount: finalAmount,
       currency,
-      receipt: receipt || `${item.key}_${Date.now()}`,
+      receipt: buildReceipt(receipt, item.key),
       notes: {
         itemKey: item.key,
         kind: item.kind,

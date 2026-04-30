@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BarChart3, CheckCircle2, Medal, Search, Trophy, User2, Users } from "lucide-react";
+import { BarChart3, CheckCircle2, ChevronDown, Medal, Search, Trophy, User2, Users } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import Image from 'next/image'
 import { useRouter } from "next/navigation";
@@ -24,7 +24,15 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
   const router = useRouter();
+
+  const toggleUser = (userId: string) => {
+    setExpandedUsers((prev) => ({
+      ...prev,
+      [userId]: !prev[userId],
+    }));
+  };
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -132,57 +140,128 @@ export default function LeaderboardPage() {
             {filteredUsers.map((user) => {
               const rank = users.findIndex((rankedUser) => rankedUser._id === user._id) + 1;
               const isTopThree = rank <= 3;
+              const isExpanded = !!expandedUsers[user._id];
 
               return (
                 <article
                   key={user._id}
-                  className="card grid gap-4 p-5 lg:grid-cols-[6rem_1fr_8rem_8rem_8rem] lg:items-center"
+                  className="card p-5"
                 >
-                  <div className="flex items-center gap-3">
-                    <p className={`grid h-8 w-8 place-items-centertext-sm font-extrabold ${isTopThree ? "text-primary" : ""}`}>
-                      #{rank}
-                    </p>
-                    <div>
-                      {user.avatar ? (
-                        <Image
-                          src={user.avatar}
-                          alt={user.name || "User"}
-                          width={40}
-                          height={40}
-                          className="rounded-full object-cover border"
-                        />
-                      ) : (
-                        <User2 className="h-10 w-10 rounded-full border p-2" />
-                      )}
+                  <div className="flex items-start justify-between gap-3 lg:hidden">
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-3 flex items-center gap-3">
+                        <p className={`grid h-8 w-8 place-items-center text-sm font-extrabold ${isTopThree ? "text-primary" : ""}`}>
+                          #{rank}
+                        </p>
+                        <div>
+                          {user.avatar ? (
+                            <Image
+                              src={user.avatar}
+                              alt={user.name || "User"}
+                              width={40}
+                              height={40}
+                              className="rounded-full object-cover border"
+                            />
+                          ) : (
+                            <User2 className="h-10 w-10 rounded-full border p-2" />
+                          )}
+                        </div>
+                      </div>
+
+                      <p
+                        onClick={() => router.push(`/main/users/${user._id}`)}
+                        className="truncate cursor-pointer text-lg font-extrabold transition-all duration-200 hover:text-primary"
+                      >
+                        {user.name || "Student"} <span className="ml-2 text-sm font-light">@{user?.username || "user"}</span>
+                      </p>
+
+                      <p className="mt-2 text-xs opacity-60">
+                        Ranked by accuracy and average score from first attempts
+                      </p>
+                    </div>
+
+                    <div
+                      onClick={() => toggleUser(user._id)}
+                      className="mt-1 rounded-full border border-(--border) p-2 transition hover:bg-black/5"
+                      aria-label={isExpanded ? "Collapse leaderboard user details" : "Expand leaderboard user details"}
+                      aria-expanded={isExpanded}
+                    >
+                      <ChevronDown
+                        size={18}
+                        className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                      />
                     </div>
                   </div>
 
-                  <div className="min-w-0">
-                    <p onClick={() => router.push(`/main/users/${user._id}`)} className="truncate cursor-pointer text-lg font-extrabold transition-all duration-200 hover:text-primary">
-                      {user.name || "Student"} <span className="text-sm font-light ml-2">@{user?.username || "user"}</span>
-                    </p>
-                    
-                    <p className="text-xs opacity-60 mt-2">
-                      Ranked by accuracy and average score from first attempts
-                    </p>
-                  </div>
+                  {isExpanded && (
+                    <div className="mt-4 grid gap-3 border-t border-(--border) pt-4 lg:hidden">
+                      <div className="flex items-center gap-2 text-sm">
+                        <CheckCircle2 size={17} className="text-primary" />
+                        <span className="font-extrabold">{percent(user.avgAccuracy)}</span>
+                        <span className="opacity-60">accuracy</span>
+                      </div>
 
-                  <div className="flex items-center gap-2 text-sm">
-                    <CheckCircle2 size={17} className="text-primary" />
-                    <span className="font-extrabold">{percent(user.avgAccuracy)}</span>
-                    <span className="opacity-60 lg:hidden">accuracy</span>
-                  </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <BarChart3 size={17} className="text-primary" />
+                        <span className="font-extrabold">{user.testsTaken || 0}</span>
+                        <span className="opacity-60">tests taken</span>
+                      </div>
 
-                  <div className="flex items-center gap-2 text-sm">
-                    <BarChart3 size={17} className="text-primary" />
-                    <span className="font-extrabold">{user.testsTaken || 0}</span>
-                    <span className="opacity-60 lg:hidden">tests</span>
-                  </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Trophy size={17} className="text-primary" />
+                        <span className="font-extrabold">{Math.round(user.avgScore || 0)}</span>
+                        <span className="opacity-60">avg score</span>
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex items-center gap-2 text-sm">
-                    <Trophy size={17} className="text-primary" />
-                    <span className="font-extrabold">{Math.round(user.avgScore || 0)}</span>
-                    <span className="opacity-60 lg:hidden">avg score</span>
+                  <div className="hidden gap-4 lg:grid lg:grid-cols-[6rem_1fr_8rem_8rem_8rem] lg:items-center">
+                    <div className="flex items-center gap-3">
+                      <p className={`grid h-8 w-8 place-items-center text-sm font-extrabold ${isTopThree ? "text-primary" : ""}`}>
+                        #{rank}
+                      </p>
+                      <div>
+                        {user.avatar ? (
+                          <Image
+                            src={user.avatar}
+                            alt={user.name || "User"}
+                            width={40}
+                            height={40}
+                            className="rounded-full object-cover border"
+                          />
+                        ) : (
+                          <User2 className="h-10 w-10 rounded-full border p-2" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="min-w-0">
+                      <p
+                        onClick={() => router.push(`/main/users/${user._id}`)}
+                        className="truncate cursor-pointer text-lg font-extrabold transition-all duration-200 hover:text-primary"
+                      >
+                        {user.name || "Student"} <span className="ml-2 text-sm font-light">@{user?.username || "user"}</span>
+                      </p>
+
+                      <p className="mt-2 text-xs opacity-60">
+                        Ranked by accuracy and average score from first attempts
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 size={17} className="text-primary" />
+                      <span className="font-extrabold">{percent(user.avgAccuracy)}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <BarChart3 size={17} className="text-primary" />
+                      <span className="font-extrabold">{user.testsTaken || 0}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <Trophy size={17} className="text-primary" />
+                      <span className="font-extrabold">{Math.round(user.avgScore || 0)}</span>
+                    </div>
                   </div>
                 </article>
               );

@@ -152,8 +152,8 @@ export default function TestsPage() {
         </label>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="card p-5">
+      <section className="grid gap-4 grid-cols-2 md:grid-cols-3">
+        <div className="card p-5 hidden md:flex flex-col">
           <p className="text-sm font-bold opacity-60">Showing</p>
           <p className="mt-2 text-3xl font-extrabold">{filteredTests.length}</p>
           <p className="text-xs opacity-60">{typeLabel[mode]} tests</p>

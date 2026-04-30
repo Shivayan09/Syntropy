@@ -226,7 +226,7 @@ export default function AttemptReviewPage() {
 
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 grid-cols-2 md:grid-cols-4">
         <div className="card2 p-5">
           <Target size={22} className="mb-3 text-primary" />
           <p className="text-sm font-bold opacity-60">Score</p>

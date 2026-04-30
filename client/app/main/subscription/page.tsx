@@ -208,7 +208,10 @@ const getPlanRank = (plan: PlanKey) => {
 const formatPerTestCost = (totalRupees: number, totalTests: number) =>
   `Rs ${Number((totalRupees / totalTests).toFixed(1)).toString()}/test`;
 
-const createReceipt = (itemKey: PurchaseKey) => `${itemKey}_${crypto.randomUUID()}`;
+const createReceipt = (itemKey: PurchaseKey) => {
+  const compactId = crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+  return `${itemKey}_${compactId}`;
+};
 
 export default function PlansPage() {
   const { user, getMe } = useAuth();
@@ -380,9 +383,9 @@ export default function PlansPage() {
           </div>
         </section>
 
-        <section className="mt-7">
+        <section className="mt-5">
           <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
-            <div className="card2 flex flex-col gap-6">
+            <div className="card flex flex-col gap-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1 border border-black bg-primary px-3 py-1 text-white">
                   <CurrentPlanIcon size={16} className="text-white" />
@@ -448,7 +451,7 @@ export default function PlansPage() {
                 {topUps.map((pack, i) => (
                   <div
                     key={pack.itemKey}
-                    className="group relative flex items-center justify-between gap-4 border-2 border-black bg-(--surface) p-5 shadow-[4px_4px_0px_black] transition-all duration-150"
+                    className="card2 group relative flex items-center justify-between gap-4 border-2 border-black transition-all duration-150"
                   >
                     {i === 1 && (
                       <span className="absolute -top-3 left-4 bg-primary text-white text-xs font-extrabold px-2 py-1 border border-black shadow-[2px_2px_0px_black]">

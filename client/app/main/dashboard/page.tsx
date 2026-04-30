@@ -180,7 +180,7 @@ export default function Dashboard() {
 
       </section>
 
-      <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-5 grid-cols-2 md:grid-cols-4">
         {[
           {
             label: "Tests taken",
