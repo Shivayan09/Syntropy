@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import { normalizeSubject } from "@/components/utils/subject";
 
 type Attempt = {
   _id: string;
@@ -53,7 +54,7 @@ const getDuration = (attempt: Attempt) => {
   return Number.isFinite(duration) && duration >= 0 ? duration : null;
 };
 
-const getSubject = (attempt: Attempt) => attempt.test?.subjects?.[0] || "General";
+const getSubject = (attempt: Attempt) => normalizeSubject(attempt.test?.subjects?.[0]);
 
 const percent = (value?: number) => `${Math.round(value || 0)}%`;
 

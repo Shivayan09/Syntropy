@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AiTokenProvider } from "@/context/AiTokenContext";
+import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,33 +18,65 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "syntropy",
-  description: "Test your exam preparation",
-  icons: {
-    icon: "/logo.png"
+  metadataBase: siteUrl,
+  title: {
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  keywords: [
+    "Syntropy",
+    "mock test platform",
+    "exam preparation",
+    "practice tests",
+    "student analytics",
+    "AI test generation",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  category: "education",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: "/logo.png",
+  },
   openGraph: {
-    title: "syntropy",
-    description: "Test your exam preparation",
-    url: "https://syntropy-jet.vercel.app",
-    siteName: "syntropy",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    url: siteUrl,
+    siteName: SITE_NAME,
     images: [
       {
-        url: "https://syntropy-jet.vercel.app/logo.png",
+        url: "/logo.png",
         width: 512,
         height: 512,
-        alt: "syntropy logo",
+        alt: `${SITE_NAME} logo`,
       },
     ],
     type: "website",
+    locale: "en_IN",
   },
-
   twitter: {
     card: "summary_large_image",
-    title: "syntropy",
-    description: "Test your exam preparation",
-    images: ["https://syntropy-jet.vercel.app/logo.png"],
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 

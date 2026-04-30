@@ -1,12 +1,14 @@
-"use client";
-
-import AuthRoute from "@/routes/AuthRoute";
+import type { Metadata } from "next";
+import AuthLayoutClient from "@/components/layouts/AuthLayoutClient";
 import type { ReactNode } from "react";
 
+export const metadata: Metadata = {
+    robots: {
+        index: false,
+        follow: false,
+    },
+};
+
 export default function AuthLayout({ children }: { children: ReactNode }) {
-    return (
-        <AuthRoute>
-            {children}
-        </AuthRoute>
-    );
+    return <AuthLayoutClient>{children}</AuthLayoutClient>;
 }

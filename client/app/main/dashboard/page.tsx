@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, BrainCircuit, CalendarDays, Clock3, Flame, TicketCheck } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
+import { normalizeSubject } from "@/components/utils/subject";
 import { useAuth } from "@/context/AuthContext";
 import { useAiTokens } from "@/context/AiTokenContext";
 
@@ -117,7 +118,7 @@ export default function Dashboard() {
     const subjectMap = new Map<string, { total: number; count: number }>();
 
     attempts.forEach((attempt) => {
-      const subject = attempt.test?.subjects?.[0] || "Mixed practice";
+      const subject = normalizeSubject(attempt.test?.subjects?.[0], "mixed practice");
       const current = subjectMap.get(subject) || { total: 0, count: 0 };
       subjectMap.set(subject, {
         total: current.total + (attempt.accuracy || 0),
@@ -375,7 +376,7 @@ export default function Dashboard() {
                       <Clock3 size={14} />
                       {getDuration(attempt)}
                     </span>
-                    <span>{attempt.test?.subjects?.[0] || "Mixed practice"}</span>
+                    <span>{normalizeSubject(attempt.test?.subjects?.[0], "mixed practice")}</span>
                   </div>
                 </div>
 

@@ -1,3 +1,13 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Terms and Conditions",
+    description: "Read the terms and conditions for using Syntropy.",
+    alternates: {
+        canonical: "/terms-and-conditions",
+    },
+};
+
 export default function TermsAndConditions() {
     return (
         <div className="min-h-screen bg-(--bg) text-(--text) px-6 py-12">
