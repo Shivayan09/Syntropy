@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     "AI test generation",
   ],
   alternates: {
-    canonical: "/",
+    canonical: "https://syntropytest.in",
   },
   category: "education",
   formatDetection: {
@@ -53,10 +53,10 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     images: [
       {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: `${SITE_NAME} logo`,
+        url: "https://syntropytest.in/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Syntropy - Mock Test Platform",
       },
     ],
     type: "website",
@@ -66,7 +66,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ["/logo.png"],
+    images: [
+      {
+        url: "https://syntropytest.in/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   robots: {
     index: true,
