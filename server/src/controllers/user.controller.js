@@ -1,5 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
+import Attempt from "../models/attempt.model.js";
+import Test from "../models/test.model.js";
 import validator from "validator";
 import nodemailer from "nodemailer";
 import { buildAiTokenStatus, syncAiTokens } from "../utils/aiToken.utils.js";
@@ -12,6 +14,85 @@ const createEmailTransporter = () => nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
+export const getPublicProfile = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findById(id).select(
+            "name username avatar college semester createdAt preferences.targetRole stats analytics streak"
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const [testsCreated, attemptStats] = await Promise.all([
+            Test.countDocuments({ createdBy: user._id }),
+            Attempt.aggregate([
+                {
+                    $match: {
+                        user: user._id,
+                        isFirstAttempt: true
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        testsAttempted: { $sum: 1 },
+                        averageAccuracy: { $avg: "$accuracy" },
+                        averageScore: { $avg: "$score" },
+                        bestScore: { $max: "$score" },
+                        totalQuestionsSolved: {
+                            $sum: {
+                                $add: ["$correct", "$wrong", "$skipped"]
+                            }
+                        },
+                        totalCorrect: { $sum: "$correct" },
+                        totalWrong: { $sum: "$wrong" },
+                        totalSkipped: { $sum: "$skipped" }
+                    }
+                }
+            ])
+        ]);
+
+        const stats = attemptStats[0];
+
+        return res.status(200).json({
+            success: true,
+            profile: {
+                _id: user._id,
+                name: user.name,
+                username: user.username || "",
+                avatar: user.avatar || "",
+                college: user.college || "",
+                semester: user.semester || null,
+                joinedOn: user.createdAt,
+                targetRole: user.preferences?.targetRole || "",
+                testsAttempted: stats?.testsAttempted || 0,
+                testsCreated,
+                averageAccuracy: stats?.averageAccuracy ?? user.stats?.accuracy ?? 0,
+                averageScore: stats?.averageScore ?? user.stats?.avgScore ?? 0,
+                bestScore: stats?.bestScore ?? user.stats?.bestScore ?? 0,
+                totalQuestionsSolved: stats?.totalQuestionsSolved ?? user.stats?.totalQuestionsSolved ?? 0,
+                totalCorrect: stats?.totalCorrect || 0,
+                totalWrong: stats?.totalWrong || 0,
+                totalSkipped: stats?.totalSkipped || 0,
+                currentStreak: user.streak?.current || 0,
+                longestStreak: user.streak?.longest || 0,
+                lastActive: user.analytics?.lastActive || null
+            }
+        });
+    } catch {
+        return res.status(500).json({
+            success: false,
+            message: "Unable to load public profile"
+        });
+    }
+};
 
 export const getAiTokenStatus = async (req, res) => {
     try {

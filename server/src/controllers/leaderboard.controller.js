@@ -1,19 +1,32 @@
-import Attempt from "../models/attempt.model.js";
+import User from "../models/user.model.js";
 
 export const getLeaderboard = async (req, res) => {
   try {
-    const leaderboard = await Attempt.aggregate([
+    const leaderboard = await User.aggregate([
       {
-        $match: {
-          isFirstAttempt: true
+        $lookup: {
+          from: "attempts",
+          localField: "_id",
+          foreignField: "user",
+          as: "attempts"
         }
       },
       {
-        $group: {
-          _id: "$user",
-          avgAccuracy: { $avg: "$accuracy" },
-          avgScore: { $avg: "$score" },
-          testsTaken: { $sum: 1 }
+        $addFields: {
+          firstAttempts: {
+            $filter: {
+              input: "$attempts",
+              as: "a",
+              cond: { $eq: ["$$a.isFirstAttempt", true] }
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          avgAccuracy: { $avg: "$firstAttempts.accuracy" },
+          avgScore: { $avg: "$firstAttempts.score" },
+          testsTaken: { $size: "$firstAttempts" }
         }
       },
       {
@@ -22,23 +35,14 @@ export const getLeaderboard = async (req, res) => {
         }
       },
       {
-        $lookup: {
-          from: "users",
-          localField: "_id",
-          foreignField: "_id",
-          as: "user"
-        }
-      },
-      { $unwind: "$user" },
-      {
         $project: {
           _id: 1,
-          avgAccuracy: 1,
-          avgScore: 1,
-          testsTaken: 1,
-          name: "$user.name",
-          username: "$user.username",
-          avatar: "$user.avatar"
+          name: 1,
+          username: 1,
+          avatar: 1,
+          avgAccuracy: { $ifNull: ["$avgAccuracy", 0] },
+          avgScore: { $ifNull: ["$avgScore", 0] },
+          testsTaken: 1
         }
       }
     ]);

@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { BarChart3, CheckCircle2, Medal, Search, Trophy, User2, Users } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import Image from 'next/image'
+import { useRouter } from "next/navigation";
 
 type LeaderboardUser = {
   _id: string;
   name?: string;
+  username?: string;
   avgAccuracy?: number;
   avgScore?: number;
   testsTaken?: number;
@@ -22,6 +24,7 @@ export default function LeaderboardPage() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -155,8 +158,11 @@ export default function LeaderboardPage() {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="truncate text-lg font-extrabold">{user.name || "Student"}</p>
-                    <p className="text-xs opacity-60">
+                    <p onClick={() => router.push(`/main/users/${user._id}`)} className="truncate cursor-pointer text-lg font-extrabold transition-all duration-200 hover:text-primary">
+                      {user.name || "Student"} <span className="text-sm font-light ml-2">@{user?.username || "user"}</span>
+                    </p>
+                    
+                    <p className="text-xs opacity-60 mt-2">
                       Ranked by accuracy and average score from first attempts
                     </p>
                   </div>
