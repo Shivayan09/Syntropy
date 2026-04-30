@@ -55,7 +55,11 @@ export default function SyllabusManager() {
     }, [BACKEND_URL]);
 
     useEffect(() => {
-        fetchSyllabus();
+        const timeoutId = window.setTimeout(() => {
+            void fetchSyllabus();
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
     }, [fetchSyllabus]);
 
     const update = (updated: SyllabusRecord) => {

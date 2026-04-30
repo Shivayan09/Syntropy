@@ -82,7 +82,6 @@ export default function Onboarding() {
     useEffect(() => {
         if (!loading || step !== 4) return;
 
-        setProcessingStep(0);
         const interval = window.setInterval(() => {
             setProcessingStep((current) =>
                 current < syllabusProcessingSteps.length - 1 ? current + 1 : current
@@ -212,6 +211,7 @@ export default function Onboarding() {
         }
         if (step === 4) {
             try {
+                setProcessingStep(0);
                 setLoading(true);
 
                 const fd = new FormData();

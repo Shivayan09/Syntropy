@@ -50,7 +50,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
-    const [googleReady, setGoogleReady] = useState(false);
+    const [googleReady, setGoogleReady] = useState(() => typeof window !== "undefined" && Boolean(window.google));
     const [googleButtonMounted, setGoogleButtonMounted] = useState(false);
     const [googleTermsOpen, setGoogleTermsOpen] = useState(false);
     const [googleTermsAccepted, setGoogleTermsAccepted] = useState(false);
@@ -169,12 +169,6 @@ export default function LoginPage() {
             setGoogleLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (window.google) {
-            setGoogleReady(true);
-        }
-    }, []);
 
     useEffect(() => {
         if (!googleReady || !GOOGLE_CLIENT_ID || !googleButtonRef.current || !window.google) {

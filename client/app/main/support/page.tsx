@@ -47,11 +47,15 @@ export default function SupportPage() {
             return;
         }
 
-        setForm((prev) => ({
-            ...prev,
-            name: prev.name || user.name || "",
-            email: prev.email || user.email || "",
-        }));
+        const timeoutId = window.setTimeout(() => {
+            setForm((prev) => ({
+                ...prev,
+                name: prev.name || user.name || "",
+                email: prev.email || user.email || "",
+            }));
+        }, 0);
+
+        return () => window.clearTimeout(timeoutId);
     }, [user]);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

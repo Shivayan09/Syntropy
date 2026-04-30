@@ -208,6 +208,8 @@ const getPlanRank = (plan: PlanKey) => {
 const formatPerTestCost = (totalRupees: number, totalTests: number) =>
   `Rs ${Number((totalRupees / totalTests).toFixed(1)).toString()}/test`;
 
+const createReceipt = (itemKey: PurchaseKey) => `${itemKey}_${crypto.randomUUID()}`;
+
 export default function PlansPage() {
   const { user, getMe } = useAuth();
   const [loading, setLoading] = useState<PurchaseKey | null>(null);
@@ -300,7 +302,7 @@ export default function PlansPage() {
         },
         body: JSON.stringify({
           itemKey,
-          receipt: `${itemKey}_${Date.now()}`,
+          receipt: createReceipt(itemKey),
           currency: "INR",
         }),
       });

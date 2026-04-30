@@ -63,7 +63,11 @@ export const AiTokenProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    refreshTokenStatus();
+    const timeoutId = window.setTimeout(() => {
+      void refreshTokenStatus();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [refreshTokenStatus]);
 
   return (

@@ -55,7 +55,7 @@ export default function RegisterPage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
-    const [googleReady, setGoogleReady] = useState(false);
+    const [googleReady, setGoogleReady] = useState(() => typeof window !== "undefined" && Boolean(window.google));
     const [googleButtonMounted, setGoogleButtonMounted] = useState(false);
     const [googleTermsOpen, setGoogleTermsOpen] = useState(false);
     const [googleTermsAccepted, setGoogleTermsAccepted] = useState(false);
@@ -194,12 +194,6 @@ export default function RegisterPage() {
             setGoogleLoading(false);
         }
     };
-
-    useEffect(() => {
-        if (window.google) {
-            setGoogleReady(true);
-        }
-    }, []);
 
     useEffect(() => {
         if (step !== 1 || !googleReady || !GOOGLE_CLIENT_ID || !googleButtonRef.current || !window.google) {

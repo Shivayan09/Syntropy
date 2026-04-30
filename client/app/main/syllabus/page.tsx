@@ -64,7 +64,11 @@ export default function SyllabusPage() {
   }, [BACKEND_URL]);
 
   useEffect(() => {
-    void fetchSyllabus();
+    const timeoutId = window.setTimeout(() => {
+      void fetchSyllabus();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [fetchSyllabus]);
 
   const upload = async () => {

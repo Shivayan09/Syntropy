@@ -84,7 +84,6 @@ export default function Profile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [original, setOriginal] = useState<UserForm | null>(null);
   const [form, setForm] = useState<UserForm | null>(null);
-  const [dirty, setDirty] = useState(false);
   const [subjectInput, setSubjectInput] = useState("");
   const [imgLoaded, setImgLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -106,18 +105,19 @@ export default function Profile() {
       subjects: user.preferences?.subjects || [],
     };
 
-    setOriginal(normalized);
-    setForm(normalized);
-  }, [user]);
+    const timeoutId = window.setTimeout(() => {
+      setOriginal(normalized);
+      setForm(normalized);
+    }, 0);
 
-  useEffect(() => {
-    if (!form || !original) return;
-    setDirty(JSON.stringify(form) !== JSON.stringify(original));
-  }, [form, original]);
+    return () => window.clearTimeout(timeoutId);
+  }, [user]);
 
   const updateForm = (patch: Partial<UserForm>) => {
     setForm((current) => (current ? { ...current, ...patch } : current));
   };
+
+  const dirty = Boolean(form && original && JSON.stringify(form) !== JSON.stringify(original));
 
   const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -196,7 +196,6 @@ export default function Profile() {
       toast.success("Profile updated");
       await getMe();
       setOriginal(form);
-      setDirty(false);
     } catch (error) {
       console.error("Profile update failed", error);
       toast.error("Could not save profile");
