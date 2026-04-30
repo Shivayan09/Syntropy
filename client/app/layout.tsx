@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AiTokenProvider } from "@/context/AiTokenContext";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/seo";
+import { Analytics } from '@vercel/analytics/next';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,6 +119,7 @@ export default function RootLayout({
           hideProgressBar
           newestOnTop
         />
+        <Analytics />
       </body>
     </html>
   );
