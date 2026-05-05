@@ -2,6 +2,5 @@
 .expo-shared/
 node_modules/
 dist/
-
 .env
 .env.*
