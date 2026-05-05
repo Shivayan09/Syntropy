@@ -346,8 +346,8 @@ export default function Onboarding() {
 
 
                     <div className="card">
-                        <div onClick={() => {router.push('/main/dashboard'); toast.warn("Onboarding skipped")}} className="flex items-center gap-1 w-fit ml-auto mb-3 border border-yellow-500 px-3 py-1.5 cursor-pointer text-sm">
-                            <SkipForward className="h-4"/>
+                        <div onClick={() => {router.push('/main/dashboard'); toast.warn("Onboarding skipped")}} className="flex items-center gap-1 w-fit ml-auto mb-3 border-2 text-black bg-yellow-50 border-yellow-500 px-3 py-1.5 cursor-pointer text-sm">
+                            <SkipForward className="h-4 text-yellow-500"/>
                             Skip onboarding
                         </div>
                         
