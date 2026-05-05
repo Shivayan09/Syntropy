@@ -1,9 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import { getRequestToken } from "../utils/authToken.js";
 
 export const protect = async (req, res, next) => {
     try {
-        const token = req.cookies.token;
+        const token = getRequestToken(req);
         if (!token) {
             return res.status(401).json({
                 message: "No token"

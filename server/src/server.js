@@ -20,11 +20,20 @@ await connectDB();
 
 const allowedOrigins = new Set([
   "http://localhost:3000",
+  "http://127.0.0.1:3000",
   "https://syntropy-tests.vercel.app",
   "https://syntropytest.in",
   "https://www.syntropytest.in",
   process.env.FRONTEND_URL,
 ].filter(Boolean));
+
+const isPrivateDevHost = (hostname) =>
+  hostname === "localhost" ||
+  hostname === "127.0.0.1" ||
+  hostname === "::1" ||
+  /^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+  /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+  /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(hostname);
 
 const isAllowedOrigin = (origin) => {
   if (!origin) {
@@ -37,6 +46,9 @@ const isAllowedOrigin = (origin) => {
 
   try {
     const { hostname, protocol } = new URL(origin);
+    if (process.env.NODE_ENV !== "production" && protocol === "http:" && isPrivateDevHost(hostname)) {
+      return true;
+    }
     return protocol === "https:" && hostname.endsWith(".vercel.app");
   } catch {
     return false;
@@ -53,7 +65,7 @@ app.use(cors({
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Client-Platform"]
 }));
 
 app.use(express.json({ limit: "1mb" }));

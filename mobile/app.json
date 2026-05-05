@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "Syntropy",
+    "slug": "syntropy-mobile",
+    "scheme": "syntropy",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.syntropy.mobile"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-asset"
+    ]
+  }
+}

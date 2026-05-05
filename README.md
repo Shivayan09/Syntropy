@@ -198,3 +198,10 @@ This is not just a landing page or mock UI. It is an implemented full-stack exam
 ## License
 
 No license file is currently present in the repository.
+
+## Mobile App Status
+
+- A new `mobile/` Expo + React Native app scaffold is now included in the repo.
+- The Express auth flow now supports mobile-safe bearer tokens while keeping the existing cookie flow for the web app.
+- Current mobile coverage includes login, OTP registration, dashboard, analytics, tests, history, and profile foundations.
+- See `mobile/README.md` for setup steps and the remaining parity work before Play Store release.

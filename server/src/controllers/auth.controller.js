@@ -2,11 +2,11 @@ import User from "../models/user.model.js"
 import RegistrationOtp from "../models/registrationOtp.model.js";
 import validator from 'validator'
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { OAuth2Client } from "google-auth-library";
 import { normalizePlan } from "../config/plan.js";
+import { clearAuthCookie, createAuthToken, isMobileAuthRequest, setAuthCookie } from "../utils/authToken.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;
@@ -19,16 +19,6 @@ const normalizeEmail = (email) => {
 }
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-const setAuthCookie = (res, userId) => {
-    const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-};
 
 const hashResetToken = (token) =>
     crypto.createHash("sha256").update(token).digest("hex");
@@ -85,6 +75,50 @@ const createEmailTransporter = () => nodemailer.createTransport({
 });
 
 const getFrontendUrl = () => process.env.FRONTEND_URL || DEFAULT_FRONTEND_URL;
+
+const createAuthPayload = (user) => ({
+    _id: user._id,
+    username: user.username,
+    name: user.name,
+    email: user.email,
+    emailVerified: user.emailVerified,
+    provider: user.provider,
+    phoneNumber: user.phoneNumber,
+    avatar: user.avatar,
+    college: user.college,
+    semester: user.semester,
+    onboardingCompleted: user.onboardingCompleted,
+    plan: normalizePlan(user.plan),
+    planBillingCycle: user.planBillingCycle,
+    planExpiry: user.planExpiry,
+    preferences: user.preferences,
+});
+
+const respondWithAuth = async (req, res, user, message) => {
+    const token = createAuthToken(user._id);
+
+    if (isMobileAuthRequest(req)) {
+        const freshUser = await User.findById(user._id).select('-password -aiTokens -lastTokenReset');
+        if (!freshUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            message,
+            token,
+            user: createAuthPayload(freshUser),
+        });
+    }
+
+    setAuthCookie(res, token);
+    return res.status(200).json({
+        success: true,
+        message,
+    });
+};
 
 const escapeHtml = (value = "") =>
     value
@@ -400,17 +434,12 @@ export const register = async (req, res) => {
             termsAcceptedAt: new Date(),
         });
         await RegistrationOtp.deleteOne({ _id: verifiedOtp._id });
-        setAuthCookie(res, user._id);
-        const savedUser = await User.findById(user._id);
 
         sendWelcomeEmail(normalizedEmail, name).catch((emailError) => {
             console.error("Welcome email failed", emailError);
         });
 
-        return res.status(200).json({
-            success: true,
-            user: savedUser
-        });
+        return respondWithAuth(req, res, user, "Account created successfully");
     } catch {
         return res.status(500).json({
             success: false,
@@ -449,11 +478,7 @@ export const login = async (req, res) => {
                 message: "Invalid credentials"
             })
         }
-        setAuthCookie(res, user._id);
-        return res.status(200).json({
-            success: true,
-            message: "Logged In successfully"
-        })
+        return respondWithAuth(req, res, user, "Logged In successfully");
     } catch {
         return res.status(500).json({
             success: false,
@@ -543,19 +568,13 @@ export const googleLogin = async (req, res) => {
             isNewUser = true;
         }
 
-        setAuthCookie(res, user._id);
-
         if (isNewUser) {
             sendWelcomeEmail(normalizedEmail, user.name).catch((emailError) => {
                 console.error("Welcome email failed", emailError);
             });
         }
 
-        return res.status(200).json({
-            success: true,
-            message: "Logged in with Google successfully",
-            user,
-        });
+        return respondWithAuth(req, res, user, "Logged in with Google successfully");
     } catch {
         return res.status(500).json({
             success: false,
@@ -565,12 +584,7 @@ export const googleLogin = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.cookie("token", "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        expires: new Date(0),
-    });
+    clearAuthCookie(res);
     res.status(200).json({
         success: true,
         message: "Logged out successfully"
@@ -588,7 +602,7 @@ export const getMe = async (req, res) => {
             user.plan = normalizedPlan;
             await user.save();
         }
-        return res.status(200).json(user);
+        return res.status(200).json(createAuthPayload(user));
     } catch {
         res.status(500).json({ message: "Unable to load profile" });
     }
