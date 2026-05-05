@@ -2,16 +2,50 @@
   "expo": {
     "name": "Syntropy",
     "slug": "syntropy-mobile",
+    "version": "1.0.0",
     "scheme": "syntropy",
     "orientation": "portrait",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "light",
+    "description": "Syntropy helps students create, attempt, and review mock tests with analytics and syllabus-aware practice flows.",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
     "android": {
-      "package": "com.syntropy.mobile"
+      "package": "com.syntropy.mobile",
+      "versionCode": 6,
+      "permissions": [
+        "android.permission.READ_MEDIA_IMAGES"
+      ],
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
       "expo-secure-store",
-      "expo-asset"
-    ]
+      "expo-asset",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Syntropy to access your photos so you can upload a profile image."
+        }
+      ],
+      [
+        "expo-document-picker",
+        {
+          "iCloudContainerEnvironment": "Production"
+        }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "007626c3-f01d-40cf-84d9-5087d8cea441"
+      }
+    },
+    "owner": "shivayan09"
   }
 }

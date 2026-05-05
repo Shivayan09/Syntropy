@@ -10,7 +10,18 @@ import type {
   User,
 } from "@/types/api";
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL?.trim();
+
+if (!API_URL) {
+  throw new Error("Missing EXPO_PUBLIC_API_URL. Set it in your Expo environment before running the app.");
+}
+
+if (!__DEV__) {
+  const normalizedUrl = API_URL.toLowerCase();
+  if (normalizedUrl.includes("localhost") || normalizedUrl.includes("127.0.0.1")) {
+    throw new Error("Production builds cannot use a localhost EXPO_PUBLIC_API_URL.");
+  }
+}
 
 type UploadFile = File | { uri: string; name: string; mimeType?: string; type?: string };
 
