@@ -89,7 +89,10 @@ export default function TestsPage() {
   return (
     <div className="space-y-7 relative">
       {!user?.onboardingCompleted &&
-        <AddSyllabusBanner />
+        <div onClick={() => router.push('/main/profile/education')} className="md:absolute mb-5 md:mb-0 right-0 z-50 bg-yellow-50 text-black flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md cursor-pointer transition-all">
+          <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+          Click here your syllabus in profile for personalized tests <ArrowRight className="h-4" />
+        </div>
       }
       <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
         <div>

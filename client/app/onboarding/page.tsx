@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { FileImage, FileText, Sparkles, UploadCloud } from "lucide-react";
+import { FileImage, FileText, SkipForward, Sparkles, UploadCloud } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, ChangeEvent, DragEvent, useRef } from "react";
@@ -344,10 +344,13 @@ export default function Onboarding() {
 
                     <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
 
+
                     <div className="card">
-                        <div onClick={() => {router.push('/main/dashboard'); toast.warn("Onboarding skipped")}} className="text-yellow-500 underline absolute top-5 right-5 cursor-pointer text-sm">
+                        <div onClick={() => {router.push('/main/dashboard'); toast.warn("Onboarding skipped")}} className="flex items-center gap-1 w-fit ml-auto mb-3 border border-yellow-500 px-3 py-1.5 cursor-pointer text-sm">
+                            <SkipForward className="h-4"/>
                             Skip onboarding
                         </div>
+                        
 
                         {/* HEADER */}
                         <div className="mb-8 text-center">

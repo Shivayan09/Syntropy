@@ -130,11 +130,7 @@ export default function RegisterPage() {
     const completeGoogleLogin = async () => {
         await getMe();
         toast.success("Logged in with Google");
-        if (!user?.onboardingCompleted) {
-            router.push("/onboarding");
-        } else {
-            router.push("/main/dashboard");
-        }
+        router.push("/main/dashboard");
     };
 
     const handleGoogleLogin = useEffectEvent(async (credentialResponse: GoogleCredentialResponse) => {
@@ -341,7 +337,7 @@ export default function RegisterPage() {
             } else {
                 await getMe();
                 toast.success("Account created");
-                router.push("/onboarding");
+                router.push("/main/dashboard");
             }
         } catch (err: unknown) {
             console.error(err);

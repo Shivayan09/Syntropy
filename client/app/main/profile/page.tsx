@@ -5,17 +5,7 @@ import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import {
-  ArrowRight,
-  Camera,
-  Crown,
-  Mail,
-  Phone,
-  Save,
-  Settings,
-  ShieldAlert,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowRight, Camera, Crown, Mail, Phone, Save, Settings, ShieldAlert, ShieldCheck } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import SyllabusUpload from "@/components/main/SyllabusUpload";
 import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
@@ -330,11 +320,10 @@ export default function Profile() {
               <div className="flex items-center justify-between gap-3">
                 <span className="opacity-70">Onboarding</span>
                 <span
-                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${
-                    user?.onboardingCompleted
+                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${user?.onboardingCompleted
                       ? "border-black bg-primary text-white"
                       : "border-black bg-[#fff3e8] text-[#8a3b12]"
-                  }`}
+                    }`}
                 >
                   {user?.onboardingCompleted ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
                   {user?.onboardingCompleted ? "Completed" : "Incomplete"}

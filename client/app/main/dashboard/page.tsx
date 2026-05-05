@@ -7,6 +7,7 @@ import Loader2 from "@/components/utils/Loader2";
 import { normalizeSubject } from "@/components/utils/subject";
 import { useAuth } from "@/context/AuthContext";
 import { useAiTokens } from "@/context/AiTokenContext";
+import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
 
 type TestSummary = {
   _id?: string;
@@ -155,6 +156,7 @@ export default function Dashboard() {
       <section className="flex flex-col border-b border-(--border) gap-6 pb-4 lg:flex-row lg:justify-between">
 
         <div className="space-y-3">
+
           <div>
             <h2 className="text-3xl font-bold text-(--text)">
               {user?.onboardingCompleted ? `Welcome back ${user?.username} 👋` : `Welcome ${user?.name} 👋`}
@@ -163,6 +165,7 @@ export default function Dashboard() {
               Let&apos;s continue your exam preparation.
             </p>
           </div>
+
 
         </div>
         <div className="bg-surface card flex items-center justify-between">
@@ -179,8 +182,9 @@ export default function Dashboard() {
         </div>
 
       </section>
-
+      {!user?.onboardingCompleted && <CompleteOnboardingBanner />}
       <section className="grid gap-5 grid-cols-2 md:grid-cols-4">
+
         {[
           {
             label: "Tests taken",

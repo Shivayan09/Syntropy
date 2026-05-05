@@ -16,9 +16,9 @@ export default function CompleteOnboardingBanner({ compact = false, className = 
       className={`border border-(--border) bg-(--bg-secondary) p-4 text-(--text) shadow-[4px_4px_0px_var(--shadow)] ${className}`.trim()}
     >
       <div className={`flex ${compact ? "flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" : "flex-col gap-4 md:flex-row md:items-start md:justify-between"}`}>
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           <div className="mt-0.5 shrink-0 text-primary">
-            <CircleAlert size={18} />
+            <CircleAlert size={28}/>
           </div>
           <div>
             <p className="font-extrabold text-primary">Complete onboarding</p>

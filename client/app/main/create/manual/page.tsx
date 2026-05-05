@@ -1,6 +1,8 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -47,6 +49,7 @@ export default function Create() {
   const [subjectiveQuestions, setSubjectiveQuestions] = useState<SubjectiveQuestion[]>([createEmptySubjectiveQuestion()]);
   const [syllabusSubjects, setSyllabusSubjects] = useState<string[]>([]);
   const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchSyllabus = async () => {
@@ -195,11 +198,11 @@ export default function Create() {
   return (
     <div className="relative">
       {!user?.onboardingCompleted &&
-        <div className="md:absolute mb-5 md:mb-0 -top-2 right-0 z-50 bg-yellow-50 flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md">
-          <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
-          Add your syllabus in profile for personalized tests
-        </div>
-      }
+                <div onClick={() => router.push('/main/profile/education')} className="md:absolute mb-5 md:mb-0 right-0 z-50 bg-yellow-50 text-black flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md cursor-pointer transition-all">
+                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
+                    Click here your syllabus in profile for personalized tests <ArrowRight className="h-4"/>
+                </div>
+            }
       <div className="mb-6">
         <h1 className="text-3xl font-extrabold">Create Test</h1>
         <p className="mt-2 text-stone-500">

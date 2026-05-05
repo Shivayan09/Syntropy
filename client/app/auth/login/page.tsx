@@ -88,11 +88,7 @@ export default function LoginPage() {
             } else {
                 await getMe();
                 toast.success("Logged in successfully");
-                if (!user?.onboardingCompleted) {
-                    router.push('/onboarding');
-                } else {
-                    router.push("/main/dashboard");
-                }
+                router.push("/main/dashboard");
             }
         } catch (error: unknown) {
             console.error(error);

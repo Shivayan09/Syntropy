@@ -10,11 +10,7 @@ export default function AuthRoute({ children, }: { children: React.ReactNode }) 
     const router = useRouter();
     useEffect(() => {
         if (!loading && user) {
-            if (!user.onboardingCompleted) {
-                router.replace("/onboarding");
-            } else {
-                router.replace("/main/dashboard");
-            }
+            router.replace("/main/dashboard");
         }
     }, [user, loading, router]);
     if (loading) {
