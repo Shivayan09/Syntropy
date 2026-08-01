@@ -14,6 +14,7 @@ import syllabusRouter from "./routes/syllabus.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
+import { applyRouteRateLimits } from "./middlewares/routeRateLimits.middleware.js";
 
 const app = express();
 await connectDB();
@@ -70,6 +71,7 @@ app.use(cors({
 
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
+applyRouteRateLimits(app);
 
 app.get("/", (req, res) => {
   res.send("Server is running");
