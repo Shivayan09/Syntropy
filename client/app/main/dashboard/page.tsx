@@ -71,9 +71,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/attempt/my", {
-          credentials: "include",
-        });
+        const res = await fetch(BACKEND_URL + "/api/attempt/my", {credentials: "include"});
         const data = await res.json();
         setAttempts(data.attempts || []);
       } catch (err) {
@@ -82,7 +80,6 @@ export default function Dashboard() {
         setLoading(false);
       }
     };
-
     fetchAttempts();
   }, []);
 

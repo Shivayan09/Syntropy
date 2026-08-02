@@ -1,3 +1,4 @@
+import redis from "../config/redis.js";
 import Attempt from "../models/attempt.model.js";
 import Test from "../models/test.model.js";
 import { evaluateSubjective } from "../services/evaluateSubjective.service.js";
@@ -182,18 +183,26 @@ export const getAttemptById = async (req, res) => {
     }
 };
 
-export const getMyAttempts = async (req, res) => {
+export const getMyAttempts = async (req, res, next) => {
     try {
-        const attempts = await Attempt.find({ user: req.user._id, status: "completed" }).populate("test", "title subjects duration difficulty totalQuestions type questions").sort({ createdAt: -1 })
-        res.json({
+        const cacheKey = `attempts:${req.user._id}`;
+        const cachedAttempts = await redis.get(cacheKey);
+        if (cachedAttempts) {
+            return res.json({
+                success: true,
+                attempts: cachedAttempts,
+                source: "cache",
+            });
+        }
+        const attempts = await Attempt.find({user: req.user._id,status: "completed",}).populate("test","title subjects duration difficulty totalQuestions type questions") .sort({ createdAt: -1 });
+        await redis.set(cacheKey, attempts, {ex: 300});
+        return res.json({
             success: true,
-            attempts
+            attempts,
+            source: "database",
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message
-        });
+        next(error);
     }
 };
 
