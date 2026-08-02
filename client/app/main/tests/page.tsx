@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock3, ClipboardList, ClipboardPen, FileQuestion, ListFilter, Plus, Search, Sparkles } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { useAuth } from "@/context/AuthContext";
-import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
 
 type Test = {
   _id: string;
