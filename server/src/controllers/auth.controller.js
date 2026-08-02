@@ -6,7 +6,7 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { OAuth2Client } from "google-auth-library";
 import { normalizePlan } from "../config/plan.js";
-import { clearAuthCookie, createAuthToken, isMobileAuthRequest, setAuthCookie } from "../utils/authToken.js";
+import { clearAuthCookie, createAuthToken, isMobileAuthRequest, setAuthCookie } from "../utils/authToken.utils.js";
 
 const OTP_EXPIRY_MINUTES = 10;
 const MAX_OTP_ATTEMPTS = 5;

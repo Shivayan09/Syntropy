@@ -3,7 +3,7 @@ import User from "../models/user.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
 import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
 import { buildAiTokenStatus, consumeAiCredit, refundAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
-import { sanitizeSubjects } from "../utils/subjectValidation.js";
+import { sanitizeSubjects } from "../utils/subjectValidation.utils.js";
 import { getTestNumber } from "../utils/testTitle.utils.js";
 
 export const createTest = async (req, res) => {

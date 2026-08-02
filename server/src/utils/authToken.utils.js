@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 
 export const AUTH_TOKEN_TTL = 7 * 24 * 60 * 60 * 1000;
 
-export const createAuthToken = (userId) =>
-  jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+export const createAuthToken = (userId) => jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
 export const setAuthCookie = (res, token) => {
   res.cookie("token", token, {
@@ -28,7 +27,6 @@ export const getBearerToken = (req) => {
   if (!authorization?.startsWith("Bearer ")) {
     return null;
   }
-
   const token = authorization.slice("Bearer ".length).trim();
   return token || null;
 };
@@ -38,6 +36,5 @@ export const getRequestToken = (req) => getBearerToken(req) || req.cookies.token
 export const isMobileAuthRequest = (req) => {
   const platformHeader = req.headers["x-client-platform"];
   const responseMode = req.body?.responseMode;
-
   return platformHeader === "mobile" || responseMode === "mobile";
 };
