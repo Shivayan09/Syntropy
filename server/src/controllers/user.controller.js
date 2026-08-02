@@ -18,27 +18,19 @@ const createEmailTransporter = () => nodemailer.createTransport({
 export const getPublicProfile = async (req, res) => {
     try {
         const { id } = req.params;
-
         const user = await User.findById(id).select(
             "name username avatar college semester createdAt preferences.targetRole stats analytics streak"
         );
-
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not found"
             });
         }
-
         const [testsCreated, attemptStats] = await Promise.all([
             Test.countDocuments({ createdBy: user._id }),
             Attempt.aggregate([
-                {
-                    $match: {
-                        user: user._id,
-                        isFirstAttempt: true
-                    }
-                },
+                { $match: {user: user._id,isFirstAttempt: true}},
                 {
                     $group: {
                         _id: null,
@@ -46,11 +38,7 @@ export const getPublicProfile = async (req, res) => {
                         averageAccuracy: { $avg: "$accuracy" },
                         averageScore: { $avg: "$score" },
                         bestScore: { $max: "$score" },
-                        totalQuestionsSolved: {
-                            $sum: {
-                                $add: ["$correct", "$wrong", "$skipped"]
-                            }
-                        },
+                        totalQuestionsSolved: {$sum: {$add: ["$correct", "$wrong", "$skipped"]}},
                         totalCorrect: { $sum: "$correct" },
                         totalWrong: { $sum: "$wrong" },
                         totalSkipped: { $sum: "$skipped" }
@@ -58,9 +46,7 @@ export const getPublicProfile = async (req, res) => {
                 }
             ])
         ]);
-
         const stats = attemptStats[0];
-
         return res.status(200).json({
             success: true,
             profile: {
@@ -103,9 +89,7 @@ export const getAiTokenStatus = async (req, res) => {
                 message: "User not found"
             });
         }
-
         await syncAiTokens(user);
-
         return res.status(200).json({
             success: true,
             aiTokenStatus: buildAiTokenStatus(user)
@@ -286,35 +270,30 @@ export const updateAvatar = async (req, res) => {
 export const contactSupport = async (req, res) => {
     try {
         const { name, email, message } = req.body;
-
         if (!name?.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Name is required"
             });
         }
-
         if (!email || !validator.isEmail(email)) {
             return res.status(400).json({
                 success: false,
                 message: "Please enter a valid email!"
             });
         }
-
         if (!message?.trim()) {
             return res.status(400).json({
                 success: false,
                 message: "Message is required"
             });
         }
-
         if (message.trim().length < 10) {
             return res.status(400).json({
                 success: false,
                 message: "Message is too short"
             });
         }
-
         const user = await User.findById(req.user._id).select("name email username");
         if (!user) {
             return res.status(404).json({
@@ -322,25 +301,21 @@ export const contactSupport = async (req, res) => {
                 message: "User not found"
             });
         }
-
         const transporter = createEmailTransporter();
         const normalizedEmail = normalizeEmail(email);
         const safeMessage = message.trim();
-
         await transporter.sendMail({
             from: process.env.EMAIL,
             to: process.env.EMAIL,
             replyTo: normalizedEmail,
             subject: `Support request from ${name.trim()}`,
             text: `Support request received
-
 Name: ${name.trim()}
 Email: ${normalizedEmail}
 User ID: ${user._id}
 Username: ${user.username || "Not set"}
 Account Name: ${user.name || "Not set"}
 Account Email: ${user.email || "Not set"}
-
 Message:
 ${safeMessage}`,
             html: `
@@ -362,7 +337,6 @@ ${safeMessage}`,
                 </div>
             `,
         });
-
         return res.status(200).json({
             success: true,
             message: "Support message sent successfully"

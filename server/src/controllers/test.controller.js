@@ -69,14 +69,11 @@ export const getTest = async (req, res) => {
                 message: "Test not found"
             });
         }
-
         const responseTest = test.toObject();
-
         if (responseTest.type === "generated") {
             const testNumber = await getTestNumber(req.user._id, test);
             responseTest.title = `Test ${testNumber}`;
         }
-
         res.json({
             success: true,
             test: responseTest
@@ -122,26 +119,22 @@ export const getTestForAttempt = async (req, res) => {
 export const aiTest = async (req, res) => {
     let user;
     let creditSource = null;
-
     try {
         const userId = req.user._id;
         const { subjects: rawSubjects } = req.body;
         const { subjects, invalidSubjects } = sanitizeSubjects(rawSubjects);
-
         if (!subjects.length) {
             return res.status(400).json({
                 success: false,
                 message: "Enter at least 1 valid subject"
             });
         }
-
         if (invalidSubjects.length) {
             return res.status(400).json({
                 success: false,
                 message: `Invalid subject${invalidSubjects.length > 1 ? "s" : ""}: ${invalidSubjects.join(", ")}`
             });
         }
-
         req.body.subjects = subjects;
         user = await User.findById(userId);
         if (!user) {
@@ -175,7 +168,6 @@ export const aiTest = async (req, res) => {
         if (user && creditSource) {
             await refundAiCredit(user, creditSource);
         }
-
         return res.status(500).json({
             success: false,
             message: err.message,

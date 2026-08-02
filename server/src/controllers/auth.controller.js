@@ -52,18 +52,10 @@ const getSmtpConfig = () => {
 
     const host = process.env.SMTP_HOST || DEFAULT_SMTP_HOST;
     const port = Number(process.env.SMTP_PORT || DEFAULT_SMTP_PORT);
-    const secure = process.env.SMTP_SECURE
-        ? process.env.SMTP_SECURE === "true"
-        : port === 465;
+    const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
 
     return {
-        host,
-        port,
-        secure,
-        auth: {
-            user,
-            pass,
-        },
+        host, port, secure, auth: { user, pass },
     };
 };
 
@@ -120,13 +112,7 @@ const respondWithAuth = async (req, res, user, message) => {
     });
 };
 
-const escapeHtml = (value = "") =>
-    value
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
+const escapeHtml = (value = "") => value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 const getFirstName = (name = "") => {
     const trimmed = name.trim();
