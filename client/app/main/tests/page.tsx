@@ -198,7 +198,7 @@ export default function TestsPage() {
                 onClick={() =>
                   router.push(mode === "all" ? "/main/create" : `${mode === "generated" ? "/main/create/generate" : "/main/create/manual"}`)
                 }
-                className="mt-6 gap-2"
+                className="mt-6 gap-2 mx-auto"
               >
                 <Plus size={18} />
                 {mode === "all" ? "Create a test" : `${mode === "generated" ? "Generate AI test" : "Create manual test"}`}
@@ -213,32 +213,32 @@ export default function TestsPage() {
               return (
                 <article
                   key={test._id}
-                  className="card grid gap-4 p-5 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center"
+                  className="border border-black/10 p-3 rounded-2xl grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center"
                 >
                   <div className="min-w-0">
-                    <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1 border border-black bg-(--surface) px-2 py-0.5 text-xs font-extrabold uppercase">
-                        {isGenerated ? <Sparkles size={13} /> : <ClipboardPen size={13} />}
+                    <div className="mb-1 flex flex-wrap items-center">
+                      <span className="inline-flex items-center gap-1 bg-(--surface) px-2 py-0.5 text-xs font-extrabold uppercase">
+                        {isGenerated ? <Sparkles size={12} /> : <ClipboardPen size={12} />}
                         {isGenerated ? "AI" : "Manual"}
                       </span>
                     </div>
-                    <p className="truncate text-xl font-bold">{test.title || "Untitled test"}</p  >
+                    <p className="truncate text-xl font-semibold">{test.title || "Untitled test"}</p  >
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
                     <FileQuestion size={17} className="text-primary" />
-                    <span className="font-bold">{test.totalQuestions}</span>
+                    <span className="font-semibold">{test.totalQuestions}</span>
                     <span className="opacity-60 lg:hidden">questions</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
                     <Clock3 size={17} className="text-primary" />
-                    <span className="font-bold">{test.duration} min</span>
+                    <span className="font-semibold">{test.duration} min</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
                     <CalendarDays size={17} className="text-primary" />
-                    <span className="font-bold">{formatDate(test.createdAt)}</span>
+                    <span className="font-semibold">{formatDate(test.createdAt)}</span>
                   </div>
 
                   <div className="flex justify-end">

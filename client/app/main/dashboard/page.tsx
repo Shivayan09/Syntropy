@@ -367,7 +367,7 @@ export default function Dashboard() {
               >
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-lg font-bold">{attempt.test?.title || "AI Test"}</p>
+                    <p className="text-lg font-semibold">{attempt.test?.title || "AI Test"}</p>
 
                   </div>
 
@@ -387,11 +387,11 @@ export default function Dashboard() {
                 <div className="grid grid-cols-2 gap-3 text-sm md:w-48">
                   <div>
                     <p className="opacity-60">Score</p>
-                    <p className="text-xl font-bold">{clampPercent(attempt.score || 0)}%</p>
+                    <p className="text-xl font-semibold">{clampPercent(attempt.score || 0)}%</p>
                   </div>
                   <div>
                     <p className="opacity-60">Accuracy</p>
-                    <p className="text-xl font-bold">{clampPercent(attempt.accuracy || 0)}%</p>
+                    <p className="text-xl font-semibold">{clampPercent(attempt.accuracy || 0)}%</p>
                   </div>
                 </div>
 
