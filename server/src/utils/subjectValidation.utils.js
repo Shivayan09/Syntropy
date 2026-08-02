@@ -1,5 +1,4 @@
-export const normalizeSubjectName = (value = "") =>
-    value.trim().replace(/\s+/g, " ");
+export const normalizeSubjectName = (value = "") => value.trim().replace(/\s+/g, " ");
 
 const academicKeywordStems = [
     "account", "algebra", "algorithm", "anatom", "biology", "biotech", "botany",

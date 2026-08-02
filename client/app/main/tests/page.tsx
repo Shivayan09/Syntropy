@@ -212,7 +212,7 @@ export default function TestsPage() {
               return (
                 <article
                   key={test._id}
-                  className="border border-black/10 p-3 rounded-2xl grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center"
+                  className="border border-(--border) p-3 rounded-2xl grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center"
                 >
                   <div className="min-w-0">
                     <div className="mb-1 flex flex-wrap items-center">

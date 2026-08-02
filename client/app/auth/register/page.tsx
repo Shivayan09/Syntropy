@@ -663,16 +663,28 @@ export default function RegisterPage() {
                             </p>
                         </div>
 
-                        <label className="mt-5 flex items-start gap-3 text-sm">
+                        <label className="mt-5 flex items-center gap-3 text-sm">
                             <input
                                 type="checkbox"
-                                className="mt-1 h-4 w-4 shrink-0"
                                 checked={googleTermsAccepted}
                                 onChange={(e) => setGoogleTermsAccepted(e.target.checked)}
+                                className="shrink-0"
+                                style={{
+                                    width: "16px",
+                                    height: "16px",
+                                    padding: 0,
+                                    margin: 0,
+                                    flex: "none",
+                                }}
                             />
+
                             <span>
                                 I agree to the{" "}
-                                <Link href="/terms-and-conditions" target="_blank" className="font-bold text-primary underline">
+                                <Link
+                                    href="/terms-and-conditions"
+                                    target="_blank"
+                                    className="font-bold text-primary underline"
+                                >
                                     Terms and Conditions
                                 </Link>
                                 .
