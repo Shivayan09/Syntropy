@@ -305,7 +305,7 @@ export default function AttemptPage() {
                   const selected = answers[current] === index;
 
                   return (
-                    <div key={`${option}-${index}`} onClick={() => selectOption(index)} className={`h-auto rounded-xl min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full rounded-none px-0 py-0 text-left hover:transform-none cursor-pointer ${selected ? "bg-primary text-white" : "button-secondary bg-(--surface) text-(--text)"}`} >
+                    <div key={`${option}-${index}`} onClick={() => selectOption(index)} className={`h-auto rounded-xl min-h-16 shadow-[4px_4px_0px_var(--shadow)] w-full px-0 py-0 text-left hover:transform-none cursor-pointer ${selected ? "bg-primary text-white" : "button-secondary bg-(--surface) text-(--text)"}`} >
                       <span className="flex min-h-16 w-full items-start gap-4 p-4 md:p-5">
                         <span className={`grid h-9 w-9 shrink-0 place-items-center border text-sm font-extrabold ${selected ? "border-white bg-white text-black" : "border-(--border) bg-(--bg-secondary)"}`} >
                           {optionLabels[index] || index + 1}
