@@ -46,7 +46,7 @@ declare global {
 export default function RegisterPage() {
     const router = useRouter();
     const [step, setStep] = useState(1);
-    const { user, getMe } = useAuth();
+    const { getMe } = useAuth();
     const [loading, setLoading] = useState(false);
     const [otp, setOtp] = useState("");
     const [otpVerified, setOtpVerified] = useState(false);
