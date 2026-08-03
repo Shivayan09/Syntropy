@@ -117,19 +117,19 @@ export default function AiTokenStatus({
       </div>
 
       <div className="flex flex-col md:flex-row gap-2 md:gap-5">
-        <div className="border border-black bg-(--surface) p-3">
+        <div className="card border border-black bg-(--surface) p-3">
           <p className="text-xs font-extrabold uppercase opacity-55">Credits left</p>
           <p className="mt-1 text-xl font-extrabold">{remaining}</p>
           <p className="text-xs opacity-60">
             {includedRemaining} plan + {bonusRemaining} top-up
           </p>
         </div>
-        <div className="border border-black bg-(--surface) p-3">
+        <div className="card border border-black bg-(--surface) p-3">
           <p className="text-xs font-extrabold uppercase opacity-55">Monthly allowance</p>
           <p className="mt-1 text-xl font-extrabold">{cycleLimit}</p>
           <p className="text-xs opacity-60">{getWindowCopy(status)}</p>
         </div>
-        <div className="border border-black bg-(--surface) p-3">
+        <div className="card border border-black bg-(--surface) p-3">
           <p className="text-xs font-extrabold uppercase opacity-55">Next refill</p>
           <p className="mt-1 text-xl font-extrabold">{resetTime}</p>
           <p className="text-xs opacity-60">{status.planLabel} access</p>

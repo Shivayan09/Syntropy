@@ -319,7 +319,7 @@ export default function CreateAITest() {
                 </div>
             </section>
 
-            <div className="mb-7 border-2 border-black px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div className="mb-7 card2 flex flex-wrap items-center justify-between gap-4">
                 <div className="flex flex-wrap gap-6 text-sm">
                     <div>
                         <p className="text-xs text-gray-500">Subjects</p>

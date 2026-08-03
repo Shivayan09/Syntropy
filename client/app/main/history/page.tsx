@@ -153,7 +153,7 @@ export default function AttemptsPage() {
           </div>
         </div>
 
-        <button onClick={() => router.push("/main/tests")} className="gap-2">
+        <button onClick={() => router.push("/main/tests")} className="button-secondary gap-2">
           <FileQuestion size={18} />
           Take test
         </button>

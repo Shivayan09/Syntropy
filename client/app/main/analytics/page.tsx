@@ -472,7 +472,7 @@ export default function Analytics() {
             </div>
           </section>
 
-          <section className="card p-6 md:p-7">
+          <section>
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-bold opacity-60">Recent attempts</p>
@@ -486,7 +486,7 @@ export default function Analytics() {
 
             <div className="space-y-3">
               {attempts.slice(0, 5).map((attempt) => (
-                <article key={attempt._id} className="grid gap-4 border border-(--border) bg-(--surface) p-4 lg:grid-cols-[1fr_8rem_8rem_7rem] lg:items-center">
+                <article key={attempt._id} className="card grid gap-4 border border-(--border) bg-(--surface) p-4 lg:grid-cols-[1fr_8rem_8rem_7rem] lg:items-center">
                   <div className="min-w-0">
                     <p className="truncate font-extrabold">{attempt.test?.title || "Mock Test"}</p>
                     <p className="mt-1 flex items-center gap-2 text-xs opacity-60">

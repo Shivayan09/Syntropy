@@ -272,7 +272,7 @@ export default function Profile() {
 
               <div className="min-w-0 w-full">
                 <div className="flex items-center justify-end">
-                  <div className="mb-3 inline-flex items-center gap-2 border border-black bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white shadow-[3px_3px_0px_black]">
+                  <div className="mb-3 inline-flex items-center gap-2 text-primary px-3 py-1 text-xs font-extrabold uppercase text-white">
                     <Crown size={14} />
                     {activePlan.label} Plan
                   </div>

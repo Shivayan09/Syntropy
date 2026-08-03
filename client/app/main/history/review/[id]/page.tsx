@@ -289,7 +289,7 @@ export default function AttemptReviewPage() {
                 return (
                   <div
                     key={`${option}-${index}`}
-                    className={`flex min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${isCorrect
+                    className={`flex rounded-xl min-h-16 items-start justify-between gap-4 border p-4 md:p-5 ${isCorrect
                       ? "border-primary bg-primary text-white"
                       : isWrongSelection
                         ? "border-[#ef4444] bg-[#ef4444] text-white"

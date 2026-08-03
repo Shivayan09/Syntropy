@@ -385,64 +385,92 @@ export default function PlansPage() {
 
         <section className="mt-5">
           <div className="grid gap-8 xl:grid-cols-[1fr_1fr]">
-            <div className="card flex flex-col gap-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 border border-black bg-primary px-3 py-1 text-white">
-                  <CurrentPlanIcon size={16} className="text-white" />
-                  <span className="text-sm font-extrabold uppercase">
-                    {currentPlan.name} Plan
-                  </span>
+            <div className="card flex flex-col gap-7">
+
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                  <CurrentPlanIcon size={16} />
+                  {currentPlan.name} Plan
                 </div>
 
-                <div className="border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase">
+                <span className="rounded-full bg-(--bg-secondary) px-3 py-1 text-xs font-medium opacity-75">
                   {planMeta[currentPlanKey].status}
-                </div>
+                </span>
               </div>
 
               <div>
-                <h1 className="text-2xl leading-tight font-extrabold md:text-3xl">
+                <h1 className="text-3xl font-bold leading-tight">
                   Your current setup is tuned for{" "}
-                  <span className="text-primary">consistent practice</span>
+                  <span className="text-primary">
+                    consistent practice
+                  </span>
                 </h1>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                <StatTile
-                  label="Progress loop"
-                  value="Active user"
-                  note="attempt tests -> review your attempts -> improve"
-                />
-
-                <StatTile
-                  label={isPaidPlan ? "Valid till" : "Upgrade path"}
-                  value={isPaidPlan ? formatExpiry(user?.planExpiry) : "Starter / Pro"}
-                  note={currentPlan.name==="Pro" ? "Already on max level plan" : "Upgrade to the next plan for more benefits"}
-                />
-              </div>
-
-              <div className="border border-dashed border-black bg-(--bg-secondary) p-4">
-                <p className="text-sm font-extrabold">What this means for your prep</p>
-
-                <p className="mt-1 text-sm opacity-70">
-                  {currentPlanKey === "free"
-                    ? "You get 10 AI tests every month for free, and can scale with a paid plan or a top-up whenever needed."
-                    : currentPlanKey === "starter"
-                      ? "You can keep a weekly revision rhythm without overspending, and step up when prep intensity grows."
-                      : "You can run repeated focused tests per week, making revision cycles tighter and more effective."}
+                <p className="mt-3 max-w-xl text-sm opacity-65">
+                  Your membership determines your AI credits, refill cycle and
+                  subscription benefits.
                 </p>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="rounded-xl border border-(--border) bg-(--bg-secondary) p-4">
+                  <p className="text-xs font-medium uppercase opacity-60">
+                    Progress loop
+                  </p>
+
+                  <p className="mt-2 text-lg font-bold">
+                    Active User
+                  </p>
+
+                  <p className="mt-2 text-sm opacity-65">
+                    Attempt tests → Review → Improve
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-(--border) bg-(--bg-secondary) p-4">
+                  <p className="text-xs font-medium uppercase opacity-60">
+                    {isPaidPlan ? "Valid till" : "Upgrade path"}
+                  </p>
+
+                  <p className="mt-2 text-lg font-bold">
+                    {isPaidPlan
+                      ? formatExpiry(user?.planExpiry)
+                      : "Starter / Pro"}
+                  </p>
+
+                  <p className="mt-2 text-sm opacity-65">
+                    {currentPlan.name === "Pro"
+                      ? "Already on the highest plan."
+                      : "Upgrade anytime for more AI credits."}
+                  </p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-(--border) bg-(--bg-secondary) p-5">
+                <p className="text-sm font-semibold text-primary">
+                  Included in your plan
+                </p>
+
+                <ul className="mt-4 space-y-3 text-sm">
+                  <li>✓ AI-generated mock tests</li>
+                  <li>✓ Unlimited manual tests</li>
+                  <li>✓ Detailed analytics</li>
+                  <li>✓ Leaderboards & history</li>
+                  <li>✓ Monthly AI credit refill</li>
+                </ul>
+              </div>
+
             </div>
 
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-primary">
                   <Wallet size={18} />
-                  <p className="text-lg font-extrabold uppercase tracking-wider">
+                  <p className="text-lg font-bold">
                     Top-up Packs
                   </p>
                 </div>
 
-                <span className="text-xs font-bold border border-black px-2 py-1 bg-primary text-white shadow-[2px_2px_0px_black]">
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                   Instant Credits
                 </span>
               </div>
@@ -451,48 +479,62 @@ export default function PlansPage() {
                 {topUps.map((pack, i) => (
                   <div
                     key={pack.itemKey}
-                    className="card2 group relative flex items-center justify-between gap-4 border-2 border-black transition-all duration-150"
+                    className="card relative flex items-center justify-between gap-5"
                   >
                     {i === 1 && (
-                      <span className="absolute -top-3 left-4 bg-primary text-white text-xs font-extrabold px-2 py-1 border border-black shadow-[2px_2px_0px_black]">
-                        BEST VALUE
+                      <span className="absolute -top-3 left-5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white">
+                        Best Value
                       </span>
                     )}
 
                     <div>
-                      <p className="text-xl font-extrabold">{pack.name}</p>
-                      <p className="mt-1 text-sm opacity-70 max-w-55">
+                      <p className="text-2xl font-bold">
+                        {pack.name}
+                      </p>
+
+                      <p className="mt-2 max-w-56 text-sm opacity-70">
                         {pack.description}
                       </p>
-                      {(pack.itemKey === "topup_5" || pack.itemKey === "topup_15") && (
-                        <div className="mt-3 inline-flex border-2 border-black bg-primary px-3 py-1 text-sm font-extrabold text-white shadow-[3px_3px_0px_black]">
-                          {pack.itemKey === "topup_5"
-                            ? formatPerTestCost(39, 5)
-                            : formatPerTestCost(89, 15)}
-                        </div>
-                      )}
 
-                      <p className="mt-2 text-xs font-bold text-primary">
-                        {i === 1 ? "Most popular choice" : "Upgrade your performance"}
+                      {(pack.itemKey === "topup_5" ||
+                        pack.itemKey === "topup_15") && (
+                          <div className="mt-4 inline-flex rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">
+                            {pack.itemKey === "topup_5"
+                              ? formatPerTestCost(39, 5)
+                              : formatPerTestCost(89, 15)}
+                          </div>
+                        )}
+
+                      <p className="mt-3 text-xs font-medium text-primary">
+                        {i === 1
+                          ? "Most popular choice"
+                          : "Upgrade your performance"}
                       </p>
                     </div>
 
-                    <div className="flex flex-col items-end gap-3">
-                      <span className="border-2 border-black bg-secondary text-primary px-4 py-1 text-sm font-extrabold shadow-[2px_2px_0px_black]">
+                    <div className="flex flex-col items-end gap-4">
+                      <span className="rounded-full bg-(--bg-secondary) px-4 py-2 text-lg font-bold text-primary">
                         {pack.priceLabel}
                       </span>
 
                       <button
                         onClick={() => handlePurchase(pack.itemKey)}
                         disabled={loading === pack.itemKey}
-                        className={`flex items-center justify-center gap-2 px-5 h-10 font-bold border-2 border-black bg-(--bg-secondary) text-(--text) shadow-[4px_4px_0px_black] transition-all duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_black] ${loading === pack.itemKey ? "opacity-70 cursor-not-allowed" : ""}`}
+                        className={`gap-2 ${loading === pack.itemKey
+                          ? "cursor-not-allowed opacity-60"
+                          : ""
+                          }`}
                       >
                         {loading === pack.itemKey ? (
                           "Processing..."
                         ) : (
                           <>
-                            <span className="sm:hidden">Buy</span>
-                            <span className="hidden sm:inline">Buy Now</span>
+                            <span className="sm:hidden">
+                              Buy
+                            </span>
+                            <span className="hidden sm:inline">
+                              Buy Now
+                            </span>
                           </>
                         )}
                       </button>
@@ -530,12 +572,12 @@ export default function PlansPage() {
                         </div>
                         <div className="absolute top-3 right-5">
                           {plan.highlighted && (
-                            <span className="border border-black bg-primary px-2 py-1 text-xs font-extrabold text-white">
+                            <span className="text-primary px-2 py-1 text-xs font-extrabold text-white">
                               POPULAR
                             </span>
                           )}
                           {isCurrent && (
-                            <span className="border border-black bg-(--surface) px-2 py-1 text-xs font-extrabold">
+                            <span className="text-primary px-2 py-1 text-xs font-extrabold">
                               ACTIVE
                             </span>
                           )}
@@ -546,7 +588,7 @@ export default function PlansPage() {
                         <p className="text-3xl font-extrabold">{plan.priceLabel}</p>
                         <p className="mt-1 text-sm font-bold text-primary">{plan.quota}</p>
                         {(plan.key === "starter" || plan.key === "pro") && (
-                          <div className="mt-3 inline-flex border-2 border-black bg-primary px-3 py-1 text-sm font-extrabold text-white shadow-[3px_3px_0px_black]">
+                          <div className="mt-3 inline-flex shadow-sm shadow-green-500 bg-primary px-3 py-1 text-sm font-extrabold text-white rounded-xl">
                             {plan.key === "starter"
                               ? formatPerTestCost(99, 30)
                               : formatPerTestCost(249, 100)}
