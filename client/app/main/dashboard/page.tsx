@@ -167,12 +167,9 @@ export default function Dashboard() {
         </div>
         <div className="bg-surface card flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-primary text-muted-foreground flex items-center gap-2">
+            <p className="text-sm text-primary text-muted-foreground flex gap-1">
               <TicketCheck className="text-primary" size={18} />
-              AI Test Credits
-            </p>
-            <p className="text-2xl font-bold text-(--text)">
-              {tokenStatus?.remaining} <span className="text-xs opacity-70">left for this month</span>
+              10 AI Test Credits <p className="text-(--text)">left this month</p>
             </p>
           </div>
 
