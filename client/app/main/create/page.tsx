@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import { useAiTokens } from "@/context/AiTokenContext";
 import { useAuth } from "@/context/AuthContext";
-import AddSyllabusBanner from "@/components/main/AddSyllabusBanner";
 
 export default function CreateTestPage() {
     const router = useRouter();
