@@ -274,7 +274,7 @@ export default function AttemptsPage() {
                 <article key={attempt._id} className="card grid gap-4 p-5 lg:grid-cols-[1fr_5rem_7rem_6rem_10rem_11rem] lg:items-center">
                   <div className="min-w-0">
                     <div className="mb-2 flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1 border border-black bg-(--surface) px-2 py-0.5 text-xs font-extrabold uppercase">
+                      <span className="inline-flex items-center gap-1 text-primary py-0.5 text-xs font-extrabold uppercase">
                         <FileQuestion size={13} />
                         {getSubject(attempt)}
                       </span>

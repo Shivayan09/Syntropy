@@ -92,7 +92,7 @@ export default function CreateTestPage() {
                             <li>Test conceptual understanding</li>
                         </ul>
 
-                        <div className="mt-5 border border-black bg-(--surface) p-4">
+                        <div className=" card2 mt-5 border border-black bg-(--surface) p-4">
                             <p className="text-sm font-extrabold">Unlimited manual tests</p>
                             <p className="mt-1 text-xs opacity-65">
                                 Unlimitted manual test creation, no tokens needed

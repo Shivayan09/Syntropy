@@ -65,7 +65,7 @@ export default function AiTokenStatus({
 
   if (compact) {
     return (
-      <div className={`mt-5 border border-black bg-(--surface) p-4 ${hasTokens ? "" : "border-red-500!"}`}>
+      <div className={`mt-5 card2 border border-black bg-(--surface) p-4 ${hasTokens ? "" : "border-red-500!"}`}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="flex items-center gap-2 text-sm font-extrabold">

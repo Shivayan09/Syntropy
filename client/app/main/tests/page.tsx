@@ -270,13 +270,13 @@ export default function TestsPage() {
                   <div className="hidden lg:grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center">
                     <div className="min-w-0">
                       <div className="mb-1 flex flex-wrap items-center">
-                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                        <span className="inline-flex font-bold items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs text-primary">
                           {isGenerated ? <Sparkles size={12} /> : <ClipboardPen size={12} />}
                           {isGenerated ? "AI" : "Manual"}
                         </span>
                       </div>
 
-                      <p className="truncate text-xl font-semibold">
+                      <p className="truncate text-xl font-bold">
                         {test.title || "Untitled test"}
                       </p>
                     </div>
