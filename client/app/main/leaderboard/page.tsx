@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3, CheckCircle2, ChevronDown, Medal, Search, Trophy, User2, Users } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
 import Image from 'next/image'
 import { useRouter } from "next/navigation";
 import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";

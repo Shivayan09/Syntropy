@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { ElementType } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, BarChart3, BookOpenCheck, BrainCircuit, CalendarDays, FileQuestion, Target, TrendingUp } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
 import AnalyticsSkeleton from "@/components/skeletons/AnalyticsSkeleton";
 
 type Difficulty = "Easy" | "Medium" | "Hard";

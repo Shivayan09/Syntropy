@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock3, ClipboardList, ClipboardPen, FileQuestion, ListFilter, Plus, Search, Sparkles } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
 import { useAuth } from "@/context/AuthContext";
 import TestsSkeleton from "@/components/skeletons/TestsSkeleton";
 

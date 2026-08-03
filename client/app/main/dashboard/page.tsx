@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, BrainCircuit, CalendarDays, Clock3, Flame, TicketCheck } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
 import { normalizeSubject } from "@/components/utils/subject";
 import { useAuth } from "@/context/AuthContext";
 import { useAiTokens } from "@/context/AiTokenContext";
