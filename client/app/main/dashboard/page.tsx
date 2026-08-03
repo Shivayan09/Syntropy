@@ -8,6 +8,7 @@ import { normalizeSubject } from "@/components/utils/subject";
 import { useAuth } from "@/context/AuthContext";
 import { useAiTokens } from "@/context/AiTokenContext";
 import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
+import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 
 type TestSummary = {
   _id?: string;
@@ -71,7 +72,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/attempt/my", {credentials: "include"});
+        const res = await fetch(BACKEND_URL + "/api/attempt/my", { credentials: "include" });
         const data = await res.json();
         setAttempts(data.attempts || []);
       } catch (err) {
@@ -145,7 +146,7 @@ export default function Dashboard() {
           : "Start baseline";
 
   if (loading) {
-    return <Loader2 />;
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -358,47 +359,116 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-3">
             {attempts.slice(0, visibleCount).map((attempt) => (
-              <div
-                key={attempt._id}
-                className="card grid gap-5 p-5 md:grid-cols-[1fr_auto_auto] md:items-center"
-              >
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-lg font-semibold">{attempt.test?.title || "AI Test"}</p>
+              <div key={attempt._id} className="card">
 
+                {/* Mobile */}
+                <div className="md:hidden">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-lg font-bold leading-snug">
+                        {attempt.test?.title || "AI Test"}
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs opacity-70">
+                        <span className="inline-flex items-center gap-1">
+                          <CalendarDays size={14} />
+                          {formatDate(attempt.createdAt)}
+                        </span>
+
+                        <span className="inline-flex items-center gap-1">
+                          <Clock3 size={14} />
+                          {getDuration(attempt)}
+                        </span>
+
+                        <span>
+                          {normalizeSubject(
+                            attempt.test?.subjects?.[0],
+                            "mixed practice"
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        router.push(`/main/history/review/${attempt._id}`)
+                      }
+                      className="button-secondary h-10 px-4"
+                    >
+                      Review
+                    </button>
                   </div>
 
-                  <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs opacity-70">
-                    <span className="inline-flex items-center gap-1">
-                      <CalendarDays size={14} />
-                      {formatDate(attempt.createdAt)}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Clock3 size={14} />
-                      {getDuration(attempt)}
-                    </span>
-                    <span>{normalizeSubject(attempt.test?.subjects?.[0], "mixed practice")}</span>
+                  <div className="mt-5 grid grid-cols-2 gap-4 border-t border-(--border) pt-4">
+                    <div>
+                      <p className="text-xs opacity-60">Score</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {clampPercent(attempt.score || 0)}%
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-xs opacity-60">Accuracy</p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {clampPercent(attempt.accuracy || 0)}%
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm md:w-48">
+                {/* Desktop */}
+                <div className="hidden gap-5 md:grid md:grid-cols-[1fr_auto_auto] md:items-center">
                   <div>
-                    <p className="opacity-60">Score</p>
-                    <p className="text-xl font-semibold">{clampPercent(attempt.score || 0)}%</p>
-                  </div>
-                  <div>
-                    <p className="opacity-60">Accuracy</p>
-                    <p className="text-xl font-semibold">{clampPercent(attempt.accuracy || 0)}%</p>
-                  </div>
-                </div>
+                    <p className="text-lg font-semibold">
+                      {attempt.test?.title || "AI Test"}
+                    </p>
 
-                <button
-                  onClick={() => router.push(`/main/history/review/${attempt._id}`)}
-                  className="button-secondary w-full gap-2 md:w-fit"
-                >
-                  Review
-                  <ArrowRight size={18} />
-                </button>
+                    <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs opacity-70">
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarDays size={14} />
+                        {formatDate(attempt.createdAt)}
+                      </span>
+
+                      <span className="inline-flex items-center gap-1">
+                        <Clock3 size={14} />
+                        {getDuration(attempt)}
+                      </span>
+
+                      <span>
+                        {normalizeSubject(
+                          attempt.test?.subjects?.[0],
+                          "mixed practice"
+                        )}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm md:w-48">
+                    <div>
+                      <p className="opacity-60">Score</p>
+                      <p className="text-xl font-semibold">
+                        {clampPercent(attempt.score || 0)}%
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="opacity-60">Accuracy</p>
+                      <p className="text-xl font-semibold">
+                        {clampPercent(attempt.accuracy || 0)}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      router.push(`/main/history/review/${attempt._id}`)
+                    }
+                    className="button-secondary w-fit gap-2"
+                  >
+                    Review
+                    <ArrowRight size={18} />
+                  </button>
+                </div>
               </div>
             ))}
 

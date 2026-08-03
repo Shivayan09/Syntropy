@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, CalendarDays, Clock3, ClipboardList, ClipboardPen, FileQuestion, ListFilter, Plus, Search, Sparkles } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 import { useAuth } from "@/context/AuthContext";
+import TestsSkeleton from "@/components/skeletons/TestsSkeleton";
 
 type Test = {
   _id: string;
@@ -154,7 +155,7 @@ export default function TestsPage() {
         </label>
       </section>
 
-      <section className="grid gap-4 grid-cols-2 md:grid-cols-3">
+      <section className="md:grid gap-4 grid-cols-2 md:grid-cols-3 hidden">
         <div className="card p-5 hidden md:flex flex-col">
           <p className="text-sm font-bold opacity-60">Showing</p>
           <p className="mt-2 text-3xl font-extrabold">{filteredTests.length}</p>
@@ -182,7 +183,7 @@ export default function TestsPage() {
         </div>
 
         {loading ? (
-          <Loader2 />
+          <TestsSkeleton />
         ) : filteredTests.length === 0 ? (
           <div className="card grid min-h-64 place-items-center p-7 text-center">
             <div>
@@ -212,42 +213,100 @@ export default function TestsPage() {
               return (
                 <article
                   key={test._id}
-                  className="border border-(--border) p-3 rounded-2xl grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center"
+                  className="card border border-(--border)"
                 >
-                  <div className="min-w-0">
-                    <div className="mb-1 flex flex-wrap items-center">
-                      <span className="inline-flex items-center gap-1 bg-(--surface) px-2 py-0.5 text-xs font-extrabold uppercase">
-                        {isGenerated ? <Sparkles size={12} /> : <ClipboardPen size={12} />}
-                        {isGenerated ? "AI" : "Manual"}
+                  {/* Mobile */}
+                  <div className="lg:hidden">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                          {isGenerated ? <Sparkles size={12} /> : <ClipboardPen size={12} />}
+                          {isGenerated ? "AI" : "Manual"}
+                        </span>
+
+                        <p className="mt-3 text-lg font-bold leading-snug">
+                          {test.title || "Untitled test"}
+                        </p>
+                      </div>
+
+                      <button
+                        className="button-secondary h-10 px-4"
+                        onClick={() => router.push(`/main/test/preview/${test._id}`)}
+                      >
+                        Preview
+                      </button>
+                    </div>
+
+                    <div className="mt-5 grid grid-cols-3 gap-4 border-t border-(--border) pt-4">
+                      <div>
+                        <p className="text-xs opacity-60">Questions</p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <FileQuestion size={15} className="text-primary" />
+                          <span className="font-semibold">{test.totalQuestions}</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs opacity-60">Duration</p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <Clock3 size={15} className="text-primary" />
+                          <span className="font-semibold">{test.duration} min</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs opacity-60">Created</p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <CalendarDays size={15} className="text-primary" />
+                          <span className="font-semibold text-xs">
+                            {formatDate(test.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop */}
+                  <div className="hidden lg:grid gap-4 lg:grid-cols-[1fr_9rem_8rem_10rem_7rem] lg:items-center">
+                    <div className="min-w-0">
+                      <div className="mb-1 flex flex-wrap items-center">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                          {isGenerated ? <Sparkles size={12} /> : <ClipboardPen size={12} />}
+                          {isGenerated ? "AI" : "Manual"}
+                        </span>
+                      </div>
+
+                      <p className="truncate text-xl font-semibold">
+                        {test.title || "Untitled test"}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileQuestion size={17} className="text-primary" />
+                      <span className="font-semibold">{test.totalQuestions}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <Clock3 size={17} className="text-primary" />
+                      <span className="font-semibold">{test.duration} min</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-sm">
+                      <CalendarDays size={17} className="text-primary" />
+                      <span className="font-semibold">
+                        {formatDate(test.createdAt)}
                       </span>
                     </div>
-                    <p className="truncate text-xl font-semibold">{test.title || "Untitled test"}</p  >
-                  </div>
 
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileQuestion size={17} className="text-primary" />
-                    <span className="font-semibold">{test.totalQuestions}</span>
-                    <span className="opacity-60 lg:hidden">questions</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock3 size={17} className="text-primary" />
-                    <span className="font-semibold">{test.duration} min</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm">
-                    <CalendarDays size={17} className="text-primary" />
-                    <span className="font-semibold">{formatDate(test.createdAt)}</span>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      className="button-secondary w-full gap-2 lg:w-fit"
-                      onClick={() => router.push(`/main/test/preview/${test._id}`)}
-                    >
-                      Preview
-                      <ArrowRight size={18} />
-                    </button>
+                    <div className="flex justify-end">
+                      <button
+                        className="button-secondary gap-2"
+                        onClick={() => router.push(`/main/test/preview/${test._id}`)}
+                      >
+                        Preview
+                        <ArrowRight size={18} />
+                      </button>
+                    </div>
                   </div>
                 </article>
               );

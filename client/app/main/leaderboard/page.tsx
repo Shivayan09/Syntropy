@@ -5,6 +5,7 @@ import { BarChart3, CheckCircle2, ChevronDown, Medal, Search, Trophy, User2, Use
 import Loader2 from "@/components/utils/Loader2";
 import Image from 'next/image'
 import { useRouter } from "next/navigation";
+import LeaderboardSkeleton from "@/components/skeletons/LeaderboardSkeleton";
 
 type LeaderboardUser = {
   _id: string;
@@ -65,7 +66,7 @@ export default function LeaderboardPage() {
   const totalTests = users.reduce((total, user) => total + (user.testsTaken || 0), 0);
 
   if (loading) {
-    return <Loader2 />;
+    return <LeaderboardSkeleton />;
   }
 
   return (

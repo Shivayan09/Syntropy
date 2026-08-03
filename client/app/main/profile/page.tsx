@@ -228,18 +228,17 @@ export default function Profile() {
 
   return (
     <div className="mx-auto space-y-7">
-      <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
-        <div>
-          <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
-            <Settings size={18} />
-            Settings
-          </div>
+      <section className="flex items-center justify-between border-b border-(--border) pb-2 lg:items-end">
+        <div className="flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+          <Settings size={18} />
+          Settings
         </div>
 
         <button
           onClick={handleSave}
           disabled={!dirty || saving}
-          className={`gap-2 ${!dirty || saving ? "cursor-not-allowed opacity-55" : ""}`}
+          className={`h-10 w-fit self-auto gap-2 ${!dirty || saving ? "cursor-not-allowed opacity-55" : ""
+            }`}
         >
           <Save size={18} />
           {saving ? "Saving" : dirty ? "Save changes" : "Saved"}
@@ -292,43 +291,61 @@ export default function Profile() {
 
           <div className="card2 p-5 w-full md:w-1/2">
             <p className="text-sm font-bold opacity-60">Profile status</p>
+
             <div className="mt-4 space-y-3 text-sm">
+
               <div className="flex items-center justify-between gap-3">
                 <span className="opacity-70">Email</span>
+
                 <span
-                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${emailVerified
-                    ? "border-black bg-primary text-white"
-                    : "border-black bg-[#fff3e8] text-[#8a3b12]"
+                  className={`inline-flex items-center gap-2 rounded-full py-1 text-md font-semibold ${emailVerified
+                    ? "bg-primary/10 text-primary"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
                     }`}
                 >
-                  {emailVerified ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                  {emailVerified ? (
+                    <ShieldCheck size={14} />
+                  ) : (
+                    <ShieldAlert size={14} />
+                  )}
                   {emailVerified ? "Verified" : "Verify your email"}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-3">
-                <span className="opacity-70">College</span>
-                <span className="font-extrabold">{form.college || "Not set"}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="opacity-70">Semester</span>
-                <span className="font-extrabold">{semesterLabel(form.semester)}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <span className="opacity-70">Target</span>
-                <span className="font-extrabold">{form.targetRole || "Not set"}</span>
-              </div>
-              <div className="flex items-center justify-between gap-3">
                 <span className="opacity-70">Onboarding</span>
+
                 <span
-                  className={`inline-flex items-center gap-2 border px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_black] ${user?.onboardingCompleted
-                      ? "border-black bg-primary text-white"
-                      : "border-black bg-[#fff3e8] text-[#8a3b12]"
+                  className={`inline-flex items-center gap-2 rounded-full py-1 text-md font-semibold ${user?.onboardingCompleted
+                    ? "bg-primary/10 text-primary"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
                     }`}
                 >
-                  {user?.onboardingCompleted ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                  {user?.onboardingCompleted ? (
+                    <ShieldCheck size={14} />
+                  ) : (
+                    <ShieldAlert size={14} />
+                  )}
                   {user?.onboardingCompleted ? "Completed" : "Incomplete"}
                 </span>
               </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">College</span>
+                <span className="font-bold">{form.college || "Not set"}</span>
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Semester</span>
+                <span className="font-bold">{semesterLabel(form.semester)}</span>
+              </div>
+
+              <div className="flex items-center justify-between gap-3">
+                <span className="opacity-70">Target</span>
+                <span className="font-bold">{form.targetRole || "Not set"}</span>
+              </div>
+
+
+
             </div>
           </div>
         </div>
@@ -511,63 +528,76 @@ export default function Profile() {
             </div>
           </section>
           <section className="card p-6 md:p-7">
-            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm font-bold opacity-60">Membership</p>
-                <h2 className="text-2xl font-extrabold">Subscription</h2>
-                <p className="mt-1 text-sm opacity-70">
-                  Your current access level, renewal state, and upgrade controls in one place.
+                <p className="text-sm font-semibold text-primary">Membership</p>
+                <h2 className="mt-1 text-3xl font-bold">Subscription</h2>
+                <p className="mt-2 max-w-xl text-sm opacity-65">
+                  Your current plan, billing information and renewal status.
                 </p>
               </div>
 
-              <button onClick={() => router.push("/main/subscription")} className="button-secondary gap-2">
+              <button
+                onClick={() => router.push("/main/subscription")}
+                className="button-secondary gap-2"
+              >
                 Manage
                 <ArrowRight size={18} />
               </button>
             </div>
 
-            <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-              <div className="card p-5 md:p-6">
-                <div className="flex flex-col sm:items-start md:items-center gap-5 sm:flex-row sm:justify-between">
+            <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
+
+              {/* Main Card */}
+              <div className="rounded-2xl border border-(--border) bg-(--bg-secondary) p-6">
+
+                <div className="flex items-center justify-between flex-wrap gap-5">
+
                   <div>
-                    <div className="inline-flex items-center gap-2 border border-black bg-primary px-3 py-1 text-xs font-extrabold uppercase text-white shadow-[3px_3px_0px_black]">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                       <Crown size={14} />
-                      {activePlan.label} Membership
-                    </div>
-                    <p className="mt-4 text-3xl font-extrabold">{activePlan.label}</p>
-                    <p className="mt-2 text-sm font-semibold opacity-80">{activePlan.note}</p>
+                      {activePlan.label}
+                    </span>
+
+                    <h3 className="mt-4 text-4xl font-bold">
+                      {activePlan.label}
+                    </h3>
+
+                    <p className="mt-2 text-sm opacity-70">
+                      {activePlan.note}
+                    </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
-                      <p className="text-xs font-bold uppercase opacity-60">Access status</p>
-                      <p className="mt-2 text-lg font-extrabold">
-                        {user?.plan === "free" ? "Trial" : "Paid"}
-                      </p>
-                    </div>
-                    <div className="border border-black bg-(--surface) p-4 shadow-[3px_3px_0px_var(--shadow)]">
-                      <p className="text-xs font-bold uppercase opacity-60">Billing state</p>
-                      <p className="mt-2 text-lg font-extrabold">{billingState}</p>
-                    </div>
+                  <div className="text-right">
+                    <p className="text-xs uppercase opacity-50">
+                      Access
+                    </p>
+
+                    <p className="mt-1 text-xl font-bold">
+                      {user?.plan === "free" ? "Trial" : "Premium"}
+                    </p>
                   </div>
-                </div>
-              </div>
 
-              <div className="card p-5 md:p-6">
-                <p className="text-sm font-bold opacity-60">Plan details</p>
-                <div className="mt-4 inline-flex items-center gap-2 border border-black bg-(--surface) px-3 py-1 text-xs font-extrabold uppercase shadow-[3px_3px_0px_var(--shadow)]">
-                  <span className="h-2.5 w-2.5 rounded-full bg-primary" />
-                  {user?.plan === "free"
-                    ? "Monthly free access"
-                    : user?.planBillingCycle === "annual"
-                      ? "Annual subscription"
-                      : "Monthly subscription"}
                 </div>
 
-                <div className="mt-5 space-y-4 text-sm">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="opacity-70">Valid till</span>
-                    <span className="text-right font-extrabold">
+                <div className="mt-8 grid grid-cols-2 gap-5 border-t border-(--border) pt-6">
+
+                  <div>
+                    <p className="text-xs uppercase opacity-50">
+                      Billing
+                    </p>
+
+                    <p className="mt-2 font-semibold">
+                      {billingState}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase opacity-50">
+                      Renewal
+                    </p>
+
+                    <p className="mt-2 font-semibold">
                       {user?.planExpiry
                         ? new Date(user.planExpiry).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -575,10 +605,61 @@ export default function Profile() {
                           year: "numeric",
                         })
                         : "Not applicable"}
+                    </p>
+                  </div>
+
+                </div>
+
+              </div>
+
+              {/* Side Card */}
+              <div className="rounded-2xl border border-(--border) bg-(--bg-secondary) p-6">
+
+                <p className="text-sm font-semibold opacity-60">
+                  Plan Details
+                </p>
+
+                <div className="mt-5 space-y-6">
+
+                  <div>
+                    <p className="text-xs uppercase opacity-50">
+                      Billing Cycle
+                    </p>
+
+                    <p className="mt-2 font-semibold">
+                      {user?.plan === "free"
+                        ? "Monthly Free"
+                        : user?.planBillingCycle === "annual"
+                          ? "Annual"
+                          : "Monthly"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase opacity-50">
+                      Membership
+                    </p>
+
+                    <p className="mt-2 font-semibold">
+                      {activePlan.label}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase opacity-50">
+                      Status
+                    </p>
+
+                    <span className="mt-2 inline-flex items-center gap-2 text-primary font-semibold">
+                      <span className="h-2 w-2 rounded-full bg-primary" />
+                      Active
                     </span>
                   </div>
+
                 </div>
+
               </div>
+
             </div>
           </section>
         </div>

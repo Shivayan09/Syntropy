@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-import {BarChart3,BookOpen,History,LayoutDashboard,LogOut,Menu,Pen,Settings,X,PanelLeft,Trophy,Crown,Headphones} from "lucide-react";
+import { BarChart3, BookOpen, History, LayoutDashboard, LogOut, Menu, Pen, Settings, X, PanelLeft, Trophy, Crown, Headphones } from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -51,9 +51,12 @@ export default function Sidebar({
     <>
       {/* MOBILE TOP BAR */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-secondary flex items-center px-4 z-50">
-        <button onClick={() => setOpen(true)}>
-          <Menu size={22} />
-        </button>
+        <div
+          onClick={() => setOpen(true)}
+          className="h-auto w-auto bg-transparent p-0 shadow-none hover:bg-transparent hover:shadow-none hover:translate-y-0 active:scale-100"
+        >
+          <Menu size={24} className="text-primary" />
+        </div>
 
         <p className="ml-5 font-bold text-primary">
           syntropy
@@ -75,9 +78,9 @@ export default function Sidebar({
               syntropy
             </p>
 
-            <button onClick={() => setOpen(false)}>
+            <div onClick={() => setOpen(false)} className="h-auto w-auto bg-transparent p-0 shadow-none hover:bg-transparent hover:shadow-none hover:translate-y-0 active:scale-100">
               <X size={20} />
-            </button>
+            </div>
           </div>
 
           <nav className="space-y-3 text-sm font-bold">
