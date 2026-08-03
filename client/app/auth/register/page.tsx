@@ -433,8 +433,6 @@ export default function RegisterPage() {
 
                 <div className="w-full max-w-md relative">
 
-                    <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
-
                     <div className="card bg-surface">
 
                         <div className="mb-6 text-center">

@@ -201,7 +201,7 @@ export default function LoginPage() {
                     onLoad={() => setGoogleReady(true)}
                 />
             ) : null}
-            <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
+            <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary">
 
                 <div className="flex gap-1 mb-5">
                     <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
@@ -271,7 +271,6 @@ export default function LoginPage() {
             <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">
 
                 <div className="w-full max-w-md relative">
-                    <div className="absolute top-4 left-4 w-full h-full border-2 border-black bg-primary -z-10"></div>
 
                     <div className="card bg-surface">
                         <div className="mb-8 text-center">

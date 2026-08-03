@@ -167,7 +167,7 @@ export default function Dashboard() {
           <div className="space-y-1">
             <p className="text-sm text-primary text-muted-foreground flex gap-1">
               <TicketCheck className="text-primary" size={18} />
-              10 AI Test Credits <p className="text-(--text)">left this month</p>
+              10 AI Test Credits <span className="text-(--text)">left this month</span>
             </p>
           </div>
 
