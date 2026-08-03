@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import {AlertTriangle,ArrowLeft,ArrowRight,Bookmark,BookmarkCheck,CheckCircle2,Circle,Clock3,Eraser,Flag,ListChecks,Send,X} from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, Circle, Clock3, Eraser, Flag, ListChecks, Send, X } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type Question = {
@@ -33,7 +33,6 @@ const formatTime = (seconds: number) => {
   const safeSeconds = Math.max(0, seconds);
   const minutes = Math.floor(safeSeconds / 60);
   const remainingSeconds = safeSeconds % 60;
-
   return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
 };
 
@@ -70,13 +69,8 @@ export default function AttemptPage() {
       const res = await fetch(BACKEND_URL + "/api/attempt/submit", {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          attemptId,
-          answers,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attemptId, answers }),
       });
       const data = await res.json();
       if (!res.ok) {

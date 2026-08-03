@@ -88,7 +88,7 @@ export function DashboardScreen() {
   return (
     <Screen>
       <View style={styles.hero}>
-        <Text style={styles.title}>Welcome back {user?.username || user?.name}</Text>
+        <h1>Welcome back {user?.username || user?.name}</h1>
         <Text style={styles.copy}>Let&apos;s continue your exam preparation.</Text>
       </View>
 
