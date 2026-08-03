@@ -195,7 +195,7 @@ export const getMyAttempts = async (req, res, next) => {
             });
         }
         const attempts = await Attempt.find({user: req.user._id,status: "completed",}).populate("test","title subjects duration difficulty totalQuestions type questions") .sort({ createdAt: -1 });
-        await redis.set(cacheKey, attempts, {ex: 300});
+        await redis.set(cacheKey, attempts, {ex: 60*60});
         return res.json({
             success: true,
             attempts,

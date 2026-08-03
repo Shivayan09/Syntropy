@@ -1,3 +1,4 @@
+import redis from "../config/redis.js";
 import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
@@ -88,30 +89,58 @@ export const getTest = async (req, res) => {
 
 export const getAllTests = async (req, res) => {
     try {
+        const cacheKey = `tests:${req.user._id}`;
+        const cachedTests = await redis.get(cacheKey);
+        if (cachedTests) {
+            return res.status(200).json({
+                success: true,
+                tests: cachedTests,
+                cached: true,
+            });
+        }
         const tests = await Test.find({ createdBy: req.user._id }).select("-questions").sort({ createdAt: -1 });
+        await redis.set(cacheKey, tests, { ex: 60 * 60 });
         res.status(200).json({
             success: true,
-            tests
+            tests,
+            cached: false,
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message,
         });
     }
 };
 
 export const getTestForAttempt = async (req, res) => {
     try {
+        const cacheKey = `test:${req.user._id}:${req.params.id}`;
+        const cachedTest = await redis.get(cacheKey);
+        if (cachedTest) {
+            return res.status(200).json({
+                success: true,
+                test: cachedTest,
+                cached: true,
+            });
+        }
         const test = await Test.findOne({ _id: req.params.id, createdBy: req.user._id }).select("-questions.correctAnswer");
+        if (!test) {
+            return res.status(404).json({
+                success: false,
+                message: "Test not found",
+            });
+        }
+        await redis.set(cacheKey, test, { ex: 60 * 60 });
         res.status(200).json({
             success: true,
-            test
+            test,
+            cached: false,
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message,
         });
     }
 };
