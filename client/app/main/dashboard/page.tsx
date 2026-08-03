@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, BrainCircuit, CalendarDays, Clock3, Flame, TicketCheck } from "lucide-react";
 import { normalizeSubject } from "@/components/utils/subject";
 import { useAuth } from "@/context/AuthContext";
-import { useAiTokens } from "@/context/AiTokenContext";
 import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
 import DashboardSkeleton from "@/components/skeletons/DashboardSkeleton";
 
@@ -66,7 +65,6 @@ export default function Dashboard() {
   const [visibleCount, setVisibleCount] = useState(4);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { tokenStatus } = useAiTokens();
 
   useEffect(() => {
     const fetchAttempts = async () => {

@@ -713,23 +713,3 @@ export default function PlansPage() {
     </div>
   );
 }
-
-function StatTile({
-  label,
-  value,
-  note,
-}: {
-  label: string;
-  value: string;
-  note: string;
-}) {
-  return (
-    <div className="card">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-sm font-bold opacity-60">{label}</p>
-      </div>
-      <p className="mt-3 text-2xl font-extrabold">{value}</p>
-      <p className="mt-1 text-xs opacity-60">{note}</p>
-    </div>
-  );
-}
