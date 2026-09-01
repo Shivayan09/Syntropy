@@ -1,10 +1,30 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  ClipboardPen,
+  FileText,
+  Infinity as InfinityIcon,
+  ListChecks,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
+import {
+  BuilderBar,
+  ChoiceChip,
+  OptionCard,
+  PageHeading,
+  RangeField,
+  SegmentedControl,
+  SelectionIndicator,
+  StepSection,
+} from "@/components/main/builder/BuilderKit";
 
 type TestFormat = "mcq" | "subjective";
 
@@ -22,6 +42,7 @@ type SubjectiveQuestion = {
 };
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+const optionLabels = ["A", "B", "C", "D"];
 
 const createEmptyMcqQuestion = (): McqQuestion => ({
   question: "",
@@ -74,6 +95,29 @@ export default function Create() {
     [subjectiveQuestions],
   );
 
+  const missingRequirements = useMemo(() => {
+    const missing: string[] = [];
+
+    if (!title.trim()) missing.push("a test name");
+    if (!subjects.length) missing.push("at least one subject");
+
+    if (testFormat === "mcq") {
+      const incomplete = mcqQuestions.some(
+        (question) => !question.question.trim() || question.options.some((option) => !option.trim()),
+      );
+      if (incomplete) missing.push("every question and all 4 options filled");
+    } else {
+      const incomplete = subjectiveQuestions.some(
+        (question) => !question.question.trim() || !(Number(question.marks) > 0),
+      );
+      if (incomplete) missing.push("every question filled with marks above 0");
+    }
+
+    return missing;
+  }, [mcqQuestions, subjectiveQuestions, subjects.length, testFormat, title]);
+
+  const isReady = missingRequirements.length === 0;
+
   const addSubject = () => {
     const value = subjectInput.trim();
     if (!value || subjects.includes(value)) return;
@@ -81,9 +125,10 @@ export default function Create() {
     setSubjectInput("");
   };
 
-  const addSuggestedSubject = (subject: string) => {
-    if (subjects.includes(subject)) return;
-    setSubjects((prev) => [...prev, subject]);
+  const toggleSuggestedSubject = (subject: string) => {
+    setSubjects((prev) =>
+      prev.includes(subject) ? prev.filter((item) => item !== subject) : [...prev, subject],
+    );
   };
 
   const removeSubject = (subject: string) => {
@@ -196,208 +241,251 @@ export default function Create() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative pb-2">
       {!user?.onboardingCompleted &&
-                <div onClick={() => router.push('/main/profile/education')} className="md:absolute mb-5 md:mb-0 right-0 z-50 bg-yellow-50 text-black flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md cursor-pointer transition-all">
-                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
-                    Click here your syllabus in profile for personalized tests <ArrowRight className="h-4"/>
-                </div>
-            }
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold">Create Test</h1>
-        <p className="mt-2 text-stone-500">
-          Build a manual paper your way, with separate flows for objective drills and written practice.
-        </p>
-      </div>
-
-      <section className="mb-6">
-        <p className="font-bold text-lg mb-5">Choose test format :</p>
-        <div className="flex flex-col md:flex-row gap-5">
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setTestFormat("mcq")}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                setTestFormat("mcq");
-              }
-            }}
-            className="card cursor-pointer p-5 text-left"
-            style={
-              testFormat === "mcq"
-                ? {
-                  backgroundColor: "var(--primary)",
-                  color: "white",
-                  borderColor: "var(--primary)",
-                }
-                : undefined
-            }
-          >
-            <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
-            <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
-            <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
-              Keep the existing multiple-choice authoring flow with four options and one correct answer.
-            </p>
-          </div>
-
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => setTestFormat("subjective")}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                setTestFormat("subjective");
-              }
-            }}
-            className="card cursor-pointer p-5 text-left"
-            style={
-              testFormat === "subjective"
-                ? {
-                  backgroundColor: "var(--primary)",
-                  color: "white",
-                  borderColor: "var(--primary)",
-                }
-                : undefined
-            }
-          >
-            <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>
-              Subjective Test
-            </p>
-            <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
-            <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
-              Set marks per question and optionally add model answers plus key points to guide evaluation.
-            </p>
-          </div>
+        <div onClick={() => router.push('/main/profile/education')} className="mb-5 flex w-fit cursor-pointer items-center gap-2 rounded-md bg-yellow-50 px-3 py-2 text-sm text-black transition-all">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-yellow-300"></div>
+          Add your syllabus in profile for personalized tests <ArrowRight className="h-4" />
         </div>
-      </section>
+      }
 
-      <div className="mb-5 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <div>
-          <p className="mb-2 font-bold">Test Name</p>
-          <input placeholder="DSA Mock 1" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full" />
-        </div>
-
-        <div>
-          <p className="mb-2 font-bold">Difficulty</p>
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full">
-            <option>Easy</option>
-            <option>Medium</option>
-            <option>Hard</option>
-          </select>
-        </div>
-
-        <div>
-          <p className="mb-2 font-bold">Time (minutes)</p>
-          <input type="number" min={5} value={time} onChange={(e) => setTime(Number(e.target.value))} className="w-full" />
-        </div>
-
-        <div className="border border-(--border) bg-(--surface) p-4">
-          <p className="text-xs font-extrabold uppercase text-primary">Summary</p>
-          <p className="mt-2 text-lg font-extrabold">{activeQuestionCount} questions</p>
-          <p className="mt-1 text-sm opacity-70">
-            {testFormat === "mcq" ? "Single-correct MCQs" : `${subjectiveTotalMarks} total marks`}
-          </p>
-        </div>
-      </div>
-
-      <div className="mb-5">
-        <p className="mb-2 font-bold">Description</p>
-        <textarea
-          placeholder="Add a short description or instructions for this test"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full"
-        />
-      </div>
-
-      <div className="mb-7">
-        <p className="mb-2 font-bold">Subjects</p>
-
-        <div className="mb-3 flex flex-wrap gap-2">
-          {subjects.map((subject) => (
-            <div key={subject} className="flex items-center gap-2 border-2 border-black bg-secondary px-3 py-1">
-              {subject}
-              <button onClick={() => removeSubject(subject)} className="h-5! px-1! text-sm">
-                x
-              </button>
+      <PageHeading
+        eyebrow="Manual builder"
+        icon={ClipboardPen}
+        title="Create Test"
+        description="Build a paper your way, with separate flows for objective drills and written practice."
+        aside={
+          <div className="soft-panel flex items-center gap-3">
+            <InfinityIcon size={20} className="text-primary" />
+            <div>
+              <p className="text-xs font-bold uppercase opacity-55">Manual tests</p>
+              <p className="text-lg font-extrabold">Unlimited</p>
             </div>
-          ))}
+          </div>
+        }
+      />
+
+      <StepSection
+        step={1}
+        title="Choose test format"
+        description="This decides how questions are authored and how attempts are scored."
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          <OptionCard
+            selected={testFormat === "mcq"}
+            onSelect={() => setTestFormat("mcq")}
+            icon={ListChecks}
+            eyebrow="MCQ Test"
+            title="Objective practice"
+            description="Four options with one correct answer, scored instantly on submit."
+          />
+
+          <OptionCard
+            selected={testFormat === "subjective"}
+            onSelect={() => setTestFormat("subjective")}
+            icon={FileText}
+            eyebrow="Subjective Test"
+            title="Written evaluation"
+            description="Set marks per question and optionally add model answers plus key points."
+          />
+        </div>
+      </StepSection>
+
+      <StepSection
+        step={2}
+        title="Test details"
+        description="Name the paper and set how long the attempt should run."
+      >
+        <div className="grid gap-8 md:grid-cols-3">
+          <div>
+            <p className="mb-3 font-bold">Test name</p>
+            <input
+              placeholder="DSA Mock 1"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full"
+            />
+          </div>
+
+          <SegmentedControl
+            label="Difficulty"
+            value={difficulty}
+            onChange={setDifficulty}
+            options={[
+              { value: "Easy", label: "Easy" },
+              { value: "Medium", label: "Medium" },
+              { value: "Hard", label: "Hard" },
+            ]}
+          />
+
+          <RangeField
+            label="Time limit"
+            value={time}
+            min={5}
+            max={180}
+            step={5}
+            suffix="min"
+            onChange={setTime}
+          />
         </div>
 
-        <div className="mb-3 flex gap-3">
+        <div className="mt-6">
+          <p className="mb-3 font-bold">Description</p>
+          <textarea
+            placeholder="Optional instructions shown before the attempt"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full"
+          />
+        </div>
+      </StepSection>
+
+      <StepSection
+        step={3}
+        title="Add subjects"
+        description="Used for filtering, analytics and your subject-wise accuracy map."
+        error={!subjects.length ? "Add at least one subject to continue." : undefined}
+        action={
+          <span className="soft-panel px-3! py-2! text-xs font-bold">{subjects.length} added</span>
+        }
+      >
+        <div className="flex items-center gap-3">
           <input
-            placeholder="Add subject"
+            placeholder="Type a subject, e.g. Operating Systems"
             value={subjectInput}
             className="w-full"
             onChange={(e) => setSubjectInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && addSubject()}
           />
 
-          <button className="button-secondary" onClick={addSubject}>
+          <button className="button-secondary shrink-0 gap-2" onClick={addSubject}>
+            <Plus size={17} />
             Add
           </button>
         </div>
 
+        {subjects.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {subjects.map((subject) => (
+              <span
+                key={subject}
+                className="inline-flex items-center gap-2 rounded-full bg-primary py-1 pl-3 pr-1 text-xs font-bold text-white"
+              >
+                <Check size={13} strokeWidth={3.5} />
+                {subject}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Remove ${subject}`}
+                  onClick={() => removeSubject(subject)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      removeSubject(subject);
+                    }
+                  }}
+                  className="grid h-5 w-5 cursor-pointer place-items-center rounded-full bg-white/25 hover:bg-white/40"
+                >
+                  <X size={11} strokeWidth={3} />
+                </span>
+              </span>
+            ))}
+          </div>
+        )}
+
         {syllabusSubjects.length > 0 && (
-          <div className="mt-3">
-            <p className="mb-2 text-xs text-gray-500">Suggested</p>
+          <div className="soft-panel mt-4">
+            <p className="mb-3 text-xs font-extrabold uppercase tracking-wide opacity-60">
+              From your syllabus
+            </p>
 
             <div className="flex flex-wrap gap-2">
               {syllabusSubjects.map((subject) => (
-                <span
+                <ChoiceChip
                   key={subject}
-                  onClick={() => addSuggestedSubject(subject)}
-                  className="cursor-pointer border px-2 py-1 text-xs hover:bg-secondary"
-                >
-                  {subject}
-                </span>
+                  label={subject}
+                  selected={subjects.includes(subject)}
+                  onSelect={() => toggleSuggestedSubject(subject)}
+                />
               ))}
             </div>
           </div>
         )}
-      </div>
+      </StepSection>
 
       {testFormat === "mcq" ? (
-        <section>
-          <div>
-            <h3 className="text-xl">Add questions</h3>
-            <p className="mt-2 text-sm text-stone-500">Minimum of 1 question is compulsory</p>
-          </div>
-
-          <div className="flex flex-col gap-3">
+        <StepSection
+          step={4}
+          title="Add questions"
+          description="At least one question is required. Tick the option that is correct."
+          action={
+            <span className="soft-panel px-3! py-2! text-xs font-bold">
+              {mcqQuestions.length} question{mcqQuestions.length === 1 ? "" : "s"}
+            </span>
+          }
+        >
+          <div className="space-y-4">
             {mcqQuestions.map((question, questionIndex) => (
-              <div key={questionIndex}>
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="mt-3 font-bold">Question {questionIndex + 1}</p>
+              <div key={questionIndex} className="card p-5">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <p className="text-xs font-extrabold uppercase tracking-wide text-primary">
+                    Question {questionIndex + 1}
+                  </p>
 
-                  <button onClick={() => removeMcqQuestion(questionIndex)} className="button-secondary">
+                  <button
+                    onClick={() => removeMcqQuestion(questionIndex)}
+                    disabled={mcqQuestions.length === 1}
+                    className={`button-secondary h-9 gap-2 px-4 text-sm ${mcqQuestions.length === 1 ? "cursor-not-allowed opacity-40" : ""}`}
+                  >
+                    <Trash2 size={15} />
                     Remove
                   </button>
                 </div>
 
                 <textarea
-                  placeholder="Enter question"
+                  placeholder="Enter the question"
                   value={question.question}
                   onChange={(e) => updateMcqQuestion(questionIndex, e.target.value)}
                   className="mb-4 w-full"
                 />
+
+                <p className="mb-3 text-xs font-bold uppercase tracking-wide opacity-55">
+                  Options — tick the correct one
+                </p>
 
                 <div className="grid gap-3 md:grid-cols-2">
                   {question.options.map((option, optionIndex) => {
                     const isCorrect = question.correctIndex === optionIndex;
 
                     return (
-                      <div key={optionIndex} className="flex items-center gap-2">
-                        <div
+                      <div
+                        key={optionIndex}
+                        data-selected={isCorrect}
+                        className="select-card is-static flex items-center gap-3 p-3!"
+                      >
+                        <span
+                          role="radio"
+                          aria-checked={isCorrect}
+                          aria-label={`Mark option ${optionLabels[optionIndex]} correct`}
+                          tabIndex={0}
                           onClick={() => setCorrect(questionIndex, optionIndex)}
-                          className={`flex h-6 w-6 cursor-pointer items-center justify-center border-2 border-black ${isCorrect ? "bg-primary" : "bg-white"}`}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter" || event.key === " ") {
+                              event.preventDefault();
+                              setCorrect(questionIndex, optionIndex);
+                            }
+                          }}
+                          className="cursor-pointer"
                         >
-                          {isCorrect && <span className="text-xs font-bold text-white">V</span>}
-                        </div>
+                          <SelectionIndicator selected={isCorrect} round />
+                        </span>
+
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-(--bg-secondary) text-xs font-extrabold">
+                          {optionLabels[optionIndex]}
+                        </span>
 
                         <input
-                          placeholder={`Option ${optionIndex + 1}`}
+                          placeholder={`Option ${optionLabels[optionIndex]}`}
                           value={option}
                           onChange={(e) => updateOption(questionIndex, optionIndex, e.target.value)}
                           className="w-full"
@@ -407,45 +495,40 @@ export default function Create() {
                   })}
                 </div>
 
-                <p className="mt-3 text-xs text-gray-600">Select green box to mark correct answer</p>
+                <p className="mt-3 text-xs opacity-60">
+                  Correct answer: option {optionLabels[question.correctIndex]}
+                </p>
               </div>
             ))}
           </div>
 
-          <div className="mt-5">
-            <button onClick={addMcqQuestion} className="button-secondary">
-              + Add Question
-            </button>
-          </div>
-        </section>
+          <button onClick={addMcqQuestion} className="button-secondary mt-4 gap-2">
+            <Plus size={17} />
+            Add question
+          </button>
+        </StepSection>
       ) : (
-        <section className="space-y-4">
-          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h3 className="text-xl font-extrabold">Add written questions</h3>
-              <p className="mt-2 text-sm text-stone-500">
-                Each question needs marks. Expected answer and key points are optional but recommended for better evaluation.
-              </p>
-            </div>
-
-            <div className="border border-(--border) bg-(--surface) px-4 py-3 text-sm">
-              <p className="font-bold opacity-60">Total marks</p>
-              <p className="text-2xl font-extrabold">{subjectiveTotalMarks}</p>
-            </div>
-          </div>
-
+        <StepSection
+          step={4}
+          title="Add written questions"
+          description="Each question needs marks. Expected answer and key points are optional but improve AI evaluation."
+          action={
+            <span className="soft-panel px-3! py-2! text-xs font-bold">
+              {subjectiveQuestions.length} question{subjectiveQuestions.length === 1 ? "" : "s"} · {subjectiveTotalMarks} marks
+            </span>
+          }
+        >
           <div className="space-y-4">
             {subjectiveQuestions.map((question, index) => (
-              <div key={index} className="border border-(--border) bg-(--surface) p-5 shadow-[4px_4px_0px_var(--shadow)]">
+              <div key={index} className="card p-5">
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <p className="text-xs font-extrabold uppercase text-primary">Question {index + 1}</p>
-                    <h4 className="text-xl font-extrabold mt-2">Written response</h4>
-                  </div>
+                  <p className="text-xs font-extrabold uppercase tracking-wide text-primary">
+                    Question {index + 1}
+                  </p>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-end gap-3">
                     <div className="w-28">
-                      <p className="mb-2 text-sm font-bold">Marks</p>
+                      <p className="mb-2 text-xs font-bold">Marks</p>
                       <input
                         type="number"
                         min={1}
@@ -455,7 +538,12 @@ export default function Create() {
                       />
                     </div>
 
-                    <button onClick={() => removeSubjectiveQuestion(index)} className="button-secondary mt-6 md:mt-0">
+                    <button
+                      onClick={() => removeSubjectiveQuestion(index)}
+                      disabled={subjectiveQuestions.length === 1}
+                      className={`button-secondary h-9 gap-2 px-4 text-sm ${subjectiveQuestions.length === 1 ? "cursor-not-allowed opacity-40" : ""}`}
+                    >
+                      <Trash2 size={15} />
                       Remove
                     </button>
                   </div>
@@ -463,7 +551,7 @@ export default function Create() {
 
                 <div className="space-y-4">
                   <div>
-                    <p className="mb-2 font-bold">Question</p>
+                    <p className="mb-2 text-sm font-bold">Question</p>
                     <textarea
                       placeholder="Enter the written question"
                       value={question.question}
@@ -473,7 +561,7 @@ export default function Create() {
                   </div>
 
                   <div>
-                    <p className="mb-2 font-bold">Expected answer</p>
+                    <p className="mb-2 text-sm font-bold">Expected answer</p>
                     <textarea
                       placeholder="Optional model answer or evaluation reference"
                       value={question.expectedAnswer}
@@ -483,7 +571,7 @@ export default function Create() {
                   </div>
 
                   <div>
-                    <p className="mb-2 font-bold">Key points</p>
+                    <p className="mb-2 text-sm font-bold">Key points</p>
                     <textarea
                       placeholder={"Optional evaluation checklist, one point per line\nExample:\nDefines the concept clearly\nUses a correct example\nMentions limitations"}
                       value={question.keyPoints}
@@ -496,23 +584,36 @@ export default function Create() {
             ))}
           </div>
 
-          <div className="mt-5">
-            <button onClick={addSubjectiveQuestion} className="button-secondary">
-              + Add Written Question
-            </button>
-          </div>
-        </section>
+          <button onClick={addSubjectiveQuestion} className="button-secondary mt-4 gap-2">
+            <Plus size={17} />
+            Add written question
+          </button>
+        </StepSection>
       )}
 
-      <div className="mt-6">
+      <BuilderBar
+        items={[
+          { label: "Format", value: testFormat === "mcq" ? "MCQ" : "Subjective" },
+          { label: "Subjects", value: subjects.length ? `${subjects.length} added` : "None" },
+          {
+            label: "Paper",
+            value:
+              testFormat === "mcq"
+                ? `${activeQuestionCount} Q · ${time} min`
+                : `${activeQuestionCount} Q · ${subjectiveTotalMarks} marks · ${time} min`,
+          },
+        ]}
+        note={isReady ? undefined : `Still needed: ${missingRequirements.join(", ")}.`}
+      >
         <button
-          disabled={loading}
-          className={`${loading ? "cursor-not-allowed opacity-65" : ""} w-full text-lg`}
+          disabled={loading || !isReady}
+          className={`flex-1 gap-2 lg:flex-none ${loading || !isReady ? "cursor-not-allowed opacity-50" : ""}`}
           onClick={createTest}
         >
-          {loading ? "Creating.." : "Create Test"}
+          <ClipboardPen size={18} />
+          {loading ? "Creating..." : "Create test"}
         </button>
-      </div>
+      </BuilderBar>
     </div>
   );
 }

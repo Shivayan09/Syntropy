@@ -20,6 +20,7 @@ type AttemptResult = {
   test?: {
     _id?: string;
     title?: string;
+    category?: "academic" | "aptitude";
     duration?: number;
     questions?: {
       question: string;
@@ -168,6 +169,9 @@ export default function ResultPage() {
   const submittedAt = formatDateTime(result.completedAt);
   const testTitle = result.test?.title || "Mock Test";
 
+  const isAptitude = result.test?.category === "aptitude";
+  const backHref = isAptitude ? "/main/aptitude" : "/main/tests";
+
   const performanceRatio = isMCQ
     ? accuracy / 100
     : obtainedMarks / (totalMarks || 1);
@@ -191,11 +195,11 @@ export default function ResultPage() {
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
-            onClick={() => router.push("/main/tests")}
+            onClick={() => router.push(backHref)}
             className="button-secondary gap-2"
           >
             <FileQuestion size={18} />
-            Tests
+            {isAptitude ? "Aptitude Lab" : "Tests"}
           </button>
           <button
             onClick={() =>

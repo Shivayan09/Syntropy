@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Brain,
   CalendarDays,
   CheckCircle2,
   Clock3,
@@ -12,6 +13,7 @@ import {
   FileQuestion,
   Gauge,
   Layers3,
+  RotateCcw,
   Sparkles,
 } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
@@ -20,7 +22,14 @@ type TestPreviewData = {
   _id: string;
   title: string;
   type?: "manual" | "generated";
+  category?: "academic" | "aptitude";
   testFormat?: "mcq" | "subjective";
+  aptitude?: {
+    sections?: string[];
+    topics?: string[];
+    company?: string;
+    companyLabel?: string;
+  };
   difficulty?: string;
   totalQuestions?: number;
   duration?: number;
@@ -114,9 +123,17 @@ export default function TestPreview() {
 
   const isGenerated = test?.type === "generated";
 
-  const TestTypeIcon = isGenerated
-    ? Sparkles
-    : ClipboardPen;
+  const isAptitude = test?.category === "aptitude";
+
+  const backHref = isAptitude ? "/main/aptitude" : "/main/tests";
+
+  const backLabel = isAptitude ? "Aptitude Lab" : "Tests";
+
+  const TestTypeIcon = isAptitude
+    ? Brain
+    : isGenerated
+      ? Sparkles
+      : ClipboardPen;
 
   const formatLabel =
     test?.testFormat === "subjective"
@@ -124,11 +141,18 @@ export default function TestPreview() {
       : "MCQ";
 
   const briefingItems = useMemo(
-    () => [
-      "The timer starts immediately after you begin.",
-      "Keep the test tab open until you submit.",
-    ],
-    []
+    () =>
+      isAptitude
+        ? [
+            "The timer starts immediately after you begin.",
+            "Keep the test tab open until you submit.",
+            "Practice mode is untimed and shows the solution after every question.",
+          ]
+        : [
+            "The timer starts immediately after you begin.",
+            "Keep the test tab open until you submit.",
+          ],
+    [isAptitude]
   );
 
   if (loading) return <Loader2 />;
@@ -167,11 +191,11 @@ export default function TestPreview() {
         <div className="flex gap-5">
 
           <button
-            onClick={() => router.push("/main/tests") }
+            onClick={() => router.push(backHref) }
             className="button-secondary w-fit gap-2"
           >
             <ArrowLeft size={18} />
-            Tests
+            {backLabel}
           </button>
 
           <div>
@@ -200,8 +224,14 @@ export default function TestPreview() {
 
                   <span className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-white">
                     <TestTypeIcon size={14} />
-                    {isGenerated ? "AI Generated" : "Manual"}
+                    {isAptitude ? "Aptitude" : isGenerated ? "AI Generated" : "Manual"}
                   </span>
+
+                  {test.aptitude?.companyLabel && (
+                    <span className="inline-flex items-center rounded-full bg-secondary px-4 py-2 text-xs font-semibold">
+                      {test.aptitude.companyLabel}
+                    </span>
+                  )}
 
                   <span className="inline-flex items-center rounded-full bg-secondary px-4 py-2 text-xs font-semibold">
                     {formatLabel}
@@ -489,11 +519,32 @@ export default function TestPreview() {
 
               {starting
                 ? "Preparing attempt..."
-                : "Start Test"}
+                : isAptitude
+                  ? "Start Timed Round"
+                  : "Start Test"}
 
               <ArrowRight size={18} />
 
             </button>
+
+            {isAptitude && (
+
+              <button
+                onClick={() =>
+                  router.push(
+                    `/main/aptitude/practice/${test._id}`
+                  )
+                }
+                className="button-secondary mt-3 w-full justify-between"
+              >
+
+                Practice untimed with solutions
+
+                <RotateCcw size={18} />
+
+              </button>
+
+            )}
 
           </div>
 

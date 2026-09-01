@@ -45,7 +45,7 @@ export default function TestsPage() {
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        const res = await fetch(BACKEND_URL + "/api/test/all", { credentials: "include" });
+        const res = await fetch(BACKEND_URL + "/api/test/all?category=academic", { credentials: "include" });
         const data = await res.json();
         if (!res.ok) return;
         setTests(data.tests || []);

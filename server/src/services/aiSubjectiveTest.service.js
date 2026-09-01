@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import Test from "../models/test.model.js";
+import { extractJsonArray, readCompletionText } from "../utils/aiJson.utils.js";
 import { getNextTestTitle } from "../utils/testTitle.utils.js";
 
 function generateDistribution(totalMarks) {
@@ -42,6 +43,8 @@ export async function generateSubjectiveTest(data, userId) {
     const completion = await groq.chat.completions.create({
         model: "openai/gpt-oss-120b",
         temperature: 0.3,
+        max_completion_tokens: 6800,
+        reasoning_effort: "medium",
         messages: [
             {
                 role: "system",
@@ -86,11 +89,8 @@ subject:""
         ]
     });
 
-    let aiText = completion.choices[0].message.content;
-
-    aiText = aiText.replace(/```json|```/g, "").trim();
-
-    const parsed = JSON.parse(aiText);
+    const { text: aiText } = readCompletionText(completion);
+    const parsed = extractJsonArray(aiText);
 
     const formattedQuestions = parsed.map(q => ({
         question: q.question,

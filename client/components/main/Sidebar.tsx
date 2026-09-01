@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
-import { BarChart3, BookOpen, History, LayoutDashboard, LogOut, Menu, Pen, Settings, X, PanelLeft, Trophy, Crown, Headphones } from "lucide-react";
+import { BarChart3, BookOpen, Brain, History, LayoutDashboard, LogOut, Menu, Pen, Settings, X, PanelLeft, Trophy, Crown, Headphones } from "lucide-react";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -106,6 +106,13 @@ export default function Sidebar({
               </span>
             </div>
 
+            <div className={itemClass("/main/aptitude")} onClick={() => navigate("/main/aptitude")}>
+              <Brain size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Aptitude Lab
+              </span>
+            </div>
+
             <div className={itemClass("/main/history")} onClick={() => router.push("/main/history")}>
               <History size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
@@ -198,6 +205,13 @@ export default function Sidebar({
               <Pen size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
                 Create test
+              </span>
+            </div>
+
+            <div className={itemClass("/main/aptitude")} onClick={() => navigate("/main/aptitude")}>
+              <Brain size={18} />
+              <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
+                Aptitude Lab
               </span>
             </div>
 

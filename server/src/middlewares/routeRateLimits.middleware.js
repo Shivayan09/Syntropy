@@ -66,6 +66,7 @@ export const applyRouteRateLimits = (app) => {
     app.use("/api/auth/forgot-password", passwordResetLimiter);
     app.use("/api/auth/reset-password", passwordResetLimiter);
     app.use("/api/test/generate", aiGenerationLimiter);
+    app.use("/api/aptitude/generate", aiGenerationLimiter);
     app.use("/api/syllabus/upload", uploadLimiter);
     app.use("/api/payment", paymentLimiter);
 };

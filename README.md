@@ -8,6 +8,7 @@ syntropy is a full-stack mock test platform for students preparing for semester 
 - Complete onboarding with academic details, preferences, and syllabus upload
 - Create tests manually in both `mcq` and `subjective` formats
 - Generate AI tests from selected subjects, difficulty, duration, marks, and student context
+- Practice interview-focused aptitude sets in a dedicated Aptitude Lab (quant, reasoning, verbal, data interpretation) with untimed solution-first practice or timed scored rounds
 - Attempt tests inside a timed interface with navigation, review flags, and auto-submit on expiry
 - View result pages, answer review screens, attempt history, analytics, and leaderboard rankings
 - Upload a syllabus PDF, parse it into structured subjects/units/topics, and reuse subjects while creating tests
@@ -76,6 +77,16 @@ syntropy is a full-stack mock test platform for students preparing for semester 
   - Duration
   - College and semester context
 
+### Aptitude Lab
+
+- Separate section dedicated to interview and placement aptitude practice
+- Four sections: Quantitative Aptitude, Logical Reasoning, Verbal Ability, Data Interpretation
+- Topic level selection inside each section, plus company/exam patterns (TCS NQT, Infosys, Wipro, Accenture, Cognizant, Capgemini, product companies, banking, CAT)
+- One-click quick start presets for common rounds
+- Practice mode: untimed, one question at a time, instant answer with the fastest approach and worked solution, not recorded as an attempt
+- Timed mode: reuses the standard attempt, result, review, history and analytics flow
+- Section and topic accuracy tracking with weak-topic detection
+
 ### Attempts, Results, And Review
 
 - Timed attempt session with:
@@ -121,8 +132,10 @@ Core MongoDB models:
   - preferences and stats
 - `Test`
   - `manual` or `generated`
+  - `academic` or `aptitude` category
   - `mcq` or `subjective`
   - subjects, duration, questions, marks
+  - aptitude metadata (sections, topics, target company pattern)
 - `Attempt`
   - answers, score, accuracy, timing, first-attempt flag, status
 - `Syllabus`
@@ -140,6 +153,7 @@ Main route groups in `server/src/routes`:
 - `/api/attempt`
 - `/api/syllabus`
 - `/api/leaderboard`
+- `/api/aptitude`
 - `/api/payment`
 
 

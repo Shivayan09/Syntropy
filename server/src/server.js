@@ -12,6 +12,7 @@ import attemptRouter from "./routes/attempt.routes.js";
 import leaderboardRouter from "./routes/leaderboard.routes.js";
 import syllabusRouter from "./routes/syllabus.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
+import aptitudeRouter from "./routes/aptitude.routes.js";
 import healthRouter from "./routes/health.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import { applyRouteRateLimits } from "./middlewares/routeRateLimits.middleware.js";
@@ -84,6 +85,7 @@ app.use('/api/test', testRouter);
 app.use("/api/attempt", attemptRouter);
 app.use("/api/leaderboard", leaderboardRouter);
 app.use("/api/syllabus", syllabusRouter);
+app.use("/api/aptitude", aptitudeRouter);
 app.use("/api/payment", paymentRouter);
 app.use(errorHandler);
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Clock3, FileQuestion, RotateCcw, Target, XCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Circle, Clock3, FileQuestion, Lightbulb, RotateCcw, Target, XCircle } from "lucide-react";
 import Loader2 from "@/components/utils/Loader2";
 
 type Question = {
@@ -10,6 +10,9 @@ type Question = {
   options?: string[];
   correctAnswer?: number;
   marks?: number;
+  explanation?: string;
+  approach?: string;
+  topic?: string;
 };
 
 type AnswerEntry = {
@@ -313,6 +316,34 @@ export default function AttemptReviewPage() {
                   </div>
                 );
               })}
+
+              {(currentQuestion.approach || currentQuestion.explanation) && (
+                <div className="space-y-4 pt-2">
+                  {currentQuestion.approach && (
+                    <div className="rounded-xl border border-(--border) bg-(--bg-secondary) p-5">
+                      <div className="flex items-center gap-2 text-xs font-extrabold uppercase text-primary">
+                        <Lightbulb size={15} />
+                        Fastest approach
+                      </div>
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
+                        {currentQuestion.approach}
+                      </p>
+                    </div>
+                  )}
+
+                  {currentQuestion.explanation && (
+                    <div className="rounded-xl border border-(--border) bg-(--surface) p-5">
+                      <div className="flex items-center gap-2 text-xs font-extrabold uppercase opacity-60">
+                        <Target size={15} />
+                        Solution
+                      </div>
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed">
+                        {currentQuestion.explanation}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-4">

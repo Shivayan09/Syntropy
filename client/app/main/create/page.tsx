@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles, ClipboardPen, FlaskConical, ArrowRight } from "lucide-react";
+import { Sparkles, ClipboardPen, FlaskConical, ArrowRight, Brain } from "lucide-react";
 import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import { useAiTokens } from "@/context/AiTokenContext";
@@ -107,6 +107,25 @@ export default function CreateTestPage() {
                     </div>
                 </div>
 
+            </div>
+
+            <div className="card2 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <div className="flex items-center gap-3">
+                        <Brain size={28} className="text-primary" />
+                        <p className="text-2xl font-extrabold">Preparing for placements?</p>
+                    </div>
+                    <p className="mt-3 max-w-2xl text-sm opacity-70">
+                        The Aptitude Lab is a separate space for interview rounds: quant, reasoning, verbal
+                        and data interpretation sets tuned to company patterns, with untimed practice and
+                        instant solutions.
+                    </p>
+                </div>
+
+                <button onClick={() => router.push("/main/aptitude")} className="gap-2 lg:shrink-0">
+                    Open Aptitude Lab
+                    <ArrowRight size={18} />
+                </button>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4 text-sm">

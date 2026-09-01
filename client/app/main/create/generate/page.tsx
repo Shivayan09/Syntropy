@@ -3,9 +3,28 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
-import { ArrowRight, ClipboardPen, Sparkles, X } from "lucide-react";
+import {
+    ArrowRight,
+    Check,
+    ClipboardPen,
+    FileText,
+    ListChecks,
+    Plus,
+    Sparkles,
+    TicketCheck,
+    X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
+import {
+    BuilderBar,
+    ChoiceChip,
+    OptionCard,
+    PageHeading,
+    RangeField,
+    SegmentedControl,
+    StepSection,
+} from "@/components/main/builder/BuilderKit";
 import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
 import Loader2 from "@/components/utils/Loader2";
 
@@ -153,17 +172,19 @@ export default function CreateAITest() {
         setSubjects(subjects.filter((s) => s !== sub));
     };
 
-    const addFromSuggestion = (sub: string) => {
-        if (!subjects.includes(sub)) {
-            setSubjectError("");
-            setSubjects([...subjects, sub]);
-        }
+    const toggleSuggestion = (sub: string) => {
+        setSubjectError("");
+        setSubjects((current) =>
+            current.includes(sub) ? current.filter((item) => item !== sub) : [...current, sub],
+        );
     };
 
     const canGenerate = subjects.length > 0 && (tokenStatusUnavailable || hasTokens);
 
     const college = user?.college;
     const semester = user?.semester;
+
+    const secondsPerQuestion = questions > 0 ? Math.round((time * 60) / questions) : 0;
 
     const validateBeforeGenerate = () => {
         if (!subjects.length) {
@@ -240,152 +261,72 @@ export default function CreateAITest() {
     }
 
     return (
-        <div className="relative">
-
+        <div className="relative pb-2">
             {!user?.onboardingCompleted &&
-                <div onClick={() => router.push('/main/profile/education')} className="md:absolute mb-5 md:mb-0 right-0 z-50 bg-yellow-50 text-black flex items-center gap-2 text-sm px-3 py-2 w-fit rounded-md cursor-pointer transition-all">
-                    <div className="h-2 w-2 bg-yellow-300 animate-pulse rounded-full"></div>
-                    Click here your syllabus in profile for personalized tests <ArrowRight className="h-4"/>
+                <div onClick={() => router.push('/main/profile/education')} className="mb-5 flex w-fit cursor-pointer items-center gap-2 rounded-md bg-yellow-50 px-3 py-2 text-sm text-black transition-all">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-yellow-300"></div>
+                    Add your syllabus in profile for personalized tests <ArrowRight className="h-4" />
                 </div>
             }
 
-            <div className="mb-5">
-                <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
-                    <Sparkles size={18} />
-                    AI Test Generator
-                </div>
-                <h1 className="text-3xl font-extrabold">Generate a focused practice test.</h1>
-            </div>
-
-            <AiTokenStatus status={tokenStatus} showManualAction />
-
-            <section className="mb-6">
-                <p className="font-bold text-lg mb-5">Choose test format :</p>
-                <div className="flex flex-col md:flex-row gap-5">
-                    <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setTestFormat("mcq")}
-                        onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                                event.preventDefault();
-                                setTestFormat("mcq");
-                            }
-                        }}
-                        className="card cursor-pointer p-5 text-left"
-                        style={
-                            testFormat === "mcq"
-                                ? {
-                                    backgroundColor: "var(--primary)",
-                                    color: "white",
-                                    borderColor: "var(--primary)",
-                                }
-                                : undefined
-                        }
-                    >
-                        <p className={`text-xs font-extrabold uppercase ${testFormat === "mcq" ? "text-white" : "text-primary"}`}>MCQ Test</p>
-                        <h2 className="mt-2 text-2xl font-extrabold">Objective practice</h2>
-                        <p className={`mt-2 text-sm ${testFormat === "mcq" ? "opacity-90" : "opacity-70"}`}>
-                            Generate a focused multiple-choice paper with one correct option per question.
-                        </p>
-                    </div>
-                    <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setTestFormat("subjective")}
-                        onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") {
-                                event.preventDefault();
-                                setTestFormat("subjective");
-                            }
-                        }}
-                        className="card cursor-pointer p-5 text-left"
-                        style={
-                            testFormat === "subjective"
-                                ? {
-                                    backgroundColor: "var(--primary)",
-                                    color: "white",
-                                    borderColor: "var(--primary)",
-                                }
-                                : undefined
-                        }
-                    >
-                        <p className={`text-xs font-extrabold uppercase ${testFormat === "subjective" ? "text-white" : "text-primary"}`}>Subjective Test</p>
-                        <h2 className="mt-2 text-2xl font-extrabold">Written evaluation</h2>
-                        <p className={`mt-2 text-sm ${testFormat === "subjective" ? "opacity-90" : "opacity-70"}`}>
-                            Generate descriptive questions with marks-based evaluation for written answers.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-            <div className="mb-7 card2 flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap gap-6 text-sm">
-                    <div>
-                        <p className="text-xs text-gray-500">Subjects</p>
-                        <p className="font-bold">
-                            {subjects.length ? subjects.join(", ") : "None"}
-                        </p>
-                    </div>
-                    <div>
-                        <p className="text-xs text-gray-500">Difficulty</p>
-                        <p className="font-bold">{difficulty}</p>
-                    </div>
-
-                    {testFormat === "mcq" && (
+            <PageHeading
+                eyebrow="AI Test Generator"
+                icon={Sparkles}
+                title="Generate a focused practice test."
+                description="Pick a format, add the subjects you want covered, and set the paper length. Each generation uses 1 AI credit."
+                aside={
+                    <div className="soft-panel flex items-center gap-3">
+                        <TicketCheck size={20} className="text-primary" />
                         <div>
-                            <p className="text-xs text-gray-500">Questions</p>
-                            <p className="font-bold">{questions}</p>
+                            <p className="text-xs font-bold uppercase opacity-55">Credits left</p>
+                            <p className="text-lg font-extrabold">{tokenStatus?.remaining ?? "--"}</p>
                         </div>
-                    )}
-
-                    {testFormat === "subjective" && (
-                        <div>
-                            <p className="text-xs text-gray-500">Total Marks</p>
-                            <p className="font-bold">{totalMarks}</p>
-                        </div>
-                    )}
-
-                    <div>
-                        <p className="text-xs text-gray-500">Time</p>
-                        <p className="font-bold">{time} min</p>
                     </div>
-                    <div>
-                        <p className="text-xs text-gray-500">AI Token</p>
-                        <p className="font-bold">
-                            {tokenStatusUnavailable
-                                ? "Checked on submit"
-                                : hasTokens
-                                    ? "Ready"
-                                    : tokenStatus?.plan === "free"
-                                        ? "Monthly quota used"
-                                        : "Refill pending"}
-                        </p>
-                    </div>
-                </div>
-            </div>
+                }
+            />
 
-            <div className="mb-7">
-                <p className="font-bold">Subjects</p>
-                {!subjects.length && (
-                    <p className="text-xs text-red-500 mt-3">
-                        Select at least one subject
-                    </p>
-                )}
-                <div className="flex flex-wrap gap-2 my-3">
-                    {subjects.map((sub) => (
-                        <div key={sub} className="border-2 border-black px-3 py-1 flex items-center gap-2 bg-secondary">
-                            {sub}
-                            <button onClick={() => removeSubject(sub)} className="h-5! px-1! text-sm">
-                                x
-                            </button>
-                        </div>
-                    ))}
-                </div>
+            {(!tokenStatus || !hasTokens) && <AiTokenStatus status={tokenStatus} showManualAction />}
 
+            <StepSection
+                step={1}
+                title="Choose test format"
+                description="Objective papers are scored instantly. Written papers are evaluated by AI."
+            >
+                <div className="grid gap-4 md:grid-cols-2">
+                    <OptionCard
+                        selected={testFormat === "mcq"}
+                        onSelect={() => setTestFormat("mcq")}
+                        icon={ListChecks}
+                        eyebrow="MCQ Test"
+                        title="Objective practice"
+                        description="A multiple-choice paper with four options and one correct answer per question."
+                    />
+
+                    <OptionCard
+                        selected={testFormat === "subjective"}
+                        onSelect={() => setTestFormat("subjective")}
+                        icon={FileText}
+                        eyebrow="Subjective Test"
+                        title="Written evaluation"
+                        description="Descriptive questions with marks-based AI evaluation and feedback per answer."
+                    />
+                </div>
+            </StepSection>
+
+            <StepSection
+                step={2}
+                title="Add subjects"
+                description="Questions are spread across every subject you add."
+                error={!subjects.length ? "Add at least one subject to continue." : subjectError}
+                action={
+                    <span className="soft-panel px-3! py-2! text-xs font-bold">
+                        {subjects.length} added
+                    </span>
+                }
+            >
                 <div className="flex items-center gap-3">
                     <input
-                        placeholder="Add subject"
+                        placeholder="Type a subject, e.g. Operating Systems"
                         value={input}
                         onChange={(e) => {
                             setInput(e.target.value);
@@ -396,79 +337,158 @@ export default function CreateAITest() {
                         onKeyDown={(e) => e.key === "Enter" && addSubject()}
                         className="w-full"
                     />
-                    <button className="button-secondary" onClick={addSubject}>
+                    <button className="button-secondary gap-2 shrink-0" onClick={addSubject}>
+                        <Plus size={17} />
                         Add
                     </button>
                 </div>
-                {subjectError && (
-                    <p className="mt-2 text-xs text-red-500">{subjectError}</p>
+
+                {subjects.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {subjects.map((sub) => (
+                            <span
+                                key={sub}
+                                className="inline-flex items-center gap-2 rounded-full bg-primary py-1 pl-3 pr-1 text-xs font-bold text-white"
+                            >
+                                <Check size={13} strokeWidth={3.5} />
+                                {sub}
+                                <span
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-label={`Remove ${sub}`}
+                                    onClick={() => removeSubject(sub)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter" || event.key === " ") {
+                                            event.preventDefault();
+                                            removeSubject(sub);
+                                        }
+                                    }}
+                                    className="grid h-5 w-5 cursor-pointer place-items-center rounded-full bg-white/25 hover:bg-white/40"
+                                >
+                                    <X size={11} strokeWidth={3} />
+                                </span>
+                            </span>
+                        ))}
+                    </div>
                 )}
 
                 {syllabusSubjects.length > 0 && (
-                    <div className="mt-3">
-                        <p className="text-xs text-gray-500 mb-2">Suggested</p>
+                    <div className="soft-panel mt-4">
+                        <p className="mb-3 text-xs font-extrabold uppercase tracking-wide opacity-60">
+                            From your syllabus
+                        </p>
                         <div className="flex flex-wrap gap-2">
                             {syllabusSubjects.map((sub) => (
-                                <span key={sub} onClick={() => addFromSuggestion(sub)} className="text-xs border px-2 py-1 cursor-pointer hover:bg-secondary">
-                                    {sub}
-                                </span>
+                                <ChoiceChip
+                                    key={sub}
+                                    label={sub}
+                                    selected={subjects.includes(sub)}
+                                    onSelect={() => toggleSuggestion(sub)}
+                                />
                             ))}
                         </div>
                     </div>
                 )}
-            </div>
+            </StepSection>
 
-            <div className="grid md:grid-cols-3 gap-10 mb-3">
+            <StepSection
+                step={3}
+                title="Set the paper"
+                description="Difficulty, length and time limit for this test."
+            >
+                <div className="grid gap-8 md:grid-cols-3">
+                    <SegmentedControl
+                        label="Difficulty"
+                        value={difficulty}
+                        onChange={setDifficulty}
+                        options={[
+                            { value: "Easy", label: "Easy" },
+                            { value: "Medium", label: "Medium" },
+                            { value: "Hard", label: "Hard" },
+                        ]}
+                    />
 
-                <div>
-                    <p className="font-bold mb-3">Difficulty</p>
-                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} className="w-full">
-                        <option value="Easy">Easy</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Hard">Hard</option>
-                    </select>
+                    {testFormat === "mcq" ? (
+                        <RangeField
+                            label="Questions"
+                            value={questions}
+                            min={5}
+                            max={MAX_GENERATED_QUESTIONS}
+                            onChange={setQuestions}
+                        />
+                    ) : (
+                        <RangeField
+                            label="Total marks"
+                            value={totalMarks}
+                            min={20}
+                            max={MAX_SUBJECTIVE_MARKS}
+                            onChange={setTotalMarks}
+                        />
+                    )}
+
+                    <RangeField
+                        label="Time limit"
+                        value={time}
+                        min={10}
+                        max={120}
+                        step={5}
+                        suffix="min"
+                        onChange={setTime}
+                    />
                 </div>
 
                 {testFormat === "mcq" && (
-                    <div>
-                        <p className="font-bold mb-3">Questions</p>
-                        <input type="range" min={5} max={MAX_GENERATED_QUESTIONS} value={questions} onChange={(e) => setQuestions(Number(e.target.value))} className="w-full" />
-                        <p className="text-sm mt-2">{questions}</p>
-                    </div>
+                    <p className="mt-5 text-sm opacity-65">{secondsPerQuestion} sec per question</p>
                 )}
+            </StepSection>
 
-                {testFormat === "subjective" && (
-                    <div>
-                        <p className="font-bold mb-3">Total Marks</p>
-                        <input type="range" min={20} max={MAX_SUBJECTIVE_MARKS} value={totalMarks} onChange={(e) => setTotalMarks(Number(e.target.value))} className="w-full" />
-                        <p className="text-sm mt-2">{totalMarks}</p>
-                    </div>
-                )}
+            <StepSection
+                step={4}
+                title="Fine-tune (optional)"
+                description="Steer the generator towards specific chapters or topics."
+            >
+                <input
+                    placeholder="Focus topics, e.g. Deadlocks, Paging, Scheduling"
+                    value={topicFocus}
+                    onChange={(e) => setTopicFocus(e.target.value)}
+                    className="w-full"
+                />
+            </StepSection>
 
-                <div>
-                    <p className="font-bold mb-3">Time</p>
-                    <input type="range" min={10} max={120} step={5} value={time} onChange={(e) => setTime(Number(e.target.value))} className="w-full" />
-                    <p className="text-sm mt-2">{time} min</p>
-                </div>
-
-            </div>
-
-            <div className="mb-7 space-y-5">
-                <p className="font-bold">Additional Customization</p>
-                <input placeholder="Focus topics (optional)" value={topicFocus} onChange={(e) => setTopicFocus(e.target.value)} className="w-full" />
-            </div>
-
-            <button onClick={openGenerateConfirm} disabled={!canGenerate || loading} className={`w-full gap-2 text-lg ${(!canGenerate || loading) ? "opacity-50 cursor-not-allowed" : ""}`}>
-                <Sparkles size={20} />
-                {loading ? "Generating..." : tokenStatusUnavailable || hasTokens ? `Generate ${testFormat === "mcq" ? "MCQ" : "Subjective"} Test` : "No credits left"}
-            </button>
-
-            {tokenStatus && !hasTokens && (
-                <button type="button" onClick={() => router.push("/main/create/manual")} className="button-secondary mt-4 w-full gap-2 text-lg">
-                    <ClipboardPen size={20} />
-                    Create Manual Test Instead
+            <BuilderBar
+                items={[
+                    { label: "Format", value: testFormat === "mcq" ? "MCQ" : "Subjective" },
+                    { label: "Subjects", value: subjects.length ? `${subjects.length} added` : "None" },
+                    {
+                        label: "Paper",
+                        value:
+                            testFormat === "mcq"
+                                ? `${questions} Q · ${time} min · ${difficulty}`
+                                : `${totalMarks} marks · ${time} min · ${difficulty}`,
+                    },
+                ]}
+            >
+                <button
+                    className="button-secondary hidden gap-2 sm:inline-flex"
+                    onClick={() => router.push("/main/create/manual")}
+                >
+                    <ClipboardPen size={18} />
+                    Manual test
                 </button>
-            )}
+
+                <button
+                    onClick={openGenerateConfirm}
+                    disabled={!canGenerate || loading}
+                    className={`flex-1 gap-2 lg:flex-none ${(!canGenerate || loading) ? "cursor-not-allowed opacity-50" : ""}`}
+                >
+                    <Sparkles size={18} />
+                    {loading
+                        ? "Generating..."
+                        : tokenStatusUnavailable || hasTokens
+                          ? `Generate ${testFormat === "mcq" ? "MCQ" : "Subjective"} test`
+                          : "No credits left"}
+                </button>
+            </BuilderBar>
 
             <GenerateConfirmModal
                 open={confirmOpen}
@@ -533,7 +553,7 @@ function GenerateConfirmModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-black/50" onClick={safeClose} />
-            <div className="relative w-full max-w-lg rounded-lg border border-primary bg-surface p-6 shadow-lg" onClick={(event) => event.stopPropagation()}>
+            <div className="relative max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-(--border) bg-(--bg) p-6 shadow-lg" onClick={(event) => event.stopPropagation()}>
                 <div
                     role="button"
                     tabIndex={loading ? -1 : 0}
@@ -552,7 +572,7 @@ function GenerateConfirmModal({
                 </div>
 
                 <div className="pr-8">
-                    <p className="text-xs font-extrabold uppercase text-primary">Confirm AI Test</p>
+                    <p className="text-xs font-extrabold uppercase tracking-wide text-primary">Confirm AI Test</p>
                     <h2 className="mt-2 text-2xl font-extrabold">Check your setup before generating.</h2>
                     <p className="mt-2 text-sm opacity-70">
                         Make sure your subjects, duration, and {testFormat === "mcq" ? "total questions" : "total marks"} are correct before using an AI credit.
@@ -560,29 +580,30 @@ function GenerateConfirmModal({
                 </div>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <div className="border border-(--border) bg-(--bg-secondary) p-3">
+                    <div className="soft-panel">
                         <p className="text-xs opacity-60">Format</p>
                         <p className="font-extrabold">{testFormat === "mcq" ? "MCQ Test" : "Subjective Test"}</p>
                     </div>
-                    <div className="border border-(--border) bg-(--bg-secondary) p-3">
+                    <div className="soft-panel">
                         <p className="text-xs opacity-60">Difficulty</p>
                         <p className="font-extrabold">{difficulty}</p>
                     </div>
-                    <div className="border border-(--border) bg-(--bg-secondary) p-3">
+                    <div className="soft-panel">
                         <p className="text-xs opacity-60">Duration</p>
                         <p className="font-extrabold">{duration} min</p>
                     </div>
-                    <div className="border border-(--border) bg-(--bg-secondary) p-3">
+                    <div className="soft-panel">
                         <p className="text-xs opacity-60">{testFormat === "mcq" ? "Total Questions" : "Total Marks"}</p>
                         <p className="font-extrabold">{testFormat === "mcq" ? questions : totalMarks}</p>
                     </div>
                 </div>
 
-                <div className="mt-4 border border-(--border) bg-(--bg-secondary) p-4">
+                <div className="soft-panel mt-3">
                     <p className="text-xs opacity-60">Subjects</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                         {subjects.map((subject) => (
-                            <span key={subject} className="border-2 border-black bg-secondary px-3 py-1 text-sm font-semibold">
+                            <span key={subject} className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">
+                                <Check size={12} strokeWidth={3.5} />
                                 {subject}
                             </span>
                         ))}

@@ -8,15 +8,25 @@ const questionSchema = new mongoose.Schema({
     options: { type: [String], validate: { validator: function (v) { return this.ownerDocument().testFormat === "mcq" ? v && v.length === 4 : true; } } },
     correctAnswer: { type: Number, validate: { validator: function (v) { return this.ownerDocument().testFormat === "mcq" ? v !== undefined && v >= 0 && v < 4 : true; } } },
     explanation: { type: String, default: "" },
+    approach: { type: String, default: "" },
     subject: { type: String, default: null },
     difficulty: { type: String, enum: ["Easy", "Medium", "Hard"] },
     topic: String
 });
 
+const aptitudeMetaSchema = new mongoose.Schema({
+    sections: { type: [String], default: [] },
+    topics: { type: [String], default: [] },
+    company: { type: String, default: "general" },
+    companyLabel: { type: String, default: "" }
+}, { _id: false });
+
 const testSchema = new mongoose.Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, default: "" },
     type: { type: String, enum: ["generated", "manual"], required: true },
+    category: { type: String, enum: ["academic", "aptitude"], default: "academic", index: true },
+    aptitude: { type: aptitudeMetaSchema, default: undefined },
     testFormat: { type: String, enum: ["mcq", "subjective"], required: true },
     totalMarks: { type: Number },
     markDistribution: [{ marks: Number, count: Number }],

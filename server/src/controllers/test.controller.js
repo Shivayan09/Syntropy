@@ -3,9 +3,11 @@ import Test from "../models/test.model.js";
 import User from "../models/user.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
 import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
+import { describeAiError } from "../utils/aiError.utils.js";
 import { buildAiTokenStatus, consumeAiCredit, refundAiCredit, syncAiTokens } from "../utils/aiToken.utils.js";
 import { sanitizeSubjects } from "../utils/subjectValidation.utils.js";
-import { getTestNumber } from "../utils/testTitle.utils.js";
+import { invalidateTestListCache } from "../utils/testCache.utils.js";
+import { getGeneratedTestTitle } from "../utils/testTitle.utils.js";
 
 export const createTest = async (req, res) => {
     try {
@@ -49,6 +51,7 @@ export const createTest = async (req, res) => {
         }
         const formattedQuestions = questions.map(q => ({ ...q }));
         const test = await Test.create({ title, description, difficulty, duration, subjects, questions: formattedQuestions, totalQuestions: formattedQuestions.length, createdBy: userId, type, testFormat, totalMarks: testFormat === "subjective" ? formattedQuestions.reduce((sum, q) => sum + q.marks, 0) : undefined });
+        await invalidateTestListCache(userId);
         res.status(201).json({
             success: true,
             test
@@ -72,8 +75,7 @@ export const getTest = async (req, res) => {
         }
         const responseTest = test.toObject();
         if (responseTest.type === "generated") {
-            const testNumber = await getTestNumber(req.user._id, test);
-            responseTest.title = `Test ${testNumber}`;
+            responseTest.title = await getGeneratedTestTitle(req.user._id, test);
         }
         res.json({
             success: true,
@@ -89,7 +91,8 @@ export const getTest = async (req, res) => {
 
 export const getAllTests = async (req, res) => {
     try {
-        const cacheKey = `tests:${req.user._id}`;
+        const category = req.query.category === "aptitude" || req.query.category === "academic" ? req.query.category : null;
+        const cacheKey = category ? `tests:${req.user._id}:${category}` : `tests:${req.user._id}`;
         const cachedTests = await redis.get(cacheKey);
         if (cachedTests) {
             return res.status(200).json({
@@ -98,7 +101,13 @@ export const getAllTests = async (req, res) => {
                 cached: true,
             });
         }
-        const tests = await Test.find({ createdBy: req.user._id }).select("-questions").sort({ createdAt: -1 });
+        const query = { createdBy: req.user._id };
+        if (category === "aptitude") {
+            query.category = "aptitude";
+        } else if (category === "academic") {
+            query.category = { $ne: "aptitude" };
+        }
+        const tests = await Test.find(query).select("-questions").sort({ createdAt: -1 });
         await redis.set(cacheKey, tests, { ex: 60 * 60 });
         res.status(200).json({
             success: true,
@@ -187,6 +196,7 @@ export const aiTest = async (req, res) => {
         } else {
             test = await generateTest(req.body, userId);
         }
+        await invalidateTestListCache(userId);
         return res.status(200).json({
             success: true,
             testId: test._id,
@@ -199,7 +209,7 @@ export const aiTest = async (req, res) => {
         }
         return res.status(500).json({
             success: false,
-            message: err.message,
+            message: describeAiError(err),
             aiTokenStatus: user ? buildAiTokenStatus(user) : undefined
         });
     }

@@ -1,6 +1,6 @@
 import Groq from "groq-sdk";
 import Test from "../models/test.model.js";
-import { jsonrepair } from "jsonrepair";
+import { extractJsonArray, readCompletionText } from "../utils/aiJson.utils.js";
 import { getNextTestTitle } from "../utils/testTitle.utils.js";
 import Syllabus from "../models/syllabus.model.js";
 
@@ -42,6 +42,8 @@ export async function generateTest(data, userId) {
     const completion = await groq.chat.completions.create({
         model: "openai/gpt-oss-120b",
         temperature: 0.3,
+        max_completion_tokens: 6800,
+        reasoning_effort: "medium",
         messages: [
             {
                 role: "system",
@@ -112,33 +114,8 @@ Return JSON:
         ]
     });
 
-    const aiText = completion.choices[0].message.content;
-
-    let parsed;
-
-    try {
-        const cleaned = aiText.replace(/```json/gi, "").replace(/```/g, "").trim();
-
-        const start = cleaned.indexOf("[");
-        const end = cleaned.lastIndexOf("]");
-
-        if (start === -1 || end === -1) {
-            throw new Error("No JSON array found in AI response");
-        }
-
-        const jsonString = cleaned.slice(start, end + 1);
-
-        const repaired = jsonrepair(jsonString);
-
-        parsed = JSON.parse(repaired);
-
-        if (!Array.isArray(parsed)) {
-            throw new Error("Parsed response is not an array");
-        }
-
-    } catch (err) {
-        throw new Error("AI returned invalid JSON", { cause: err });
-    }
+    const { text: aiText } = readCompletionText(completion);
+    const parsed = extractJsonArray(aiText);
 
     const formattedQuestions = parsed
         .map((q) => {

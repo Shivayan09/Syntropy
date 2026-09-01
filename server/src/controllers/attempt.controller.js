@@ -150,7 +150,7 @@ export const getAttemptById = async (req, res) => {
     try {
         const userId = req.user._id;
         const attemptId = req.params.id;
-        const attempt = await Attempt.findOne({ _id: attemptId, user: userId }).populate({ path: "test", select: "title subjects duration questions testFormat totalMarks" });
+        const attempt = await Attempt.findOne({ _id: attemptId, user: userId }).populate({ path: "test", select: "title subjects duration questions testFormat totalMarks category" });
         if (!attempt) {
             return res.status(404).json({
                 success: false,
