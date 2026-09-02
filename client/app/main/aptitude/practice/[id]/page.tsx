@@ -100,7 +100,7 @@ export default function AptitudePracticePage() {
                     </p>
                     <button onClick={() => router.push("/main/aptitude")} className="button-secondary mt-7 gap-2 mx-auto">
                         <ArrowLeft size={18} />
-                        Back to Aptitude Lab
+                        Back to Aptitude Gym
                     </button>
                 </div>
             </div>
@@ -161,7 +161,7 @@ export default function AptitudePracticePage() {
                             Take it timed
                         </button>
                         <button onClick={() => router.push("/main/aptitude")} className="button-secondary gap-2">
-                            Back to Aptitude Lab
+                            Back to Aptitude Gym
                             <ArrowRight size={18} />
                         </button>
                     </div>

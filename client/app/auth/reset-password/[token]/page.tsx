@@ -127,12 +127,6 @@ export default function ResetPasswordPage({
                         </div>
                     </div>
                 </div>
-
-                <div className="mt-12 border-2 border-black p-4 bg-primary text-white max-w-sm">
-                    <p className="text-sm font-bold">
-                        No shortcuts. Just results.
-                    </p>
-                </div>
             </div>
 
             {/* RIGHT SIDE */}

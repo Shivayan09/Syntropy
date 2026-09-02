@@ -199,7 +199,7 @@ export default function ResultPage() {
             className="button-secondary gap-2"
           >
             <FileQuestion size={18} />
-            {isAptitude ? "Aptitude Lab" : "Tests"}
+            {isAptitude ? "Aptitude Gym" : "Tests"}
           </button>
           <button
             onClick={() =>

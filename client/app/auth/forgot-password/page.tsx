@@ -102,11 +102,6 @@ export default function ForgotPassword() {
                     </div>
                 </div>
 
-                <div className="mt-12 border-2 border-black p-4 bg-primary text-white max-w-sm">
-                    <p className="text-sm font-bold">
-                        No shortcuts. Just results.
-                    </p>
-                </div>
             </div>
 
             <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">

@@ -151,7 +151,7 @@ export default function AptitudeHubPage() {
             <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
                 <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
                     <Brain size={18} />
-                    Aptitude Lab
+                    Aptitude Gym
                 </div>
             </section>
 

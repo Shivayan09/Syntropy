@@ -30,6 +30,11 @@ body {
 
   --skeleton-base: #ececec;
   --skeleton-highlight: #f8f8f8;
+
+  /* Chart series (validated for CVD separation against the light surface) */
+  --chart-correct: #1baf7a;
+  --chart-wrong: #eb6834;
+  --chart-skipped: #2a78d6;
 }
 
 .dark {
@@ -52,6 +57,11 @@ body {
 
   --skeleton-base: #181818;
   --skeleton-highlight: #262626;
+
+  /* Same hues, stepped for the dark surface - not an automatic flip */
+  --chart-correct: #199e70;
+  --chart-wrong: #d95926;
+  --chart-skipped: #3987e5;
 }
 
 body {

@@ -127,7 +127,7 @@ export default function TestPreview() {
 
   const backHref = isAptitude ? "/main/aptitude" : "/main/tests";
 
-  const backLabel = isAptitude ? "Aptitude Lab" : "Tests";
+  const backLabel = isAptitude ? "Aptitude Gym" : "Tests";
 
   const TestTypeIcon = isAptitude
     ? Brain

@@ -109,7 +109,7 @@ export default function Sidebar({
             <div className={itemClass("/main/aptitude")} onClick={() => navigate("/main/aptitude")}>
               <Brain size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                Aptitude Lab
+                Aptitude Gym
               </span>
             </div>
 
@@ -211,7 +211,7 @@ export default function Sidebar({
             <div className={itemClass("/main/aptitude")} onClick={() => navigate("/main/aptitude")}>
               <Brain size={18} />
               <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
-                Aptitude Lab
+                Aptitude Gym
               </span>
             </div>
 

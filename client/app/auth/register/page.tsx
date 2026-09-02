@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { Target, BarChart3, Globe, X } from "lucide-react";
+import { Globe, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useAuth } from "@/context/AuthContext";
+import AuthAside from "@/components/auth/AuthAside";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -42,6 +42,13 @@ declare global {
         };
     }
 }
+
+// Google renders the button at a fixed pixel width, so it has to match the
+// container or the button sits off-centre inside it on narrow screens.
+const measureGoogleButtonWidth = (element: HTMLElement) => {
+    const available = Math.floor(element.getBoundingClientRect().width);
+    return Math.min(360, available > 0 ? available : 360);
+};
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -196,11 +203,14 @@ export default function RegisterPage() {
             return;
         }
 
+        let renderedWidth = 0;
+
         const renderGoogleButton = () => {
             if (!googleButtonRef.current || !window.google) {
                 return;
             }
 
+            renderedWidth = measureGoogleButtonWidth(googleButtonRef.current);
             setGoogleButtonMounted(false);
             googleButtonRef.current.innerHTML = "";
             window.google.accounts.id.initialize({
@@ -208,15 +218,14 @@ export default function RegisterPage() {
                 callback: handleGoogleLogin,
                 ux_mode: "popup",
             });
-            const buttonWidth = Math.min(360, googleButtonRef.current.clientWidth || 360);
             window.google.accounts.id.renderButton(googleButtonRef.current, {
                 type: "standard",
                 theme: "outline",
                 text: "continue_with",
                 shape: "pill",
                 size: "large",
-                width: buttonWidth,
-                logo_alignment: "left",
+                width: renderedWidth,
+                logo_alignment: "center",
             });
 
             requestAnimationFrame(() => setGoogleButtonMounted(true));
@@ -230,12 +239,20 @@ export default function RegisterPage() {
             }
         };
 
+        const handleResize = () => {
+            if (googleButtonRef.current && measureGoogleButtonWidth(googleButtonRef.current) !== renderedWidth) {
+                renderGoogleButton();
+            }
+        };
+
         window.addEventListener("focus", handleWindowFocus);
+        window.addEventListener("resize", handleResize);
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
             window.clearTimeout(timeoutId);
             window.removeEventListener("focus", handleWindowFocus);
+            window.removeEventListener("resize", handleResize);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, [GOOGLE_CLIENT_ID, googleReady, step]);
@@ -357,79 +374,9 @@ export default function RegisterPage() {
                 />
             ) : null}
 
-            <div className="hidden md:flex w-full md:w-[60%] flex-col justify-center px-14 bg-secondary border-r-2 border-black">
+            <AuthAside variant="register" />
 
-                <div className="flex gap-1 mb-5">
-                    <Image src="/logo.png" alt="Syntropy logo" width={28} height={28} className="h-7 w-auto" />
-                    <p className="text-sm font-bold text-primary">
-                        syntropy
-                    </p>
-                </div>
-
-                <h1 className="text-5xl font-extrabold leading-tight mb-6">
-                    Stop guessing <br />
-                    <span className="text-primary">Start improving</span>
-                </h1>
-
-                <p className="text-gray-700 mb-10">
-                    Most students practice blindly. syntropy shows you exactly where you stand and what to fix.
-                </p>
-
-                <div className="space-y-6">
-
-                    <div className="flex items-center gap-5">
-                        <div className="flex items-start gap-4">
-                            <Target />
-                            <div>
-                                <p className="font-bold">Target Weak Areas</p>
-                                <p className="text-sm text-gray-600">
-                                    Identify exactly where you&apos;re losing marks.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <BarChart3 />
-                            <div>
-                                <p className="font-bold">Clear Analytics</p>
-                                <p className="text-sm text-gray-600">
-                                    Understand your performance, not guess it.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-5 mt-10">
-                        <div className="flex items-start gap-4">
-                            <Target />
-                            <div>
-                                <p className="font-bold">Target Weak Areas</p>
-                                <p className="text-sm text-gray-600">
-                                    Identify exactly where you&apos;re losing marks.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                            <BarChart3 />
-                            <div>
-                                <p className="font-bold">Clear Analytics</p>
-                                <p className="text-sm text-gray-600">
-                                    Understand your performance, not guess it.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="mt-12 border-2 border-black p-4 bg-primary max-w-sm">
-                    <p className="text-sm font-bold">
-                        No shortcuts. Just results.
-                    </p>
-                </div>
-            </div>
-
-            <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">
+            <div className="flex w-full flex-1 items-center justify-center px-6 py-12">
 
                 <div className="w-full max-w-md relative">
 
@@ -508,7 +455,7 @@ export default function RegisterPage() {
                                             )}
                                             <div
                                                 ref={googleButtonRef}
-                                                className={`min-h-10 w-full overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""} ${googleButtonMounted ? "opacity-100" : "opacity-0"}`}
+                                                className={`flex min-h-10 w-full justify-center overflow-hidden rounded-full ${googleLoading ? "pointer-events-none opacity-70" : ""} ${googleButtonMounted ? "opacity-100" : "opacity-0"}`}
                                             />
                                         </div>
                                     </div>
