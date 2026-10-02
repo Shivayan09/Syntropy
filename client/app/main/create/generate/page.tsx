@@ -6,7 +6,9 @@ import { toast } from "react-toastify";
 import {
     ArrowRight,
     Check,
+    CircleAlert,
     ClipboardPen,
+    CornerDownLeft,
     FileText,
     ListChecks,
     Plus,
@@ -26,7 +28,7 @@ import {
     StepSection,
 } from "@/components/main/builder/BuilderKit";
 import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
-import Loader2 from "@/components/utils/Loader2";
+import GenerationLoader from "@/components/utils/GenerationLoader";
 
 type Difficulty = "Easy" | "Medium" | "Hard";
 type TestFormat = "mcq" | "subjective";
@@ -129,6 +131,8 @@ export default function CreateAITest() {
     const [loading, setLoading] = useState(false);
     const [topicFocus, setTopicFocus] = useState("");
     const [subjectError, setSubjectError] = useState("");
+    const [rejectedInput, setRejectedInput] = useState("");
+    const [shakeInput, setShakeInput] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [mixedSubjects] = useState(true);
     const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
@@ -149,21 +153,39 @@ export default function CreateAITest() {
         fetchSyllabus();
     }, [BACKEND_URL]);
 
+    const trimmedInput = normalizeSubjectName(input);
+    const inputState: "empty" | "valid" | "duplicate" | "invalid" | "rejected" = !trimmedInput
+        ? "empty"
+        : rejectedInput && rejectedInput === trimmedInput
+          ? "rejected"
+          : subjects.includes(trimmedInput)
+            ? "duplicate"
+            : isValidSubjectName(trimmedInput)
+              ? "valid"
+              : "invalid";
+
+    const rejectInput = () => {
+        setRejectedInput(trimmedInput);
+        setShakeInput(true);
+        window.setTimeout(() => setShakeInput(false), 450);
+    };
+
     const addSubject = () => {
-        const val = normalizeSubjectName(input);
+        const val = trimmedInput;
         if (!val) {
             setSubjectError("");
             return;
         }
         if (!isValidSubjectName(val)) {
-            setSubjectError("Enter a real subject name like Mathematics, Physics, or DBMS.");
+            rejectInput();
             return;
         }
         if (subjects.includes(val)) {
-            setSubjectError("");
+            rejectInput();
             return;
         }
         setSubjectError("");
+        setRejectedInput("");
         setSubjects([...subjects, val]);
         setInput("");
     };
@@ -257,7 +279,31 @@ export default function CreateAITest() {
     };
 
     if (loading) {
-        return <Loader2 />
+        const isMcq = testFormat === "mcq";
+
+        return (
+            <GenerationLoader
+                eyebrow="AI test generator"
+                title={`Building your ${isMcq ? "MCQ" : "subjective"} test`}
+                description="The paper is being written and checked right now. You will land on the preview as soon as it is ready."
+                summary={[
+                    subjects.join(", "),
+                    isMcq ? `${questions} questions` : `${totalMarks} marks`,
+                    `${time} min`,
+                    difficulty,
+                ]}
+                steps={[
+                    { label: "Reading your subjects", detail: subjects.join(", ") },
+                    { label: "Planning the paper", detail: `${difficulty} difficulty · ${time} minute limit` },
+                    {
+                        label: isMcq ? "Writing questions and options" : "Writing descriptive questions",
+                        detail: topicFocus.trim() ? `Focus: ${topicFocus.trim()}` : undefined,
+                    },
+                    { label: isMcq ? "Checking the answer key" : "Setting the marking scheme" },
+                    { label: "Finalising your test" },
+                ]}
+            />
+        );
     }
 
     return (
@@ -328,6 +374,8 @@ export default function CreateAITest() {
                     <input
                         placeholder="Type a subject, e.g. Operating Systems"
                         value={input}
+                        aria-invalid={inputState === "rejected"}
+                        aria-describedby="subject-input-hint"
                         onChange={(e) => {
                             setInput(e.target.value);
                             if (subjectError) {
@@ -335,12 +383,57 @@ export default function CreateAITest() {
                             }
                         }}
                         onKeyDown={(e) => e.key === "Enter" && addSubject()}
-                        className="w-full"
+                        className={`w-full ${shakeInput ? "shake" : ""} ${
+                            inputState === "rejected"
+                                ? "border-(--chart-wrong)! shadow-[0_0_0_4px_color-mix(in_srgb,var(--chart-wrong)_18%,transparent)]!"
+                                : ""
+                        }`}
                     />
-                    <button className="button-secondary gap-2 shrink-0" onClick={addSubject}>
+                    <button
+                        className="button-secondary gap-2 shrink-0"
+                        onClick={addSubject}
+                        disabled={inputState === "empty" || inputState === "rejected"}
+                    >
                         <Plus size={17} />
                         Add
                     </button>
+                </div>
+
+                <div id="subject-input-hint" className="mt-2 min-h-5 text-xs" aria-live="polite">
+                    {inputState === "rejected" && !subjects.includes(trimmedInput) && (
+                        <div className="mt-1 flex items-start gap-2 rounded-xl border border-(--chart-wrong) bg-[color-mix(in_srgb,var(--chart-wrong)_12%,transparent)] px-3 py-2.5 text-sm">
+                            <CircleAlert size={16} className="mt-0.5 shrink-0 text-(--chart-wrong)" />
+                            <div>
+                                <p className="font-bold">
+                                    &ldquo;{trimmedInput}&rdquo; doesn&apos;t look like a subject, so it can&apos;t be added.
+                                </p>
+                                <p className="mt-0.5 opacity-70">
+                                    Use a real academic subject name such as Mathematics, Physics, or DBMS.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                    {inputState === "rejected" && subjects.includes(trimmedInput) && (
+                        <p className="flex items-center gap-1.5 font-semibold text-(--chart-wrong)">
+                            <CircleAlert size={13} />
+                            &ldquo;{trimmedInput}&rdquo; is already in your list.
+                        </p>
+                    )}
+                    {inputState === "duplicate" && (
+                        <p className="flex items-center gap-1.5 font-semibold opacity-60">
+                            <Check size={13} />
+                            Already added
+                        </p>
+                    )}
+                    {inputState === "valid" && (
+                        <p className="flex items-center gap-1.5 font-semibold text-primary">
+                            <CornerDownLeft size={13} />
+                            Press Enter to add &ldquo;{trimmedInput}&rdquo;
+                        </p>
+                    )}
+                    {inputState === "invalid" && (
+                        <p className="opacity-50">Keep typing a full subject name, then press Enter.</p>
+                    )}
                 </div>
 
                 {subjects.length > 0 && (

@@ -12,7 +12,7 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import HistoryRowsSkeleton from "@/components/skeletons/HistoryRowsSkeleton";
 import { normalizeSubject } from "@/components/utils/subject";
 
 type Attempt = {
@@ -244,7 +244,7 @@ export default function AttemptsPage() {
         </div>
 
         {loading ? (
-          <Loader2 />
+          <HistoryRowsSkeleton />
         ) : filteredAttempts.length === 0 ? (
           <div className="card grid min-h-64 place-items-center p-7 text-center">
             <div>

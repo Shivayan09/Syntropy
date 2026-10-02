@@ -335,7 +335,7 @@ export default function Onboarding() {
             {/* RIGHT PANEL */}
             <div className="flex w-full md:w-[40%] items-center justify-center px-6 py-12">
 
-                <div className="absolute top-10 bg-yellow-50 dark:bg-white/5 flex items-center gap-2 border border-black/20 rounded-full text-xs px-5 py-1">
+                <div className="absolute top-10 bg-white/5 flex items-center gap-2 border border-(--border) rounded-full text-xs px-5 py-1">
                     <div className="h-2 w-2 rounded-full bg-yellow-400 animate-pulse"></div>
                     <p className="opacity-70">You can change these later anytime in Profile Settings</p>
                 </div>

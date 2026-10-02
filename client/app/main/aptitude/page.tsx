@@ -24,7 +24,7 @@ import {
 import { toast } from "react-toastify";
 import AiTokenStatus from "@/components/main/AiTokenStatus";
 import TestsSkeleton from "@/components/skeletons/TestsSkeleton";
-import Loader2 from "@/components/utils/Loader2";
+import GenerationLoader from "@/components/utils/GenerationLoader";
 import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -126,7 +126,38 @@ export default function AptitudeHubPage() {
     };
 
     if (generatingPreset) {
-        return <Loader2 />;
+        const preset = catalog?.presets.find((item) => item.key === generatingPreset);
+        const companyLabel =
+            catalog?.companies.find((company) => company.key === preset?.company)?.label || "Placement";
+        const sectionNames = (preset?.sections || [])
+            .map((key) => catalog?.sections.find((section) => section.key === key)?.label)
+            .filter((label): label is string => Boolean(label));
+
+        return (
+            <GenerationLoader
+                eyebrow="Quick start"
+                title={preset ? `Building ${preset.label}` : "Building your practice set"}
+                description="A ready-tuned set is being written for you. You will land on the preview as soon as it is ready."
+                summary={
+                    preset
+                        ? [companyLabel, `${preset.questions} questions`, `${preset.duration} min`, preset.difficulty]
+                        : []
+                }
+                steps={[
+                    { label: "Loading the company pattern", detail: companyLabel },
+                    { label: "Picking topics across sections", detail: sectionNames.join(", ") || undefined },
+                    { label: "Writing questions and options" },
+                    { label: "Verifying solutions and shortcuts" },
+                    { label: "Finalising your set" },
+                ]}
+                tips={[
+                    "Practice mode is untimed and shows the solution after every pick.",
+                    "Timed rounds are recorded in your history with a full answer review.",
+                    "Each question comes with the fastest approach, not just the answer.",
+                    "Keep this tab open. You will be taken to the preview the moment the set is ready.",
+                ]}
+            />
+        );
     }
 
     const statCards = [

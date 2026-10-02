@@ -13,7 +13,7 @@ import {
     Timer,
     XCircle,
 } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import PracticeSkeleton from "@/components/skeletons/PracticeSkeleton";
 import {
     AptitudePracticeSet,
     accuracyTone,
@@ -88,7 +88,7 @@ export default function AptitudePracticePage() {
         setFinished(false);
     };
 
-    if (loading) return <Loader2 />;
+    if (loading) return <PracticeSkeleton />;
 
     if (!test || !questions.length) {
         return (

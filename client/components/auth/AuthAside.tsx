@@ -54,7 +54,7 @@ export default function AuthAside({ variant }: { variant: keyof typeof copy }) {
             />
             <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-0 text-black/[0.07] dark:text-white/8 bg-[radial-gradient(currentColor_1px,transparent_1px)] bg-size-[22px_22px] mask-[radial-gradient(ellipse_at_center,black,transparent_75%)]"
+                className="pointer-events-none absolute inset-0 text-white/8bg-[radial-gradient(currentColor_1px,transparent_1px)] bg-size-[22px_22px] mask-[radial-gradient(ellipse_at_center,black,transparent_75%)]"
             />
 
             <div className="relative w-full max-w-xl">

@@ -16,7 +16,7 @@ import {
   Trophy,
   User2,
 } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import PublicProfileSkeleton from "@/components/skeletons/PublicProfileSkeleton";
 
 type PublicProfile = {
   _id: string;
@@ -101,7 +101,7 @@ export default function PublicUserProfilePage() {
   }, [params.id]);
 
   if (loading) {
-    return <Loader2 />;
+    return <PublicProfileSkeleton />;
   }
 
   if (!profile || error) {

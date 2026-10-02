@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import Loader2 from "@/components/utils/Loader2";
+import { EducationSkeleton } from "@/components/skeletons/SyllabusSkeletons";
 import SyllabusManager from "@/components/main/SyllabusManager";
 
 type EducationForm = {
@@ -27,7 +27,7 @@ export default function Education() {
     return `${num}th semester`;
   };
 
-  if (loading) return <Loader2 />;
+  if (loading) return <EducationSkeleton />;
 
   return (
     <div>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import ThemeToggle from "../utils/ThemeToggle";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
@@ -35,9 +34,6 @@ export default function Navbar() {
 
             <div className={`md:hidden fixed top-0 right-0 h-screen w-64 bg-secondary z-50 p-6 transform transition-transform duration-300 ease-out flex flex-col justify-between ${open ? "translate-x-0" : "translate-x-full"}`}>
                 <div>
-                    <div className="absolute top-7 left-5">
-                        <ThemeToggle />
-                    </div>
                     <div className="flex justify-end mb-8">
                         <button onClick={() => setOpen(false)}>
                             <X size={20} />
@@ -77,7 +73,6 @@ export default function Navbar() {
                 </div>
 
                 <div className="flex items-center gap-5">
-                    <ThemeToggle />
                     {!user && (
                         <button onClick={() => nav("/auth/login")}>
                             Sign in

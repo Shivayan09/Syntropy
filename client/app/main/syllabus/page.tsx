@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Loader2 from "@/components/utils/Loader2";
+import { SyllabusListSkeleton, SyllabusPageSkeleton } from "@/components/skeletons/SyllabusSkeletons";
 
 type SyllabusTopic = {
   name: string;
@@ -108,7 +108,7 @@ export default function SyllabusPage() {
   };
 
   if (initialLoading) {
-    return <Loader2 />;
+    return <SyllabusPageSkeleton />;
   }
 
   return (
@@ -147,7 +147,7 @@ export default function SyllabusPage() {
 
       </div>
 
-      {loading && <Loader2 />}
+      {loading && <SyllabusListSkeleton rows={1} />}
 
       {/* LIST */}
       <div className="space-y-4">

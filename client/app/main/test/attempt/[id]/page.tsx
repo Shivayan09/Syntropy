@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, ArrowRight, Bookmark, BookmarkCheck, CheckCircle2, Circle, Clock3, Eraser, Flag, ListChecks, Send, X } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import AttemptSkeleton from "@/components/skeletons/AttemptSkeleton";
 
 type Question = {
   question: string;
@@ -199,7 +199,7 @@ export default function AttemptPage() {
   };
 
   if (loading) {
-    return <Loader2 />;
+    return <AttemptSkeleton />;
   }
 
   if (!test || questions.length === 0 || !currentQuestion) {
@@ -632,7 +632,7 @@ function SubmitConfirmModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/50" onClick={safeClose} />
-      <div className="relative w-full max-w-md rounded-lg border border-primary bg-surface p-6 shadow-lg" onClick={(event) => event.stopPropagation()}>
+      <div className="relative w-full max-w-md rounded-2xl border border-primary bg-(--bg-secondary) p-6 shadow-lg" onClick={(event) => event.stopPropagation()}>
         <div
           role="button"
           tabIndex={loading ? -1 : 0}

@@ -28,7 +28,8 @@ import {
     SelectionIndicator,
     StepSection,
 } from "@/components/main/builder/BuilderKit";
-import Loader2 from "@/components/utils/Loader2";
+import BuilderSkeleton from "@/components/skeletons/BuilderSkeleton";
+import GenerationLoader from "@/components/utils/GenerationLoader";
 import { AiTokenStatus as AiTokenStatusType, useAiTokens } from "@/context/AiTokenContext";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -49,7 +50,7 @@ const sectionIcons: Record<string, LucideIcon> = {
 
 export default function GenerateAptitudePage() {
     return (
-        <Suspense fallback={<Loader2 />}>
+        <Suspense fallback={<BuilderSkeleton />}>
             <GenerateAptitudeSet />
         </Suspense>
     );
@@ -271,8 +272,37 @@ function GenerateAptitudeSet() {
         }
     };
 
-    if (loading || catalogLoading) {
-        return <Loader2 />;
+    if (loading) {
+        const sectionNames = selectedSections.map((section) => section.label);
+
+        return (
+            <GenerationLoader
+                eyebrow="Practice set builder"
+                title="Building your aptitude set"
+                description="Questions are being written to match the pattern you picked. You will land on the preview as soon as the set is ready."
+                summary={[companyLabel, `${questions} questions`, `${duration} min`, difficulty]}
+                steps={[
+                    { label: "Loading the company pattern", detail: companyLabel },
+                    { label: "Picking topics across sections", detail: sectionNames.join(", ") },
+                    {
+                        label: "Writing questions and options",
+                        detail: activeTopics.length ? `${activeTopics.length} topics in focus` : "Full section syllabus",
+                    },
+                    { label: "Verifying solutions and shortcuts" },
+                    { label: "Finalising your set" },
+                ]}
+                tips={[
+                    "Practice mode is untimed and shows the solution after every pick.",
+                    "Timed rounds are recorded in your history with a full answer review.",
+                    "Each question comes with the fastest approach, not just the answer.",
+                    "Keep this tab open. You will be taken to the preview the moment the set is ready.",
+                ]}
+            />
+        );
+    }
+
+    if (catalogLoading) {
+        return <BuilderSkeleton />;
     }
 
     const companyHint = catalog.companies.find((item) => item.key === company)?.hint;

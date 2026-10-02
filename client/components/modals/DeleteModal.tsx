@@ -40,7 +40,7 @@ export default function DeleteModal({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-            <div className="relative w-full max-w-md bg-surface border border-primary shadow-lg p-6 rounded-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full max-w-md bg-(--bg-secondary) border border-primary shadow-lg p-6 rounded-2xl" onClick={(e) => e.stopPropagation()}>
                 <div className="absolute top-3 right-3">
                     <X className="cursor-pointer hover:opacity-70" onClick={onClose} />
                 </div>

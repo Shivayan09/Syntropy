@@ -311,7 +311,7 @@ export default function LoginPage() {
             {googleTermsOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
                     <div className="absolute inset-0 bg-black/50" onClick={() => setGoogleTermsOpen(false)} />
-                    <div className="relative w-full max-w-md border border-primary bg-surface p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+                    <div className="relative w-full max-w-md rounded-2xl border border-primary bg-(--bg-secondary) p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
                         <div
                             onClick={() => setGoogleTermsOpen(false)}
                             className="absolute top-3 right-3 flex h-9 w-9 items-center justify-center cursor-pointer"

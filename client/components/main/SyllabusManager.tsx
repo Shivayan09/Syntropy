@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Trash2 } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import { SyllabusManagerSkeleton } from "@/components/skeletons/SyllabusSkeletons";
 import { toast } from "react-toastify";
 import DeleteModal from "../modals/DeleteModal";
 import SyllabusUpload from "./SyllabusUpload";
@@ -153,11 +153,7 @@ export default function SyllabusManager() {
     };
 
     if (fetching) {
-        return (
-            <div className="flex justify-center py-10">
-                <Loader2 />
-            </div>
-        );
+        return <SyllabusManagerSkeleton />;
     }
 
     if (!syllabus) {
@@ -167,7 +163,7 @@ export default function SyllabusManager() {
     }
 
     if (loading) {
-        return <Loader2 />
+        return <SyllabusManagerSkeleton />;
     }
 
     return (

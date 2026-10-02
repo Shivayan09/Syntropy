@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
 import { ArrowRight, Camera, Crown, Mail, Phone, Save, Settings, ShieldAlert, ShieldCheck } from "lucide-react";
-import Loader2 from "@/components/utils/Loader2";
+import ProfileSkeleton from "@/components/skeletons/ProfileSkeleton";
 import SyllabusUpload from "@/components/main/SyllabusUpload";
 import CompleteOnboardingBanner from "@/components/main/CompleteOnboardingBanner";
 
@@ -210,7 +210,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return <Loader2 />;
+    return <ProfileSkeleton />;
   }
 
   if (!form) {
@@ -300,7 +300,7 @@ export default function Profile() {
                 <span
                   className={`inline-flex items-center gap-2 rounded-full py-1 text-md font-semibold ${emailVerified
                     ? "bg-primary/10 text-primary"
-                    : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
+                    : "bg-amber-500/10 text-amber-300"
                     }`}
                 >
                   {emailVerified ? (
@@ -317,7 +317,7 @@ export default function Profile() {
                 <span
                   className={`inline-flex items-center gap-2 rounded-full py-1 text-md font-semibold ${user?.onboardingCompleted
                     ? "bg-primary/10 text-primary"
-                    : "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300"
+                    : "bg-amber-500/10 text-amber-300"
                     }`}
                 >
                   {user?.onboardingCompleted ? (

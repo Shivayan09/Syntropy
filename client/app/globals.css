@@ -7,37 +7,10 @@ body {
   font-family: Inter, system-ui, -apple-system, sans-serif;
 }
 
+/* Dark is the only theme. */
 :root {
-  --bg: #ffffff;
-  --bg-secondary: #f5f5f5;
-  --surface: rgba(255, 255, 255, 0.78);
-  --text: #111111;
+  color-scheme: dark;
 
-  --primary: #00a85a;
-  --primary-dark: #007a42;
-  --accent: #00ffaa;
-
-  --border: rgba(0, 0, 0, 0.08);
-
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.12);
-
-  --glass: rgba(255, 255, 255, 0.75);
-
-  --radius: 18px;
-  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-  --skeleton-base: #ececec;
-  --skeleton-highlight: #f8f8f8;
-
-  /* Chart series (validated for CVD separation against the light surface) */
-  --chart-correct: #1baf7a;
-  --chart-wrong: #eb6834;
-  --chart-skipped: #2a78d6;
-}
-
-.dark {
   --bg: #090909;
   --bg-secondary: #121212;
   --surface: rgba(20, 20, 20, 0.75);
@@ -55,10 +28,13 @@ body {
 
   --glass: rgba(20, 20, 20, 0.75);
 
+  --radius: 18px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
   --skeleton-base: #181818;
   --skeleton-highlight: #262626;
 
-  /* Same hues, stepped for the dark surface - not an automatic flip */
+  /* Chart series (validated for CVD separation against the dark surface) */
   --chart-correct: #199e70;
   --chart-wrong: #d95926;
   --chart-skipped: #3987e5;
@@ -196,6 +172,14 @@ button:disabled:hover {
   color: var(--primary);
 }
 
+.bg-primary-soft {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+}
+
+.border-primary-soft {
+  border-color: color-mix(in srgb, var(--primary) 30%, transparent);
+}
+
 .text-main {
   color: var(--text);
 }
@@ -231,11 +215,6 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-  color: #9ca3af;
-}
-
-.dark input::placeholder,
-.dark textarea::placeholder {
   color: #6b7280;
 }
 
@@ -330,14 +309,10 @@ select:focus {
 /* Logo */
 
 .logo-img {
-  background-image: url("/platform-light.png");
+  background-image: url("/platform-dark.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-}
-
-.dark .logo-img {
-  background-image: url("/platform-dark.png");
 }
 
 .skeleton {
@@ -371,6 +346,19 @@ select:focus {
   100% {
     transform: translateX(100%);
   }
+}
+
+/* Brief horizontal shake for rejected input */
+
+.shake {
+  animation: shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
 }
 /* Range inputs */
 

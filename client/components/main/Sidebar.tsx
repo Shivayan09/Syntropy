@@ -7,7 +7,6 @@ import { BarChart3, BookOpen, Brain, History, LayoutDashboard, LogOut, Menu, Pen
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import ThemeToggle from "../utils/ThemeToggle";
 
 export default function Sidebar({
   collapsed = false,
@@ -23,7 +22,7 @@ export default function Sidebar({
 
   const isActive = (path: string) => pathname.startsWith(path);
 
-  const itemClass = (path: string) => `flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors  ${isActive(path) ? "bg-primary text-white" : "hover:bg-black/5 dark:hover:bg-white/5"}`;
+  const itemClass = (path: string) => `flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors  ${isActive(path) ? "bg-primary text-white" : "hover:bg-white/5"}`;
 
   const navigate = (path: string) => {
     router.push(path);
@@ -69,10 +68,6 @@ export default function Sidebar({
       {/* MOBILE SIDEBAR */}
       <aside className={`fixed top-0 left-0 h-screen w-48 bg-secondary z-50 p-4 flex flex-col justify-between md:hidden transform transition-transform duration-300 ease-out ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div>
-          <div className="absolute bottom-4 right-5">
-            <ThemeToggle />
-          </div>
-
           <div className="flex justify-between items-center mb-6">
             <p onClick={() => navigate("/")} className="cursor-pointer font-extrabold text-lg text-primary">
               syntropy
@@ -167,9 +162,6 @@ export default function Sidebar({
       {/* DESKTOP SIDEBAR */}
       <aside className={`hidden md:flex relative h-screen bg-secondary flex-col justify-between transition-all duration-300 ease-in-out ${collapsed ? "w-18 px-2" : "w-50 px-3"} py-6 border-r border-(--border)`}>
 
-        <div className={`absolute  ${collapsed ? 'bottom-20 right-5.5' : 'bottom-6.5 right-1'}`}>
-          <ThemeToggle />
-        </div>
         <div>
           {setCollapsed && (
             <div onClick={() => setCollapsed(!collapsed)} className="absolute top-7 right-3 cursor-pointer">
