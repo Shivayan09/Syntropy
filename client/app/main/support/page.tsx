@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, MessageSquare, HelpCircle, ChevronDown } from "lucide-react";
 import { toast } from "react-toastify";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SupportPage() {
@@ -12,6 +13,7 @@ export default function SupportPage() {
 
     const [active, setActive] = useState<number | null>(0);
     const [submitting, setSubmitting] = useState(false);
+    const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
     const faqs = [
         {
@@ -64,6 +66,11 @@ export default function SupportPage() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!acceptedPrivacy) {
+            toast.warn("Please accept the Privacy Policy to continue");
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -143,7 +150,28 @@ export default function SupportPage() {
                             className="w-full"
                         />
 
-                        <button type="submit" disabled={submitting} className={submitting ? "cursor-not-allowed opacity-70" : ""}>
+                        <label className="flex items-start gap-3 text-sm">
+                            <input
+                                type="checkbox"
+                                className="mt-1 h-4 w-4 shrink-0"
+                                checked={acceptedPrivacy}
+                                onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                            />
+                            <span>
+                                I agree that Syntropy may use the details above to respond to this message, as
+                                described in the{" "}
+                                <Link href="/privacy-policy" target="_blank" className="font-bold text-primary underline">
+                                    Privacy Policy
+                                </Link>
+                                .
+                            </span>
+                        </label>
+
+                        <button
+                            type="submit"
+                            disabled={submitting || !acceptedPrivacy}
+                            className={submitting || !acceptedPrivacy ? "cursor-not-allowed opacity-70" : ""}
+                        >
                             {submitting ? "Sending..." : "Send Message"}
                         </button>
                     </form>

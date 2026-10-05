@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AiTokenProvider } from "@/context/AiTokenContext";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/seo";
 import { Analytics } from '@vercel/analytics/next';
+import CookieConsentBanner from "@/components/utils/CookieConsentBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -114,6 +115,7 @@ export default function RootLayout({
           theme="dark"
         />
         <Analytics />
+        <CookieConsentBanner />
       </body>
     </html>
   );

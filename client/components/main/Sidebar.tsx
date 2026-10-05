@@ -7,6 +7,7 @@ import { BarChart3, BookOpen, Brain, History, LayoutDashboard, LogOut, Menu, Pen
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import DeleteModal from "../modals/DeleteModal";
 
 export default function Sidebar({
   collapsed = false,
@@ -18,6 +19,8 @@ export default function Sidebar({
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const { getMe } = useAuth();
 
   const isActive = (path: string) => pathname.startsWith(path);
@@ -33,6 +36,7 @@ export default function Sidebar({
 
   const handleLogout = async () => {
     try {
+      setLoggingOut(true);
       await fetch(BACKEND_URL + "/api/auth/logout", {
         method: "POST",
         credentials: "include",
@@ -43,6 +47,9 @@ export default function Sidebar({
       router.push("/auth/login");
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoggingOut(false);
+      setLogoutConfirmOpen(false);
     }
   };
 
@@ -153,7 +160,7 @@ export default function Sidebar({
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={handleLogout}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={() => setLogoutConfirmOpen(true)}>
           <LogOut size={18} />
           Logout
         </div>
@@ -252,7 +259,7 @@ export default function Sidebar({
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={handleLogout}>
+        <div className="flex items-center gap-3 text-sm font-bold cursor-pointer px-3 py-2 rounded-lg" onClick={() => setLogoutConfirmOpen(true)}>
           <LogOut size={18} />
           <span className={`transition-all duration-200 whitespace-nowrap ${collapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100"}`}>
             Logout
@@ -260,6 +267,16 @@ export default function Sidebar({
         </div>
 
       </aside>
+
+      <DeleteModal
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={handleLogout}
+        title="Log out"
+        description="Are you sure you want to log out of your account?"
+        confirmText="Logout"
+        loading={loggingOut}
+      />
     </>
   );
 }

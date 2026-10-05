@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
     title: "Terms and Conditions",
@@ -124,7 +125,15 @@ export default function TermsAndConditions() {
                     <h2 className="text-xl mb-2">10. Data and Privacy</h2>
                     <p>
                         We collect and process user data to provide and improve our services.
-                        By using Syntropy, you agree to our data practices.
+                        By using Syntropy, you agree to our data practices. For full details on what
+                        we collect and how it is used, see our{" "}
+                        <Link href="/privacy-policy" className="font-bold text-primary underline">
+                            Privacy Policy
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/cookie-policy" className="font-bold text-primary underline">
+                            Cookie Policy
+                        </Link>.
                     </p>
                 </section>
 

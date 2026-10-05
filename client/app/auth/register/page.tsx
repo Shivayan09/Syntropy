@@ -554,6 +554,10 @@ export default function RegisterPage() {
                                         I agree to the{" "}
                                         <Link href="/terms-and-conditions" target="_blank" className="font-bold text-primary underline">
                                             Terms and Conditions
+                                        </Link>{" "}
+                                        and{" "}
+                                        <Link href="/privacy-policy" target="_blank" className="font-bold text-primary underline">
+                                            Privacy Policy
                                         </Link>
                                         .
                                     </span>
@@ -631,6 +635,14 @@ export default function RegisterPage() {
                                     className="font-bold text-primary underline"
                                 >
                                     Terms and Conditions
+                                </Link>{" "}
+                                and{" "}
+                                <Link
+                                    href="/privacy-policy"
+                                    target="_blank"
+                                    className="font-bold text-primary underline"
+                                >
+                                    Privacy Policy
                                 </Link>
                                 .
                             </span>

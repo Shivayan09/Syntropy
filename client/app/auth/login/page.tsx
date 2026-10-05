@@ -52,7 +52,7 @@ const measureGoogleButtonWidth = (element: HTMLElement) => {
 export default function LoginPage() {
 
     const router = useRouter();
-    const { user, getMe } = useAuth();
+    const { getMe } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -123,9 +123,9 @@ export default function LoginPage() {
                 toast.warn(data.message || "Google sign-in failed");
                 return;
             }
-            await getMe();
+            const freshUser = await getMe();
             toast.success("Logged in with Google");
-            if (!user?.onboardingCompleted) {
+            if (!freshUser?.onboardingCompleted) {
                 router.push('/onboarding');
             } else {
                 router.push("/main/dashboard");
@@ -158,9 +158,9 @@ export default function LoginPage() {
 
             setGoogleTermsOpen(false);
             setPendingGoogleCredential(null);
-            await getMe();
+            const freshUser = await getMe();
             toast.success("Logged in with Google");
-            if (!user?.onboardingCompleted) {
+            if (!freshUser?.onboardingCompleted) {
                 router.push('/onboarding');
             } else {
                 router.push("/main/dashboard");
@@ -339,6 +339,10 @@ export default function LoginPage() {
                                 I agree to the{" "}
                                 <Link href="/terms-and-conditions" target="_blank" className="font-bold text-primary underline">
                                     Terms and Conditions
+                                </Link>{" "}
+                                and{" "}
+                                <Link href="/privacy-policy" target="_blank" className="font-bold text-primary underline">
+                                    Privacy Policy
                                 </Link>
                                 .
                             </span>

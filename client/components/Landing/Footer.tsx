@@ -11,8 +11,11 @@ export default function Footer() {
                     <Link href="/terms-and-conditions" className="hover:text-(--text)">
                         Terms
                     </Link>
-                    <Link href="/terms-and-conditions" className="hover:text-(--text)">
+                    <Link href="/privacy-policy" className="hover:text-(--text)">
                         Privacy
+                    </Link>
+                    <Link href="/cookie-policy" className="hover:text-(--text)">
+                        Cookies
                     </Link>
                     <Link href="/terms-and-conditions" className="hover:text-(--text)">
                         Refund

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 export type AiTokenStatus = {
@@ -29,12 +29,16 @@ const AiTokenContext = createContext<AiTokenContextType | null>(null);
 
 export const AiTokenProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  // Depend on the specific fields that actually change what the backend returns, not the
+  // whole `user` object — getMe() recreates that object on every call anywhere in the app,
+  // which otherwise re-fires this fetch (and the re-renders it causes) on unrelated updates.
+  const entitlementKey = user ? `${user._id}:${user.plan}:${user.planBillingCycle}` : null;
   const [tokenStatus, setTokenStatus] = useState<AiTokenStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const refreshTokenStatus = useCallback(async () => {
-    if (!user) {
+    if (!entitlementKey) {
       setTokenStatus(null);
       setError(null);
       return;
@@ -60,7 +64,7 @@ export const AiTokenProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [entitlementKey]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -70,8 +74,13 @@ export const AiTokenProvider = ({ children }: { children: ReactNode }) => {
     return () => window.clearTimeout(timeoutId);
   }, [refreshTokenStatus]);
 
+  const value = useMemo(
+    () => ({ tokenStatus, loading, error, refreshTokenStatus, setTokenStatus }),
+    [tokenStatus, loading, error, refreshTokenStatus]
+  );
+
   return (
-    <AiTokenContext.Provider value={{ tokenStatus, loading, error, refreshTokenStatus, setTokenStatus }}>
+    <AiTokenContext.Provider value={value}>
       {children}
     </AiTokenContext.Provider>
   );
