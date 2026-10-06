@@ -228,11 +228,17 @@ export default function Dashboard() {
           </span>
           <div>
             <p className="text-lg font-extrabold leading-tight">
-              {tokenStatus ? `${tokenStatus.remaining} AI credit${tokenStatus.remaining === 1 ? "" : "s"}` : "AI credits"}
+              {tokenStatus
+                ? tokenStatus.unlimited
+                  ? "Unlimited AI credits"
+                  : `${tokenStatus.remaining} AI credit${tokenStatus.remaining === 1 ? "" : "s"}`
+                : "AI credits"}
             </p>
             <p className="text-xs opacity-60">
               {tokenStatus
-                ? `left of ${tokenStatus.cycleLimit} on ${tokenStatus.planLabel}`
+                ? tokenStatus.unlimited
+                  ? `on ${tokenStatus.planLabel}`
+                  : `left of ${tokenStatus.cycleLimit} on ${tokenStatus.planLabel}`
                 : "Checking your balance"}
             </p>
           </div>

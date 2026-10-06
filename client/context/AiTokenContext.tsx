@@ -12,6 +12,7 @@ export type AiTokenStatus = {
   lastResetAt?: string;
   nextResetAt?: string | null;
   manualTestsUnlimited: boolean;
+  unlimited?: boolean;
   plan: "free" | "starter" | "pro" | "power";
   planLabel: string;
   billingCycle: "monthly" | "annual";

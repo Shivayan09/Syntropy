@@ -52,7 +52,7 @@ const semesterLabel = (value: string) => {
 const planMeta = {
   free: {
     label: "Free",
-    note: "10 AI tests each month",
+    note: "3 AI tests each month",
   },
   starter: {
     label: "Starter",

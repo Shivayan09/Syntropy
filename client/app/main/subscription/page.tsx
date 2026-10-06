@@ -80,7 +80,7 @@ const plans = [
     key: "free",
     name: "Free",
     priceLabel: "Rs 0",
-    quota: "10 AI tests per month",
+    quota: "3 AI tests per month",
     description: "For steady practice, with a monthly AI allowance and unlimited manual tests.",
     features: [
       "10 AI test generations each month",
@@ -495,10 +495,10 @@ export default function PlansPage() {
 
                 <div className="mt-2 flex items-end gap-2">
                   <span className="text-5xl font-extrabold leading-none">
-                    {remainingCredits ?? "--"}
+                    {tokenStatus?.unlimited ? "Unlimited" : remainingCredits ?? "--"}
                   </span>
                   <span className="pb-1 text-base font-bold opacity-60">
-                    {cycleLimit ? `of ${cycleLimit} left` : "credits"}
+                    {tokenStatus?.unlimited ? "credits" : cycleLimit ? `of ${cycleLimit} left` : "credits"}
                   </span>
                 </div>
 

@@ -33,11 +33,12 @@ export default function AiTokenStatus({
   showManualAction = false,
 }: AiTokenStatusProps) {
   const router = useRouter();
-  const remaining = status?.remaining ?? 0;
-  const includedRemaining = status?.includedRemaining ?? 0;
+  const unlimited = status?.unlimited ?? false;
+  const remaining = unlimited ? "Unlimited" : status?.remaining ?? 0;
+  const includedRemaining = unlimited ? "Unlimited" : status?.includedRemaining ?? 0;
   const bonusRemaining = status?.bonusRemaining ?? 0;
-  const cycleLimit = status?.cycleLimit ?? 0;
-  const hasTokens = status?.hasTokens ?? remaining > 0;
+  const cycleLimit = unlimited ? "Unlimited" : status?.cycleLimit ?? 0;
+  const hasTokens = status?.hasTokens ?? (typeof remaining === "number" && remaining > 0);
   const resetTime = formatResetTime(status?.nextResetAt);
   const isUnavailable = !status;
 

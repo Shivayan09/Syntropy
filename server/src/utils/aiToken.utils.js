@@ -1,4 +1,6 @@
-import { FREE_MONTHLY_TESTS, PLAN_DETAILS, normalizePlan } from "../config/plan.js";
+import { FREE_MONTHLY_TESTS, PLAN_DETAILS, hasUnlimitedCredits, normalizePlan } from "../config/plan.js";
+
+const UNLIMITED_CREDIT_SENTINEL = 999999;
 
 const addMonths = (date, months) => {
   const nextDate = new Date(date);
@@ -62,6 +64,10 @@ export const getNextCreditResetAt = (user) => {
 };
 
 export const syncAiTokens = async (user) => {
+  if (hasUnlimitedCredits(user.email)) {
+    return user;
+  }
+
   const now = new Date();
   const normalizedPlan = normalizePlan(user.plan);
   let shouldSave = false;
@@ -138,6 +144,10 @@ export const syncAiTokens = async (user) => {
 };
 
 export const consumeAiCredit = async (user) => {
+  if (hasUnlimitedCredits(user.email)) {
+    return "unlimited";
+  }
+
   const normalizedPlan = normalizePlan(user.plan);
 
   if (normalizedPlan === "free") {
@@ -174,7 +184,7 @@ export const consumeAiCredit = async (user) => {
 };
 
 export const refundAiCredit = async (user, creditSource) => {
-  if (!creditSource) {
+  if (!creditSource || creditSource === "unlimited") {
     return user;
   }
 
@@ -196,6 +206,24 @@ export const refundAiCredit = async (user, creditSource) => {
 
 export const buildAiTokenStatus = (user) => {
   const normalizedPlan = normalizePlan(user.plan);
+
+  if (hasUnlimitedCredits(user.email)) {
+    return {
+      remaining: UNLIMITED_CREDIT_SENTINEL,
+      includedRemaining: UNLIMITED_CREDIT_SENTINEL,
+      bonusRemaining: 0,
+      cycleLimit: UNLIMITED_CREDIT_SENTINEL,
+      hasTokens: true,
+      lastResetAt: user.lastTokenReset,
+      nextResetAt: null,
+      manualTestsUnlimited: true,
+      unlimited: true,
+      plan: normalizedPlan,
+      planLabel: getPlanDetails(normalizedPlan).label,
+      billingCycle: normalizedPlan === "free" ? "monthly" : user.planBillingCycle || "monthly",
+    };
+  }
+
   const includedRemaining = getPlanCreditsRemaining(user);
   const bonusRemaining = Math.max(user.bonusAiTokens || 0, 0);
   const cycleLimit = getCycleLimit(user);
@@ -211,6 +239,7 @@ export const buildAiTokenStatus = (user) => {
     lastResetAt: user.lastTokenReset,
     nextResetAt,
     manualTestsUnlimited: true,
+    unlimited: false,
     plan: normalizedPlan,
     planLabel: getPlanDetails(normalizedPlan).label,
     billingCycle: normalizedPlan === "free" ? "monthly" : user.planBillingCycle || "monthly",

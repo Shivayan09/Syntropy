@@ -1,4 +1,12 @@
-export const FREE_MONTHLY_TESTS = 10;
+export const FREE_MONTHLY_TESTS = 3;
+
+const UNLIMITED_CREDIT_EMAILS = (process.env.UNLIMITED_CREDIT_EMAILS || "")
+  .split(",")
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean);
+
+export const hasUnlimitedCredits = (email) =>
+  typeof email === "string" && UNLIMITED_CREDIT_EMAILS.includes(email.toLowerCase());
 
 export const PLAN_CATALOG = {
   starter_monthly: {
