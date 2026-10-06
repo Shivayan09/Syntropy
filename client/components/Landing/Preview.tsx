@@ -81,11 +81,11 @@ export default function Preview() {
                                                 ? "var(--primary)"
                                                 : isWrong
                                                     ? "#ef4444"
-                                                    : "",
+                                                    : "rgba(0, 0, 0, 0)",
                                             color:
                                                 isCorrect || isWrong
                                                     ? "#ffffff"
-                                                    : "",
+                                                    : "var(--text)",
                                             scale: isActive ? 1.02 : 1,
                                             opacity: isActive ? 1 : 0.9,
                                         }}
