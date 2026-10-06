@@ -2,7 +2,16 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, MessageSquare, HelpCircle, ChevronDown } from "lucide-react";
+import {
+    Mail,
+    MessageSquare,
+    HelpCircle,
+    ChevronDown,
+    Headphones,
+    Send,
+    User,
+    Clock,
+} from "lucide-react";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -105,52 +114,81 @@ export default function SupportPage() {
     return (
         <div className="space-y-7">
             <section className="flex flex-col gap-5 border-b border-(--border) pb-2 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                    <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
-                        <MessageSquare size={18} />
-                        Support
-                    </div>
+                <div className="mb-3 flex items-center gap-2 text-sm font-extrabold uppercase text-primary">
+                    <Headphones size={18} />
+                    Contact us
                 </div>
             </section>
 
-            <div className="flex flex-col md:flex-row gap-5">
+            <div className="card2 -mt-3">
+                <p className="text-sm opacity-70 mb-2">WE&apos;RE LISTENING</p>
+                <h1 className="text-4xl font-extrabold">Stuck, confused, or found a bug?</h1>
+                <p className="opacity-70 mt-3 max-w-2xl">
+                    Send us a message and a real person will read it. Check the FAQs below first —
+                    there&apos;s a decent chance someone already asked your question.
+                </p>
+            </div>
 
+            <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr] lg:items-start">
 
                 {/* FORM */}
-                <div className="card max-w-2xl">
-                    <h2 className="text-xl font-bold mb-4">Contact us</h2>
+                <div className="card">
+                    <h2 className="text-xl font-extrabold mb-1">Send a message</h2>
+                    <p className="text-sm opacity-60 mb-5">
+                        We read every message that comes in here.
+                    </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <input
-                            name="name"
-                            placeholder="Your name"
-                            value={form.name}
-                            onChange={handleChange}
-                            required
-                            className="w-full"
-                        />
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <label className="space-y-2">
+                                <span className="flex items-center gap-2 text-sm font-bold opacity-70">
+                                    <User size={16} />
+                                    Your name
+                                </span>
+                                <input
+                                    name="name"
+                                    placeholder="Jane Doe"
+                                    value={form.name}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full"
+                                />
+                            </label>
 
-                        <input
-                            name="email"
-                            type="email"
-                            placeholder="Your email"
-                            value={form.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full"
-                        />
+                            <label className="space-y-2">
+                                <span className="flex items-center gap-2 text-sm font-bold opacity-70">
+                                    <Mail size={16} />
+                                    Your email
+                                </span>
+                                <input
+                                    name="email"
+                                    type="email"
+                                    placeholder="jane@example.com"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full"
+                                />
+                            </label>
+                        </div>
 
-                        <textarea
-                            name="message"
-                            placeholder="Explain your issue before losing patience..."
-                            value={form.message}
-                            onChange={handleChange}
-                            required
-                            rows={5}
-                            className="w-full"
-                        />
+                        <label className="space-y-2">
+                            <span className="flex items-center gap-2 text-sm font-bold opacity-70">
+                                <MessageSquare size={16} />
+                                Your message
+                            </span>
+                            <textarea
+                                name="message"
+                                placeholder="Explain your issue before losing patience..."
+                                value={form.message}
+                                onChange={handleChange}
+                                required
+                                rows={5}
+                                className="w-full"
+                            />
+                        </label>
 
-                        <label className="flex items-start gap-3 text-sm">
+                        <label className="flex items-start gap-3 text-sm opacity-80">
                             <input
                                 type="checkbox"
                                 className="mt-1 h-4 w-4 shrink-0"
@@ -170,35 +208,61 @@ export default function SupportPage() {
                         <button
                             type="submit"
                             disabled={submitting || !acceptedPrivacy}
-                            className={submitting || !acceptedPrivacy ? "cursor-not-allowed opacity-70" : ""}
+                            className={`w-full justify-center gap-2 ${submitting || !acceptedPrivacy ? "cursor-not-allowed opacity-70" : ""}`}
                         >
-                            {submitting ? "Sending..." : "Send Message"}
+                            {submitting ? "Sending..." : (
+                                <>
+                                    Send message
+                                    <Send size={16} />
+                                </>
+                            )}
                         </button>
                     </form>
                 </div>
-                <div className="flex flex-col gap-3">
-                    <div className="card hover:-translate-x-0.5 hover:-translate-y-0.5 transition">
-                        <HelpCircle className="mb-3 text-primary" />
-                        <h3 className="font-bold text-lg mb-1">FAQs</h3>
-                        <p className="text-sm text-gray-500">
-                            Answers to things people ask repeatedly instead of reading.
-                        </p>
+
+                {/* SIDE INFO */}
+                <div className="flex flex-col gap-4">
+                    <div className="card flex items-start gap-4">
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-(--border) bg-(--surface) text-primary shadow-(--shadow-sm)">
+                            <Mail size={20} />
+                        </span>
+                        <div>
+                            <p className="font-extrabold">Email us directly</p>
+                            <p className="text-sm text-primary font-semibold mt-1">syntropy.tests@gmail.com</p>
+                            <p className="mt-1 flex items-center gap-1.5 text-xs opacity-55">
+                                <Clock size={13} />
+                                Replies within 24–48 hours, usually.
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="card">
-                        <Mail className="mb-3 text-primary" />
-                        <p className="font-extrabold text-lg mb-1">Our email : <span className="font-semibold text-gray-500 text-sm">syntropy.tests@gmail.com</span></p>
-                        <p className="text-sm text-gray-500">
-                            Get a response within 24–48 hours. Usually.
-                        </p>
+                    <div className="card flex items-start gap-4 opacity-70">
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-(--border) bg-(--surface) text-primary shadow-(--shadow-sm)">
+                            <MessageSquare size={20} />
+                        </span>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <p className="font-extrabold">Live chat</p>
+                                <span className="rounded-full border border-(--border) bg-(--bg-secondary) px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wide opacity-80">
+                                    Soon
+                                </span>
+                            </div>
+                            <p className="mt-1 text-sm opacity-70">
+                                For when waiting feels like suffering.
+                            </p>
+                        </div>
                     </div>
 
-                    <div className="card">
-                        <MessageSquare className="mb-3 text-primary" />
-                        <h3 className="font-bold text-lg mb-1">Live Chat (Soon)</h3>
-                        <p className="text-sm text-gray-500">
-                            For when waiting feels like suffering.
-                        </p>
+                    <div className="card flex items-start gap-4">
+                        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-(--border) bg-(--surface) text-primary shadow-(--shadow-sm)">
+                            <HelpCircle size={20} />
+                        </span>
+                        <div>
+                            <p className="font-extrabold">Check the FAQs first</p>
+                            <p className="mt-1 text-sm opacity-70">
+                                Answers to things people ask repeatedly instead of reading.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
