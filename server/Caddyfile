@@ -1,0 +1,4 @@
+# Public HTTPS entrypoint. Caddy gets and renews the certificate for $DOMAIN automatically.
+{$DOMAIN} {
+	reverse_proxy gateway:5000
+}

@@ -1,7 +1,12 @@
 {
   "scripts": {
-    "dev": "nodemon gateway/index.js",
-    "start": "node gateway/index.js",
+    "dev": "concurrently -n gateway,user,billing,generation,assessment,syllabus -c auto \"npm:dev:*\"",
+    "dev:gateway": "node --watch --env-file=gateway/.env gateway/index.js",
+    "dev:user": "node --watch --env-file=services/user/.env services/user/index.js",
+    "dev:billing": "node --watch --env-file=services/billing/.env services/billing/index.js",
+    "dev:generation": "node --watch --env-file=services/generation/.env services/generation/index.js",
+    "dev:assessment": "node --watch --env-file=services/assessment/.env services/assessment/index.js",
+    "dev:syllabus": "node --watch --env-file=services/syllabus/.env services/syllabus/index.js",
     "lint": "eslint ."
   },
   "dependencies": {
@@ -12,16 +17,15 @@
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
-    "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "google-auth-library": "^10.9.1",
     "groq-sdk": "^1.1.2",
+    "http-proxy-middleware": "^3.0.10",
     "jsonrepair": "^3.14.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
     "nodemailer": "^10.0.15",
-    "nodemon": "^3.1.14",
     "pdf-parse": "^1.1.1",
     "razorpay": "^2.9.6",
     "tesseract.js": "^7.0.0",
@@ -37,6 +41,7 @@
   "type": "module",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "concurrently": "^9.2.5",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
     "jiti": "^2.6.1",

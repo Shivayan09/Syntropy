@@ -1,25 +1,20 @@
-// The single entrypoint. On Render every service runs inside this one process.
-import "dotenv/config";
-
+// The only public entrypoint. It checks CORS, rate limits and the login token,
+// then forwards each request to the service (a separate process) that owns that route.
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import connectDB from "../common/db.js";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import { errorHandler } from "../common/errorHandler.js";
 import { applyRouteRateLimits } from "./rateLimits.js";
 import { authenticate } from "./auth.js";
-import syllabusRoutes from "../services/syllabus/routes.js";
-import billingRoutes from "../services/billing/routes.js";
-import generationRoutes from "../services/generation/routes.js";
-import assessmentRoutes from "../services/assessment/routes.js";
-import userRoutes from "../services/user/routes.js";
 
-if (!process.env.INTERNAL_API_TOKEN) {
-  throw new Error("INTERNAL_API_TOKEN is not set. Services need it to call each other.");
+for (const required of ["PORT", "JWT_SECRET", "USER_URL", "BILLING_URL", "GENERATION_URL", "ASSESSMENT_URL", "SYLLABUS_URL"]) {
+  if (!process.env[required]) {
+    throw new Error(`gateway: ${required} is not set in its .env`);
+  }
 }
 
 const app = express();
-await connectDB();
 
 const allowedOrigins = new Set([
   "http://localhost:3000",
@@ -66,7 +61,7 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization", "X-Client-Platform"],
 }));
 
-app.use(express.json({ limit: "1mb" }));
+// No body parsing here: request bodies (JSON and file uploads) are streamed to the services untouched.
 app.use(cookieParser());
 applyRouteRateLimits(app);
 app.use(authenticate);
@@ -74,15 +69,31 @@ app.use(authenticate);
 app.get("/", (req, res) => res.send("Server is running"));
 app.get("/health/ping", (req, res) => res.status(200).send("ok"));
 
-// Every service adds its own /api routes.
-app.use(syllabusRoutes);
-app.use(billingRoutes);
-app.use(generationRoutes);
-app.use(assessmentRoutes);
-app.use(userRoutes);
+// Which service owns which paths. More specific paths come first:
+// /api/user/ai-token-status belongs to billing, /api/aptitude/stats to assessment.
+// /internal/* is never forwarded, so it can't be reached from outside.
+const forward = (serviceEnv, paths) => createProxyMiddleware({
+  target: process.env[serviceEnv],
+  pathFilter: paths,
+  on: {
+    error: (error, req, res) => {
+      console.error(`gateway: ${serviceEnv} unreachable for ${req.url}: ${error.code || error.message}`);
+      if (!res.headersSent) {
+        res.writeHead(503, { "Content-Type": "application/json" });
+      }
+      res.end(JSON.stringify({ success: false, message: "Service temporarily unavailable" }));
+    },
+  },
+});
+
+app.use(forward("BILLING_URL", ["/api/payment", "/api/user/ai-token-status"]));
+app.use(forward("ASSESSMENT_URL", ["/api/attempt", "/api/leaderboard", "/api/aptitude/stats"]));
+app.use(forward("USER_URL", ["/api/auth", "/api/user"]));
+app.use(forward("GENERATION_URL", ["/api/test", "/api/aptitude"]));
+app.use(forward("SYLLABUS_URL", ["/api/syllabus"]));
+
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Gateway running on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Gateway running on port ${process.env.PORT}`);
 });

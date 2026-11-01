@@ -1,0 +1,83 @@
+# Runs the gateway and the 5 services as separate containers, plus Caddy for HTTPS.
+#
+# Each container reads its own env file. The *_URL values below replace the
+# localhost ones from those files, because inside Docker the containers reach
+# each other by name (http://billing:5002) over Docker's private network.
+# Only Caddy is reachable from the internet.
+#
+# Start:   DOMAIN=api.example.com docker compose up -d --build
+# Logs:    docker compose logs -f billing
+
+x-service: &service
+  build: .
+  image: syntropy-backend
+  restart: unless-stopped
+
+services:
+  gateway:
+    <<: *service
+    command: node gateway/index.js
+    env_file: gateway/.env
+    environment:
+      USER_URL: http://user:5001
+      BILLING_URL: http://billing:5002
+      GENERATION_URL: http://generation:5003
+      ASSESSMENT_URL: http://assessment:5004
+      SYLLABUS_URL: http://syllabus:5005
+    ports:
+      # Only reachable from the machine itself, for testing without Caddy.
+      - "127.0.0.1:5000:5000"
+
+  user:
+    <<: *service
+    command: node services/user/index.js
+    env_file: services/user/.env
+    environment:
+      BILLING_URL: http://billing:5002
+      GENERATION_URL: http://generation:5003
+      ASSESSMENT_URL: http://assessment:5004
+
+  billing:
+    <<: *service
+    command: node services/billing/index.js
+    env_file: services/billing/.env
+
+  generation:
+    <<: *service
+    command: node services/generation/index.js
+    env_file: services/generation/.env
+    environment:
+      BILLING_URL: http://billing:5002
+      SYLLABUS_URL: http://syllabus:5005
+      USER_URL: http://user:5001
+
+  assessment:
+    <<: *service
+    command: node services/assessment/index.js
+    env_file: services/assessment/.env
+    environment:
+      GENERATION_URL: http://generation:5003
+      USER_URL: http://user:5001
+
+  syllabus:
+    <<: *service
+    command: node services/syllabus/index.js
+    env_file: services/syllabus/.env
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+    depends_on:
+      - gateway
+
+volumes:
+  # Keeps Caddy's HTTPS certificates across restarts.
+  caddy_data:

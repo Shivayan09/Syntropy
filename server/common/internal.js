@@ -1,9 +1,14 @@
 // How services talk to each other: plain HTTP calls to /internal/... routes,
 // protected by a shared secret (INTERNAL_API_TOKEN) instead of a user login.
 
-// Where a service lives. On Render every service runs in this same process,
-// so by default each one is reached at this server's own address.
-export const serviceUrl = (envName) => process.env[envName] || `http://localhost:${process.env.PORT || 5000}`;
+// Where another service lives, e.g. BILLING_URL=http://billing:5002 in Docker
+// or http://localhost:5002 when running locally. Set in each service's .env.
+export const serviceUrl = (envName) => {
+    if (!process.env[envName]) {
+        throw new Error(`${envName} is not set. Add it to this service's .env.`);
+    }
+    return process.env[envName];
+};
 
 export const callService = async (url, body = {}) => {
     const response = await fetch(url, {
