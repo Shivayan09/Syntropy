@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon gateway/index.js",
+    "start": "node gateway/index.js",
     "lint": "eslint ."
   },
   "dependencies": {
