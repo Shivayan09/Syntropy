@@ -15,7 +15,8 @@ export const getWallet = async (userId) => {
     return wallet;
   }
 
-  const oldUser = await mongoose.connection.collection("users").findOne({ _id: userId });
+  // Raw collection reads don't convert ids, and userId may arrive as a string over HTTP.
+  const oldUser = await mongoose.connection.collection("users").findOne({ _id: new mongoose.Types.ObjectId(String(userId)) });
   const startingValues = {};
   for (const field of WALLET_FIELDS) {
     if (oldUser?.[field] !== undefined) {

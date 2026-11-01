@@ -1,12 +1,20 @@
-// What other services are allowed to ask the generation service.
-// Everything runs in one process for now, so these read the model directly.
-// When services run as separate containers, these become HTTP calls to /internal/generation.
-import Test from "./models/test.model.js";
+// How other services talk to generation. Every call is an HTTP request to generation's /internal routes.
+import { callService, serviceUrl } from "../../common/internal.js";
 
-// The full test, including answers. Only returned if the user owns it.
-export const getUserTest = (testId, userId) => Test.findOne({ _id: testId, createdBy: userId }).lean();
+const GENERATION_URL = serviceUrl("GENERATION_URL");
 
-export const countUserTests = (userId) => Test.countDocuments({ createdBy: userId });
+// The full test, including answers, or null if the user doesn't own it.
+export const getUserTest = async (testId, userId) => {
+    const data = await callService(`${GENERATION_URL}/internal/generation/user-test`, { testId, userId });
+    return data.test;
+};
 
-export const getUserAptitudeTests = (userId) =>
-    Test.find({ createdBy: userId, category: "aptitude" }).select("_id questions aptitude").lean();
+export const countUserTests = async (userId) => {
+    const data = await callService(`${GENERATION_URL}/internal/generation/count-user-tests`, { userId });
+    return data.count;
+};
+
+export const getUserAptitudeTests = async (userId) => {
+    const data = await callService(`${GENERATION_URL}/internal/generation/user-aptitude-tests`, { userId });
+    return data.tests;
+};

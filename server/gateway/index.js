@@ -14,6 +14,10 @@ import generationRoutes from "../services/generation/routes.js";
 import assessmentRoutes from "../services/assessment/routes.js";
 import userRoutes from "../services/user/routes.js";
 
+if (!process.env.INTERNAL_API_TOKEN) {
+  throw new Error("INTERNAL_API_TOKEN is not set. Services need it to call each other.");
+}
+
 const app = express();
 await connectDB();
 

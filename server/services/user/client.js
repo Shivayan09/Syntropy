@@ -1,9 +1,16 @@
-// What other services are allowed to ask the user service.
-// Everything runs in one process for now, so these read the model directly.
-// When services run as separate containers, these become HTTP calls to /internal/user.
-import User from "./models/user.model.js";
+// How other services talk to user. Every call is an HTTP request to user's /internal routes.
+import { callService, serviceUrl } from "../../common/internal.js";
 
-export const getUserPreferences = (userId) => User.findById(userId).select("preferences").lean();
+const USER_URL = serviceUrl("USER_URL");
+
+// { preferences } of the user, or null if they don't exist.
+export const getUserPreferences = async (userId) => {
+    const data = await callService(`${USER_URL}/internal/user/preferences`, { userId });
+    return data.user;
+};
 
 // Name, username and avatar of every user, for the leaderboard.
-export const getPublicUsers = () => User.find().select("name username avatar").lean();
+export const getPublicUsers = async () => {
+    const data = await callService(`${USER_URL}/internal/user/public-users`);
+    return data.users;
+};

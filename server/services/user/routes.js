@@ -2,7 +2,9 @@ import express from "express";
 import multer from "multer";
 import { forgotPassword, getMe, googleLogin, login, logout, register, resetPassword, sendRegistrationOtp, verifyRegistrationOtp } from "./controllers/auth.controller.js";
 import { contactSupport, getPublicProfile, updateAvatar, updateProfile } from "./controllers/user.controller.js";
+import User from "./models/user.model.js";
 import { requireUser } from "../../common/requireUser.js";
+import { requireInternal } from "../../common/internal.js";
 
 const avatarMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -35,5 +37,16 @@ userRoutes.get("/api/user/public/:id", requireUser, getPublicProfile);
 userRoutes.post("/api/user/contact-support", requireUser, contactSupport);
 userRoutes.put("/api/user/update-profile", requireUser, updateProfile);
 userRoutes.put("/api/user/update-avatar", requireUser, avatarUpload.single("avatar"), updateAvatar);
+
+// Called by other services through client.js.
+userRoutes.post("/internal/user/preferences", requireInternal, async (req, res) => {
+    const user = await User.findById(req.body.userId).select("preferences").lean();
+    res.json({ user });
+});
+
+userRoutes.post("/internal/user/public-users", requireInternal, async (req, res) => {
+    const users = await User.find().select("name username avatar").lean();
+    res.json({ users });
+});
 
 export default userRoutes;
