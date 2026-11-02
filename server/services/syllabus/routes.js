@@ -2,8 +2,8 @@ import express from "express";
 import multer from "multer";
 import { uploadSyllabus, getMySyllabus, getSyllabusById, updateSyllabus } from "./controllers/syllabus.controller.js";
 import Syllabus from "./models/syllabus.model.js";
-import { requireUser } from "../../common/requireUser.js";
-import { requireInternal } from "../../common/internal.js";
+import { requireUser } from "./requireUser.js";
+import { requireInternal } from "./requireInternal.js";
 
 const allowedMimeTypes = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
 

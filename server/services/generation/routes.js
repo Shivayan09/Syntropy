@@ -2,8 +2,8 @@ import express from "express";
 import { aiTest, createTest, getAllTests, getTest, getTestForAttempt } from "./controllers/test.controller.js";
 import { generateAptitudeSet, getAptitudeCatalog, getAptitudePracticeSet, getAptitudeTests } from "./controllers/aptitude.controller.js";
 import Test from "./models/test.model.js";
-import { requireUser } from "../../common/requireUser.js";
-import { requireInternal } from "../../common/internal.js";
+import { requireUser } from "./requireUser.js";
+import { requireInternal } from "./requireInternal.js";
 
 const generationRoutes = express.Router();
 

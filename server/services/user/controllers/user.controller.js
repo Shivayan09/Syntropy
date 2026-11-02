@@ -1,7 +1,7 @@
 import cloudinary from "../config/cloudinary.js";
 import User from "../models/user.model.js";
-import { getUserAttemptStats } from "../../assessment/client.js";
-import { countUserTests } from "../../generation/client.js";
+import { getUserAttemptStats } from "../clients/assessment.js";
+import { countUserTests } from "../clients/generation.js";
 import validator from "validator";
 import { createEmailTransporter } from "../mailer.js";
 import { createAuthToken, isMobileAuthRequest, setAuthCookie } from "../utils/authToken.utils.js";

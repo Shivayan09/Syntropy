@@ -3,8 +3,8 @@ import multer from "multer";
 import { forgotPassword, getMe, googleLogin, login, logout, register, resetPassword, sendRegistrationOtp, verifyRegistrationOtp } from "./controllers/auth.controller.js";
 import { contactSupport, getPublicProfile, updateAvatar, updateProfile } from "./controllers/user.controller.js";
 import User from "./models/user.model.js";
-import { requireUser } from "../../common/requireUser.js";
-import { requireInternal } from "../../common/internal.js";
+import { requireUser } from "./requireUser.js";
+import { requireInternal } from "./requireInternal.js";
 
 const avatarMimeTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 

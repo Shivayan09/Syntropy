@@ -169,7 +169,10 @@ npm install
 
 cd ../server
 npm install
+npm run install:all
 ```
+
+The gateway and each service in `server/services/` are separate apps, each with its own `package.json`, so `install:all` installs every one of them.
 
 ### 2. Start the backend
 

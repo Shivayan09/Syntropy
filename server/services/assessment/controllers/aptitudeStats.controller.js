@@ -1,5 +1,5 @@
 import Attempt from "../models/attempt.model.js";
-import { getUserAptitudeTests } from "../../generation/client.js";
+import { getUserAptitudeTests } from "../clients/generation.js";
 
 export const getAptitudeStats = async (req, res) => {
     try {

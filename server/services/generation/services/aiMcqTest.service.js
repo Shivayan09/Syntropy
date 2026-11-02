@@ -2,7 +2,7 @@ import Groq from "groq-sdk";
 import Test from "../models/test.model.js";
 import { extractJsonArray, readCompletionText } from "../utils/aiJson.utils.js";
 import { getNextTestTitle } from "../utils/testTitle.utils.js";
-import { getUserSyllabus } from "../../syllabus/client.js";
+import { getUserSyllabus } from "../clients/syllabus.js";
 
 export async function generateTest(data, userId) {
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });

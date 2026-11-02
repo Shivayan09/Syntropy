@@ -6,15 +6,23 @@ import { defineConfig } from "eslint/config";
 export default defineConfig([
   { files: ["**/*.{js,mjs,cjs,ts,mts,cts}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.node } },
   tseslint.configs.recommended,
+  // The gateway and every service are deployed on their own, so no file may import
+  // anything outside its own folder. Talk to another service over HTTP (see clients/).
   {
-    // A service's models, controllers and services are private. Other code must use its client.js.
+    files: ["gateway/*.js", "services/*/*.js"],
     rules: {
       "no-restricted-imports": ["error", {
-        patterns: [{
-          regex: "^(\\.\\./)+(.+/)?[^/.][^/]*/(models|controllers|services)/",
-          message: "Don't import another service's internals. Use its client.js instead.",
-        }],
+        patterns: [{ regex: "^\\.\\./", message: "Don't import outside this service's folder. Call the other service over HTTP." }],
       }],
     },
   },
+  {
+    files: ["services/*/*/*.js"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: [{ regex: "^\\.\\./\\.\\./", message: "Don't import outside this service's folder. Call the other service over HTTP." }],
+      }],
+    },
+  },
+  { ignores: ["**/node_modules/**"] },
 ]);

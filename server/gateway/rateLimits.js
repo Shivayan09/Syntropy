@@ -1,4 +1,4 @@
-import { createRateLimiter } from "../common/rateLimit.js";
+import { createRateLimiter } from "./rateLimit.js";
 
 const minutes = (value) => value * 60 * 1000;
 

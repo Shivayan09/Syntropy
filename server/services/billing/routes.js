@@ -2,8 +2,8 @@ import express from "express";
 import { createOrder, getAiTokenStatus, verifyPayment } from "./controllers/billing.controller.js";
 import { normalizePlan } from "./config/plan.js";
 import { buildAiTokenStatus, consumeAiCredit, getWallet, refundAiCredit, syncAiTokens } from "./wallet.js";
-import { requireUser } from "../../common/requireUser.js";
-import { requireInternal } from "../../common/internal.js";
+import { requireUser } from "./requireUser.js";
+import { requireInternal } from "./requireInternal.js";
 
 const billingRoutes = express.Router();
 

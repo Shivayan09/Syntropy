@@ -1,9 +1,9 @@
-import redis from "../../../common/redis.js";
+import redis from "../redis.js";
 import Test from "../models/test.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
 import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
 import { describeAiError } from "../utils/aiError.utils.js";
-import { consumeCredit, refundCredit } from "../../billing/client.js";
+import { consumeCredit, refundCredit } from "../clients/billing.js";
 import { sanitizeSubjects } from "../utils/subjectValidation.utils.js";
 import { invalidateTestListCache } from "../utils/testCache.utils.js";
 import { getGeneratedTestTitle } from "../utils/testTitle.utils.js";

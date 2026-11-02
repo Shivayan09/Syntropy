@@ -1,5 +1,5 @@
 import Test from "../models/test.model.js";
-import { getUserPreferences } from "../../user/client.js";
+import { getUserPreferences } from "../clients/user.js";
 import {
     APTITUDE_PRESETS,
     MAX_APTITUDE_DURATION,
@@ -14,7 +14,7 @@ import {
 } from "../config/aptitude.js";
 import { generateAptitudeTest } from "../services/aiAptitudeTest.service.js";
 import { describeAiError } from "../utils/aiError.utils.js";
-import { consumeCredit, refundCredit } from "../../billing/client.js";
+import { consumeCredit, refundCredit } from "../clients/billing.js";
 import { invalidateTestListCache } from "../utils/testCache.utils.js";
 import { getGeneratedTestTitle } from "../utils/testTitle.utils.js";
 

@@ -1,5 +1,5 @@
 import Attempt from "../models/attempt.model.js";
-import { getPublicUsers } from "../../user/client.js";
+import { getPublicUsers } from "../clients/user.js";
 
 // Ranks every user by the average accuracy of their first attempt at each test.
 // Users who haven't attempted anything are listed last with zeros.

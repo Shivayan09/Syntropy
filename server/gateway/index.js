@@ -4,7 +4,6 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import { errorHandler } from "../common/errorHandler.js";
 import { applyRouteRateLimits } from "./rateLimits.js";
 import { authenticate } from "./auth.js";
 
@@ -92,7 +91,11 @@ app.use(forward("USER_URL", ["/api/auth", "/api/user"]));
 app.use(forward("GENERATION_URL", ["/api/test", "/api/aptitude"]));
 app.use(forward("SYLLABUS_URL", ["/api/syllabus"]));
 
-app.use(errorHandler);
+// Errors passed to next(err), e.g. a request from an origin CORS does not allow.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err, req, res, next) => {
+  res.status(400).json({ success: false, message: err.message || "Request could not be processed." });
+});
 
 app.listen(process.env.PORT, () => {
   console.log(`Gateway running on port ${process.env.PORT}`);

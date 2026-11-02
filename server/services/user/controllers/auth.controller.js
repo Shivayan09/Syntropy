@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { createEmailTransporter } from "../mailer.js";
 import { OAuth2Client } from "google-auth-library";
-import { getPlan } from "../../billing/client.js";
+import { getPlan } from "../clients/billing.js";
 import { clearAuthCookie, createAuthToken, isMobileAuthRequest, setAuthCookie } from "../utils/authToken.utils.js";
 
 const OTP_EXPIRY_MINUTES = 10;

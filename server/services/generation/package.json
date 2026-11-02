@@ -1,0 +1,17 @@
+{
+  "name": "syntropy-generation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch --env-file=.env index.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.38.1",
+    "express": "^5.2.1",
+    "groq-sdk": "^1.1.2",
+    "jsonrepair": "^3.14.0",
+    "mongoose": "^9.4.1"
+  }
+}

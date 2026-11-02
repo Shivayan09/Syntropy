@@ -1,4 +1,4 @@
-import redis from "../../../common/redis.js";
+import redis from "../redis.js";
 
 export const invalidateTestListCache = async (userId) => {
   try {

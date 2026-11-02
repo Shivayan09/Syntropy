@@ -4,8 +4,8 @@ import { getLeaderboard } from "./controllers/leaderboard.controller.js";
 import { getAptitudeStats } from "./controllers/aptitudeStats.controller.js";
 import mongoose from "mongoose";
 import Attempt from "./models/attempt.model.js";
-import { requireUser } from "../../common/requireUser.js";
-import { requireInternal } from "../../common/internal.js";
+import { requireUser } from "./requireUser.js";
+import { requireInternal } from "./requireInternal.js";
 
 const assessmentRoutes = express.Router();
 

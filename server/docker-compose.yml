@@ -1,4 +1,8 @@
-# Runs the gateway and the 5 services as separate containers, plus Caddy for HTTPS.
+# Runs the gateway and the 5 services as separate containers on one machine, plus Caddy for HTTPS.
+#
+# Each container is built from its own folder (its own package.json and Dockerfile)
+# and contains no code from any other service. Any of them could run on a different
+# machine instead: all a service needs is the URLs of the services it calls.
 #
 # Each container reads its own env file. The *_URL values below replace the
 # localhost ones from those files, because inside Docker the containers reach
@@ -8,15 +12,10 @@
 # Start:   DOMAIN=api.example.com docker compose up -d --build
 # Logs:    docker compose logs -f billing
 
-x-service: &service
-  build: .
-  image: syntropy-backend
-  restart: unless-stopped
-
 services:
   gateway:
-    <<: *service
-    command: node gateway/index.js
+    build: ./gateway
+    restart: unless-stopped
     env_file: gateway/.env
     environment:
       USER_URL: http://user:5001
@@ -29,8 +28,8 @@ services:
       - "127.0.0.1:5000:5000"
 
   user:
-    <<: *service
-    command: node services/user/index.js
+    build: ./services/user
+    restart: unless-stopped
     env_file: services/user/.env
     environment:
       BILLING_URL: http://billing:5002
@@ -38,13 +37,13 @@ services:
       ASSESSMENT_URL: http://assessment:5004
 
   billing:
-    <<: *service
-    command: node services/billing/index.js
+    build: ./services/billing
+    restart: unless-stopped
     env_file: services/billing/.env
 
   generation:
-    <<: *service
-    command: node services/generation/index.js
+    build: ./services/generation
+    restart: unless-stopped
     env_file: services/generation/.env
     environment:
       BILLING_URL: http://billing:5002
@@ -52,16 +51,16 @@ services:
       USER_URL: http://user:5001
 
   assessment:
-    <<: *service
-    command: node services/assessment/index.js
+    build: ./services/assessment
+    restart: unless-stopped
     env_file: services/assessment/.env
     environment:
       GENERATION_URL: http://generation:5003
       USER_URL: http://user:5001
 
   syllabus:
-    <<: *service
-    command: node services/syllabus/index.js
+    build: ./services/syllabus
+    restart: unless-stopped
     env_file: services/syllabus/.env
 
   caddy:

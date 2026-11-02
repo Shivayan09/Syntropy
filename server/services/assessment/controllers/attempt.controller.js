@@ -1,6 +1,6 @@
-import redis from "../../../common/redis.js";
+import redis from "../redis.js";
 import Attempt from "../models/attempt.model.js";
-import { getUserTest } from "../../generation/client.js";
+import { getUserTest } from "../clients/generation.js";
 import { evaluateSubjective } from "../services/evaluateSubjective.service.js";
 
 // The parts of a test an attempt keeps a copy of.
