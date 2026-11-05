@@ -2,6 +2,7 @@ import redis from "../redis.js";
 import Test from "../models/test.model.js";
 import { generateTest } from "../services/aiMcqTest.service.js";
 import { generateSubjectiveTest } from "../services/aiSubjectiveTest.service.js";
+import { findInvalidSubjects } from "../services/subjectCheck.service.js";
 import { describeAiError } from "../utils/aiError.utils.js";
 import { consumeCredit, refundCredit } from "../clients/billing.js";
 import { sanitizeSubjects } from "../utils/subjectValidation.utils.js";
@@ -158,13 +159,17 @@ export const aiTest = async (req, res) => {
     let creditSource = null;
     try {
         const { subjects: rawSubjects } = req.body;
-        const { subjects, invalidSubjects } = sanitizeSubjects(rawSubjects);
+        const { subjects, invalidSubjects: malformedSubjects } = sanitizeSubjects(rawSubjects);
         if (!subjects.length) {
             return res.status(400).json({
                 success: false,
                 message: "Enter at least 1 valid subject"
             });
         }
+        // Basic checks first, so the AI is only asked about names that look fine.
+        const invalidSubjects = malformedSubjects.length
+            ? malformedSubjects
+            : await findInvalidSubjects(subjects, userId);
         if (invalidSubjects.length) {
             return res.status(400).json({
                 success: false,
