@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { SyllabusListSkeleton, SyllabusPageSkeleton } from "@/components/skeletons/SyllabusSkeletons";
 
 type SyllabusTopic = {
@@ -89,12 +90,11 @@ export default function SyllabusPage() {
         }
       );
 
-      const text = await res.text();
+      const data = await res.json();
 
-      try {
-        JSON.parse(text);
-      } catch {
-        console.error("Upload failed:", text);
+      if (!res.ok) {
+        toast.warn(data.message || "Upload failed");
+        return;
       }
 
       setFile(null);
@@ -102,6 +102,7 @@ export default function SyllabusPage() {
 
     } catch (err) {
       console.error(err);
+      toast.error("Upload failed");
     } finally {
       setLoading(false);
     }

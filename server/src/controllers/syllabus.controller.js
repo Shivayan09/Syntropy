@@ -14,11 +14,19 @@ export const uploadSyllabus = async (req, res) => {
             });
         }
         const rawText = await extractTextFromFile(file.path, file.mimetype);
-        let subjects = [];
-        try {
-            subjects = await parseSyllabus(rawText);
-        } catch {
-            console.error("Syllabus parser failed");
+        if (!rawText.trim()) {
+            return res.status(422).json({
+                success: false,
+                message: "No readable text found in this file. Scanned PDFs aren't supported yet, so try a PDF with selectable text or a clear image."
+            });
+        }
+        // Stop here on failure, so a bad upload never replaces the user's existing syllabus.
+        const subjects = await parseSyllabus(rawText);
+        if (!subjects.length) {
+            return res.status(422).json({
+                success: false,
+                message: "We couldn't process this syllabus. Your existing syllabus was not changed. Please try again."
+            });
         }
         const existingSyllabus = await Syllabus.findOne({ user: userId }).sort({ createdAt: -1 });
         if (existingSyllabus) {
@@ -29,9 +37,9 @@ export const uploadSyllabus = async (req, res) => {
         syllabus.fileType = file.mimetype === "application/pdf" ? "pdf" : "image";
         syllabus.fileUrl = undefined;
         syllabus.rawText = rawText;
-        syllabus.subjects = subjects && subjects.length > 0 ? subjects : [];
+        syllabus.subjects = subjects;
         syllabus.source = "upload";
-        syllabus.parsed = syllabus.subjects.length > 0;
+        syllabus.parsed = true;
         await syllabus.save();
         return res.status(200).json({
             success: true,

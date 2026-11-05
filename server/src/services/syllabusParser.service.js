@@ -33,7 +33,8 @@ async function generateWithFallback(prompt) {
     throw new Error(lastError?.message || "All models failed");
 }
 
-export async function parseSyllabus(rawText) {
+// Returns the parsed subjects, or [] if the syllabus could not be parsed.
+export async function parseSyllabus(rawText, isRetry = false) {
     try {
         const cleanedText = rawText.replace(/\n{2,}/g, "\n").replace(/\s+/g, " ").replace(/Page \d+ of \d+/gi, "").slice(0, 15000);
         const prompt = `
@@ -71,7 +72,12 @@ ${cleanedText}
         let aiText = await generateWithFallback(prompt);
         aiText = aiText.replace(/```json/gi, "").replace(/```/g, "").replace(/[\u2010-\u2015]/g, "-").replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\u00A0/g, " ").trim();
         if (!aiText.endsWith("}")) {
-            return await parseSyllabus(rawText.slice(0, 10000));
+            // The response was cut off. Retry once with less text, then give up.
+            if (isRetry) {
+                console.error("❌ AI response cut off again after retry");
+                return [];
+            }
+            return await parseSyllabus(rawText.slice(0, 10000), true);
         }
         const start = aiText.indexOf("{");
         const end = aiText.lastIndexOf("}");
@@ -95,23 +101,9 @@ ${cleanedText}
                     title: unit.title || "Untitled Unit",
                 })),
             }));
-        if (!parsed.subjects.length) {
-            console.warn("⚠️ Empty AI output, using fallback");
-            return [
-                {
-                    name: "General",
-                    units: [{ title: "Topics" }],
-                },
-            ];
-        }
         return parsed.subjects;
     } catch (err) {
         console.error("ERROR:", err.message);
-        return [
-            {
-                name: "General",
-                units: [{ title: "Topics" }],
-            },
-        ];
+        return [];
     }
 }

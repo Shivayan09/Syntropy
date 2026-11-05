@@ -226,7 +226,8 @@ export default function Onboarding() {
                     }
                 );
                 if (!res.ok) {
-                    toast.error("Upload failed");
+                    const data = await res.json();
+                    toast.error(data.message || "Upload failed");
                     return;
                 }
                 toast.success("Syllabus uploaded");
